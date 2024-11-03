@@ -3,7 +3,7 @@ using RagDemoAPI.Models;
 
 namespace RagDemoAPI.Ingestion.Chunking;
 
-public class DoNothingChunkingHandler(IConfiguration configuration) : IChunkingHandler
+public class DoNothingChunkingHandler(IConfiguration configuration) : ChunkingBase, IChunkingHandler
 {
     private readonly IngestionOptions _ingestionOptions = configuration.GetSection(IngestionOptions.Ingestion).Get<IngestionOptions>() ?? throw new ArgumentNullException(nameof(IngestionOptions));
 
@@ -11,7 +11,7 @@ public class DoNothingChunkingHandler(IConfiguration configuration) : IChunkingH
 
     public bool IsSuitable(IngestDataRequest request, string content)
     {
-        return content.Length >= _ingestionOptions.MaxChunkSize;
+        return content.Length >= _ingestionOptions.MaxChunkWords;
     }
 
     public Task<IEnumerable<string>> DoChunking(IngestDataRequest request, string content)

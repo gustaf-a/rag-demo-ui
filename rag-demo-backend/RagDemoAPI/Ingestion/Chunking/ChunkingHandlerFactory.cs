@@ -6,9 +6,9 @@ namespace RagDemoAPI.Ingestion.Chunking
     {
         public IChunkingHandler CreateChunkingHandler(IngestDataRequest request, string filePath, string fileContent)
         {
-            var usableChunkingHandlers = _chunkingHandlers.Select(ch => ch.IsSuitable(request, fileContent));
+            var usableChunkingHandlers = _chunkingHandlers.Where(ch => ch.IsSuitable(request, fileContent));
 
-            return _chunkingHandlers.First();
+            return _chunkingHandlers.Last();
         }
 
         public IEnumerable<string> GetChunkingHandlerNames()

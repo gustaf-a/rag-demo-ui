@@ -3,7 +3,7 @@ using RagDemoAPI.Models;
 
 namespace RagDemoAPI.Ingestion.Chunking;
 
-public class SlidingWindowChunkingHandler(IConfiguration configuration) : IChunkingHandler
+public class SlidingWindowChunkingHandler(IConfiguration configuration) : ChunkingBase, IChunkingHandler
 {
     private readonly IngestionOptions _ingestionOptions = configuration.GetSection(IngestionOptions.Ingestion).Get<IngestionOptions>() ?? throw new ArgumentNullException(nameof(IngestionOptions));
 
@@ -16,15 +16,8 @@ public class SlidingWindowChunkingHandler(IConfiguration configuration) : IChunk
 
     public async Task<IEnumerable<string>> DoChunking(IngestDataRequest request, string content)
     {
-        int chunkSize = _ingestionOptions.SlidingWindowChunkSize;
-        int overlapSize = _ingestionOptions.SlidingWindowOverlapSize;
-        var chunks = new List<string>();
+        var contentChunks = GetChunks(content, _ingestionOptions.SlidingWindowWordsPerChunk, _ingestionOptions.SlidingWindowOverlapWords);
 
-        for (int i = 0; i < content.Length; i += (chunkSize - overlapSize))
-        {
-            chunks.Add(content.Substring(i, Math.Min(chunkSize, content.Length - i)));
-        }
-
-        return await Task.FromResult(chunks);
+        return await Task.FromResult(contentChunks);
     }
 }

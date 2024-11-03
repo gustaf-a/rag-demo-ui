@@ -2,7 +2,7 @@
 using RagDemoAPI.Models;
 
 namespace RagDemoAPI.Ingestion.Chunking;
-public class FixedSizeChunkingHandler(IConfiguration configuration) : IChunkingHandler
+public class FixedSizeChunkingHandler(IConfiguration configuration) : ChunkingBase, IChunkingHandler
 {
     private readonly IngestionOptions _ingestionOptions = configuration.GetSection(IngestionOptions.Ingestion).Get<IngestionOptions>() ?? throw new ArgumentNullException(nameof(IngestionOptions));
 
@@ -15,14 +15,8 @@ public class FixedSizeChunkingHandler(IConfiguration configuration) : IChunkingH
 
     public async Task<IEnumerable<string>> DoChunking(IngestDataRequest request, string content)
     {
-        int chunkSize = _ingestionOptions.FixedSizeChunkingChunkSize;
-        var chunks = new List<string>();
+        var contentChunks = GetChunks(content, _ingestionOptions.FixedSizeChunkingWordsPerChunk, 0);
 
-        for (int i = 0; i < content.Length; i += chunkSize)
-        {
-            chunks.Add(content.Substring(i, Math.Min(chunkSize, content.Length - i)));
-        }
-
-        return await Task.FromResult(chunks);
+        return await Task.FromResult(contentChunks);
     }
 }

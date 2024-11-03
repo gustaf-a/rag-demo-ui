@@ -3,7 +3,7 @@ using RagDemoAPI.Generation.LlmServices;
 using RagDemoAPI.Models;
 
 namespace RagDemoAPI.Ingestion.Chunking;
-public class ContextualChunkingHandler(IConfiguration configuration, ILlmServiceFactory _llmServiceFactory) : IChunkingHandler
+public class ContextualChunkingHandler(IConfiguration configuration, ILlmServiceFactory _llmServiceFactory) : ChunkingBase, IChunkingHandler
 {
     private readonly IngestionOptions _ingestionOptions = configuration.GetSection(IngestionOptions.Ingestion).Get<IngestionOptions>() ?? throw new ArgumentNullException(nameof(IngestionOptions));
 
@@ -11,7 +11,7 @@ public class ContextualChunkingHandler(IConfiguration configuration, ILlmService
 
     public bool IsSuitable(IngestDataRequest request, string content)
     {
-        if (_ingestionOptions.ContextualRetrievalChunkSize <= content.Length)
+        if (_ingestionOptions.ContextualRetrievalWordsPerChunk <= content.Length)
             return false;
 
         return true;
@@ -19,7 +19,7 @@ public class ContextualChunkingHandler(IConfiguration configuration, ILlmService
 
     public async Task<IEnumerable<string>> DoChunking(IngestDataRequest request, string content)
     {
-        var contentChunks = GetSimpleChunks(request, content);
+        var contentChunks = GetChunks(content, _ingestionOptions.ContextualRetrievalWordsPerChunk, 0);
 
         var chunksWithContext = new List<string>();
 
@@ -27,12 +27,20 @@ public class ContextualChunkingHandler(IConfiguration configuration, ILlmService
 
         foreach (var contentChunk in contentChunks)
         {
-            var contextEnrichedChunk = await GetContextEnrichedChunk(llmService, request, content, contentChunk);
-
-            if (string.IsNullOrWhiteSpace(contextEnrichedChunk))
+            var chunkContext = await GetChunkContext(llmService, request, content, contentChunk);
+            if (string.IsNullOrWhiteSpace(chunkContext))
             {
-                continue;
+                throw new Exception($"Failed to generate context for chunk: {contentChunk} using LlmService {llmService.GetType()}.");
             }
+
+            var contextEnrichedChunk =
+$"""
+Context:
+{chunkContext}
+
+Information:
+{contentChunk}
+""";
 
             chunksWithContext.Add(contextEnrichedChunk);
         }
@@ -40,7 +48,7 @@ public class ContextualChunkingHandler(IConfiguration configuration, ILlmService
         return chunksWithContext;
     }
 
-    private async Task<string> GetContextEnrichedChunk(ILlmService llmService, IngestDataRequest request, string content, string contentChunk)
+    private async Task<string> GetChunkContext(ILlmService llmService, IngestDataRequest request, string content, string contentChunk)
     {
         var contextEnrichedChunkPrompt =
 $"""
@@ -60,20 +68,4 @@ Please create a short context which helps situate the chunk in the document. Ans
 
         return completionResponse;
     }
-
-    private IEnumerable<string> GetSimpleChunks(IngestDataRequest request, string content)
-    {
-        var words = content.Split(' ');
-        var chunks = new List<string>();
-
-        for (int i = 0; i < words.Length; i += _ingestionOptions.ContextualRetrievalChunkSize)
-        {
-            var chunkWords = words.Skip(i).Take(_ingestionOptions.ContextualRetrievalChunkSize).ToArray();
-            chunks.Add(string.Join(' ', chunkWords));
-        }
-
-        return chunks;
-    }
-
-
 }
