@@ -26,7 +26,7 @@
       "launchUrl": "swagger",
       "applicationUrl": "https://localhost:7291;http://localhost:5043",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_ENVIRONMENT": "Development"
         //"AZURE_OPENAI_ENDPOINT": "https://gustaf-a-ai-rag-openai.openai.azure.com/",
         //"AZURE_OPENAI_API_KEY": "58e2cc573cc348879c3f5c5cb43d0492",
         //"AZURE_OPENAI_DEPLOYMENT_NAME": "gpt-35-turbo"

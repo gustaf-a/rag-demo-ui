@@ -1,6 +1,12 @@
-
 using Microsoft.SemanticKernel;
 using RagDemoAPI.Configuration;
+using RagDemoAPI.Generation;
+using RagDemoAPI.Generation.LlmServices;
+using RagDemoAPI.Ingestion;
+using RagDemoAPI.Ingestion.Chunking;
+using RagDemoAPI.Retrieval;
+using RagDemoAPI.Retrieval.Search;
+using RagDemoAPI.Services;
 
 namespace RagDemoAPI
 {
@@ -10,7 +16,7 @@ namespace RagDemoAPI
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            builder.Services.AddLogging(c => c.AddConsole().SetMinimumLevel(LogLevel.Information));
 
             builder.Services.AddControllers();
 
@@ -25,15 +31,18 @@ namespace RagDemoAPI
                     });
             });
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddHttpClient();
+
             SetupAzure(builder);
+            SetupSemanticKernel(builder);
+
+            SetupServices(builder);
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -55,19 +64,48 @@ namespace RagDemoAPI
         {
             var azureSettings = builder.Configuration.GetSection(AzureOptions.Azure).Get<AzureOptions>();
 
-            var kernelBuilder = Kernel.CreateBuilder();
-            builder.Services.AddLogging(c => c.AddConsole().SetMinimumLevel(LogLevel.Information));
-
-            builder.Services.AddHttpClient();
-
             builder.Services.AddAzureOpenAIChatCompletion(
-                    deploymentName: azureSettings.DeploymentName,
-                    endpoint: azureSettings.Endpoint,
-                    apiKey: azureSettings.ApiKey);
+                    deploymentName: azureSettings.ChatService.Name,
+                    endpoint: azureSettings.ChatService.Endpoint,
+                    apiKey: azureSettings.ChatService.ApiKey);
+        }
 
-            builder.Services.AddTransient((serviceProvider) => {
+        private static void SetupSemanticKernel(WebApplicationBuilder builder)
+        {
+            var azureSettings = builder.Configuration.GetSection(AzureOptions.Azure).Get<AzureOptions>();
+
+#pragma warning disable SKEXP0010 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            builder.Services.AddAzureOpenAITextEmbeddingGeneration(
+                azureSettings.EmbeddingService.Name,
+                azureSettings.EmbeddingService.Endpoint,
+                azureSettings.EmbeddingService.ApiKey
+                );
+
+            builder.Services.AddTransient((serviceProvider) =>
+            {
                 return new Kernel(serviceProvider);
             });
+        }
+
+        private static void SetupServices(WebApplicationBuilder builder)
+        {
+            builder.Services.AddScoped<IIngestionHandler, IngestionHandler>();
+            builder.Services.AddScoped<IChunkingHandlerFactory, ChunkingHandlerFactory>();
+            builder.Services.AddScoped<IChunkingHandler, DoNothingChunkingHandler>();
+            builder.Services.AddScoped<IChunkingHandler, FixedSizeChunkingHandler>();
+            builder.Services.AddScoped<IChunkingHandler, SlidingWindowChunkingHandler>();
+
+            builder.Services.AddScoped<IGenerationHandler, GenerationHandler>();
+            builder.Services.AddScoped<ILlmServiceFactory, LlmServiceFactory>();
+            builder.Services.AddScoped<ILlmService, LlmServiceAzure>();
+
+            builder.Services.AddScoped<IRetrievalHandler, RetrievalHandler>();
+            builder.Services.AddScoped<ISearchServiceFactory, SearchServiceFactory>();
+            builder.Services.AddScoped<ISearchService, SearchServiceAzure>();
+            builder.Services.AddScoped<ISearchService, SearchServicePostgreSql>();
+            
+            builder.Services.AddScoped<IEmbeddingService, EmbeddingService>();
+            builder.Services.AddSingleton<IPostgreSqlService, PostgreSqlService>();
         }
     }
 }
