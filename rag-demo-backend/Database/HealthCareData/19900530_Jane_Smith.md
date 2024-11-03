@@ -1,0 +1,53 @@
+## Patient 2: Jane Smith
+- **Patient ID:** 002
+- **Date of Birth:** 1990-05-30
+- **Gender:** Female
+- **Blood Type:** A+
+- **Allergies:** Latex
+- **Current Medications:** 
+  - Levothyroxine 75mcg (once daily)
+  - Ibuprofen 200mg (as needed)
+- **Chronic Conditions:** 
+  - Hypothyroidism
+  - Migraine
+- **Recent Visits:**
+  - **Date:** 2024-05-15
+    - **Visit Type:** Annual Physical
+    - **Vitals:**
+      - Blood Pressure: 115/75 mmHg
+      - Heart Rate: 70 bpm
+      - Weight: 135 lbs
+    - **Doctor's Notes:** Patient is in good overall health. Recommended annual physical exams and routine blood work. No new concerns.
+  - **Date:** 2024-07-10
+    - **Visit Type:** Migraine Treatment
+    - **Vitals:**
+      - Blood Pressure: 110/70 mmHg
+      - Heart Rate: 65 bpm
+    - **Doctor's Notes:** Migraines reported 2-3 times a month. Recommended lifestyle changes and prescribed a stronger dose of ibuprofen for acute episodes. Advised against overuse to prevent rebound headaches.
+  - **Date:** 2024-08-20
+    - **Visit Type:** Follow-up on Migraine Treatment
+    - **Vitals:**
+      - Blood Pressure: 112/72 mmHg
+      - Heart Rate: 68 bpm
+    - **Doctor's Notes:** Migraine frequency reduced to once a month since last visit. Continue current ibuprofen regimen and lifestyle modifications. Consider preventive therapy if migraines persist.
+  - **Date:** 2024-09-01
+    - **Visit Type:** Thyroid Function Test
+    - **Labs:**
+      - TSH: 4.5 mIU/L (Borderline High)
+      - Free T4: 0.9 ng/dL (Normal)
+    - **Doctor's Notes:** Adjusted levothyroxine dosage to 75mcg from 50mcg due to borderline high TSH levels. Follow-up in 6 weeks for reassessment.
+  - **Date:** 2024-10-15
+    - **Visit Type:** Thyroid Follow-up
+    - **Vitals:**
+      - Blood Pressure: 118/78 mmHg
+      - Heart Rate: 72 bpm
+    - **Labs:**
+      - TSH: 3.8 mIU/L (Improved)
+      - Free T4: 1.0 ng/dL (Normal)
+    - **Doctor's Notes:** Levothyroxine dosage remains at 75mcg. TSH levels have improved but still require monitoring. Next follow-up scheduled in 3 months.
+  - **Date:** 2024-11-01
+    - **Visit Type:** Annual Vaccination Update
+    - **Immunizations:**
+      - Influenza Vaccine: Administered
+      - Tdap Booster: Received
+    - **Doctor's Notes:** Updated patient’s vaccinations as per guidelines. No adverse reactions reported. Advised to maintain vaccination schedule and monitor for any side effects.
