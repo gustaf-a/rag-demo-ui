@@ -9,15 +9,12 @@ public class RetrievalHandler(ISearchServiceFactory _searchServiceFactory) : IRe
     //Här ska vi bestämma vilken searchservice som tillkallas.
     public async Task<IEnumerable<RetrievedDocument>> RetrieveContextForQuery(ChatRequest chatRequest)
     {
-        if (chatRequest is null || chatRequest.ChatRequestOptions is null)
-            throw new ArgumentNullException(nameof(ChatRequest.ChatRequestOptions));
+        if (chatRequest is null || chatRequest.SearchOptions is null)
+            throw new ArgumentNullException(nameof(ChatRequest.SearchOptions));
 
-        var chatRequestOptions = chatRequest.ChatRequestOptions;
+        var searchOptions = chatRequest.SearchOptions;
 
-        if (!chatRequestOptions.UseVectorSearch && !chatRequestOptions.UseTextSearch)
-            throw new ArgumentException($"Both {nameof(ChatRequestOptions.UseTextSearch)} and {nameof(ChatRequestOptions.UseVectorSearch)} can't be false.");
-
-        var searchService = _searchServiceFactory.Create(chatRequestOptions);
+        var searchService = _searchServiceFactory.Create(searchOptions);
 
         var retrievedSources = await searchService.RetrieveDocuments(chatRequest);
 

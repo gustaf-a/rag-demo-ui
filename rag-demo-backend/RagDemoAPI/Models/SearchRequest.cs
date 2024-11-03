@@ -2,7 +2,6 @@
 {
     public class SearchRequest
     {
-        public string SearchQuery { get; set; }
-        public RetrievalOptions VectorSearchRetrievalOptions { get; set; } = new();
+        public SearchOptions SearchOptions { get; set; } = new();
     }
 }

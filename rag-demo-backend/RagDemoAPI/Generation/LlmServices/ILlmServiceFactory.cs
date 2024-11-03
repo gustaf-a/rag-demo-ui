@@ -4,7 +4,8 @@ namespace RagDemoAPI.Generation.LlmServices;
 
 public interface ILlmServiceFactory
 {
-    ILlmService Create(ChatRequestOptions chatRequestOptions);
+    ILlmService Create(ChatOptions chatRequestOptions);
+    ILlmService Create(SearchOptions searchOptions);
     ILlmService Create(IngestDataRequest request);
     ILlmService Create();
 }

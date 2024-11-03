@@ -1,52 +1,85 @@
 ﻿using Azure.Search.Documents;
 using Azure.Search.Documents.Models;
-using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.ChatCompletion;
 using RagDemoAPI.Configuration;
 using RagDemoAPI.Extensions;
+using RagDemoAPI.Generation.LlmServices;
 using RagDemoAPI.Models;
 using RagDemoAPI.Services;
+using SearchOptions = RagDemoAPI.Models.SearchOptions;
 
 namespace RagDemoAPI.Retrieval.Search;
 
-public class SearchServiceAzure(IConfiguration configuration, Kernel _kernel, IEmbeddingService _embeddingService) : ISearchService
+public class SearchServiceAzure(IConfiguration configuration, ILlmServiceFactory _llmServiceFactory, IEmbeddingService _embeddingService) : ISearchService
 {
     private readonly AzureOptions _azureOptions = configuration.GetSection(AzureOptions.Azure).Get<AzureOptions>() ?? throw new ArgumentNullException(nameof(AzureOptions));
-
+    
     public async Task<IEnumerable<RetrievedDocument>> RetrieveDocuments(ChatRequest chatRequest)
     {
         var chatMessages = chatRequest.ChatMessages;
-        var options = chatRequest.ChatRequestOptions;
+        var searchOptions = chatRequest.SearchOptions;
 
-        var queryEmbeddings = options.UseVectorSearch
-                                ? await _embeddingService.GetEmbeddingsAsync(chatMessages.Last().Content)
-                                : [];
+        var searchContent = GetQueryContentForSearch(chatMessages, searchOptions);
 
-        var textSearchQuery = options.UseTextSearch
-                            ? await GenerateSearchQueryForTextSearch(chatMessages, options)
-        : string.Empty;
+        return await RetrieveDocumentsInternal(searchOptions, searchContent);
+    }
 
-        var retrievedSources = await RetrieveDocumentsInternal(chatRequest.ChatRequestOptions, queryEmbeddings, textSearchQuery);
+    private string GetQueryContentForSearch(IEnumerable<ChatMessage> chatMessages, SearchOptions searchOptions)
+    {
+        if (chatMessages.IsNullOrEmpty())
+            return string.Empty;
+
+        if (searchOptions.SemanticSearchGenerateSummaryOfMessageHistory)
+        {
+            //TODO generate a summary of all messages.
+            throw new NotImplementedException();
+        }
+        else
+        {
+            return chatMessages.Last().Content;
+        }
+    }
+
+    public async Task<IEnumerable<RetrievedDocument>> RetrieveDocuments(SearchRequest searchRequest)
+    {
+        return await RetrieveDocumentsInternal(searchRequest.SearchOptions, searchRequest.SearchOptions.SearchContent);
+    }
+
+    private async Task<IEnumerable<RetrievedDocument>> RetrieveDocumentsInternal(SearchOptions searchOptions, string searchContent)
+    {
+        var queryEmbeddings = await GenerateQueryEmbeddingsInternal(searchContent);
+
+        var textSearchQuery = await GenerateSearchQueryForTextSearch(searchContent, searchOptions);
+
+        var retrievedSources = await RetrieveDocumentsInternal(searchOptions, queryEmbeddings, textSearchQuery);
 
         return retrievedSources;
     }
 
-    private async Task<string> GenerateSearchQueryForTextSearch(IEnumerable<ChatMessage> chatMessages, ChatRequestOptions options)
+    private async Task<float[]> GenerateQueryEmbeddingsInternal(string semanticSearchContent)
     {
-        var searchQueryGenerationChatHistory = CreateSearchQueryGenerationPrompt(chatMessages);
+        return !string.IsNullOrWhiteSpace(semanticSearchContent)
+                                        ? await _embeddingService.GetEmbeddingsAsync(semanticSearchContent)
+                                        : [];
+    }
+    
+    private async Task<string> GenerateSearchQueryForTextSearch(string queryContent, SearchOptions searchOptions)
+    {
+        if(string.IsNullOrWhiteSpace(searchOptions.TextSearchContent)
+            && string.IsNullOrWhiteSpace(searchOptions.TextSearchMetaData))
+            return string.Empty;
 
-        var chatService = _kernel.GetRequiredService<IChatCompletionService>();
+        var llmService = _llmServiceFactory.Create(searchOptions);
 
-        var searchQueryGenerationResult = await chatService.GetChatMessageContentAsync(searchQueryGenerationChatHistory);
+        var searchQueryGenerationResult = await llmService.GetCompletionSimple(GetCreateSearchQueryGenerationPrompt(queryContent));
 
-        return searchQueryGenerationResult?.Content
+        return searchQueryGenerationResult
             ?? throw new Exception("Failed to generate search query.");
     }
 
-    private static ChatHistory CreateSearchQueryGenerationPrompt(IEnumerable<ChatMessage> chatMessages)
+    private static string GetCreateSearchQueryGenerationPrompt(string queryContent)
     {
-        var createSearchQueryChatHistory = new ChatHistory(
-"""
+        var createSearchQueryPrompt =
+$"""
 Your task is to generate search queries used to retrieve data used to answer the users question.
 Make the response short, simple and precise.
 Do NOT return any text except for the search query.
@@ -54,34 +87,28 @@ Do NOT return any text except for the search query.
 Example:
 employee roles AND employee benefits
 employee onboarding AND recipes AND safety instructions
-""");
 
-        createSearchQueryChatHistory.AddUserMessage(
-$"""
-Generate a search query for this query:
-{chatMessages.Last().Content}
-""");
-
-        return createSearchQueryChatHistory;
+Generate a search query for this content:
+{queryContent}
+""";
+        return createSearchQueryPrompt;
     }
 
-    private async Task<IEnumerable<RetrievedDocument>> RetrieveDocumentsInternal(ChatRequestOptions chatRequestOptions, float[]? queryEmbeddings = null, string? textSearchQuery = null)
+    private async Task<IEnumerable<RetrievedDocument>> RetrieveDocumentsInternal(SearchOptions searchOptions, float[]? queryEmbeddings = null, string? textSearchQuery = null)
     {
-        var searchOptions = new SearchOptions
+        var azureSearchOptions = new Azure.Search.Documents.SearchOptions
         {
-            Filter = CreateSearchOptionsFilter(chatRequestOptions.TextSearchRetrievalOptions),
+            Filter = CreateSearchOptionsFilter(searchOptions),
             Size = 3
         };
 
-        var vectorSearchOptions = chatRequestOptions.VectorSearchRetrievalOptions;
-
-        if (vectorSearchOptions.UseSemanticRanker)
+        if (searchOptions.UseSemanticRanker)
         {
-            searchOptions.QueryType = SearchQueryType.Semantic;
-            searchOptions.SemanticSearch = new()
+            azureSearchOptions.QueryType = SearchQueryType.Semantic;
+            azureSearchOptions.SemanticSearch = new()
             {
                 SemanticConfigurationName = "default",
-                QueryCaption = new(vectorSearchOptions.UseSemanticCaptions
+                QueryCaption = new(searchOptions.UseSemanticCaptions
                     ? QueryCaptionType.Extractive
                     : QueryCaptionType.None)
             };
@@ -89,24 +116,23 @@ Generate a search query for this query:
 
         if (queryEmbeddings is not null)
         {
-
             var vectorizedQueryEmbeddings = new VectorizedQuery(queryEmbeddings)
             {
-                KNearestNeighborsCount = vectorSearchOptions.UseSemanticRanker
-                    ? vectorSearchOptions.SemanticRankerCandidatesToRetrieve
-                    : vectorSearchOptions.ItemsToRetrieve
+                KNearestNeighborsCount = searchOptions.UseSemanticRanker
+                    ? searchOptions.SemanticRankerCandidatesToRetrieve
+                    : searchOptions.ItemsToRetrieve
             };
 
             vectorizedQueryEmbeddings.Fields.Add("embedding");
 
-            searchOptions.VectorSearch = new();
-            searchOptions.VectorSearch.Queries.Add(vectorizedQueryEmbeddings);
+            azureSearchOptions.VectorSearch = new();
+            azureSearchOptions.VectorSearch.Queries.Add(vectorizedQueryEmbeddings);
         }
 
         var searchClient = new SearchClient(new Uri(_azureOptions.SearchService.Endpoint), _azureOptions.SearchService.Name, new Azure.AzureKeyCredential(_azureOptions.SearchService.ApiKey));
 
         var searchResultResponse = await searchClient.SearchAsync<SearchDocument>(
-            textSearchQuery, searchOptions);
+            textSearchQuery, azureSearchOptions);
 
         if (searchResultResponse.Value is null)
         {
@@ -117,7 +143,7 @@ Generate a search query for this query:
 
         foreach (var searchDocument in searchResultResponse.Value.GetResults())
         {
-            RetrievedDocument retrievedDocument = GetRetrievedDocument(searchDocument, chatRequestOptions.VectorSearchRetrievalOptions.UseSemanticCaptions);
+            RetrievedDocument retrievedDocument = GetRetrievedDocument(searchDocument, searchOptions.UseSemanticCaptions);
 
             if (retrievedDocument != null)
                 retrievedDocuments.Add(retrievedDocument);
@@ -161,10 +187,10 @@ Generate a search query for this query:
         return new RetrievedDocument(sourcePage, content);
     }
 
-    private static string CreateSearchOptionsFilter(RetrievalOptions textSearchRetrievalOptions)
+    private static string CreateSearchOptionsFilter(SearchOptions searchOptions)
     {
-        var categoriesToExclude = textSearchRetrievalOptions.CategoryExclude.ToList();
-        var categoriesToInclude = textSearchRetrievalOptions.CategoryInclude.ToList();
+        var categoriesToExclude = searchOptions.CategoriesExclude.ToList();
+        var categoriesToInclude = searchOptions.CategoriesInclude.ToList();
 
         if (categoriesToExclude.IsNullOrEmpty() && categoriesToInclude.IsNullOrEmpty())
             return string.Empty;

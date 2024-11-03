@@ -11,4 +11,9 @@ public class SearchServicePostgreSql(IConfiguration configuration) : ISearchServ
     {
         throw new NotImplementedException();
     }
+
+    public Task<IEnumerable<RetrievedDocument>> RetrieveDocuments(SearchRequest searchRequest)
+    {
+        throw new NotImplementedException();
+    }
 }

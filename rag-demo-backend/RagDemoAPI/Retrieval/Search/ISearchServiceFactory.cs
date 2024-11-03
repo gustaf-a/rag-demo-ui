@@ -5,6 +5,6 @@ namespace RagDemoAPI.Generation.LlmServices;
 
 public interface ISearchServiceFactory
 {
-    ISearchService Create(ChatRequestOptions chatRequestOptions);
+    ISearchService Create(SearchOptions earchOptions);
     ISearchService Create();
 }

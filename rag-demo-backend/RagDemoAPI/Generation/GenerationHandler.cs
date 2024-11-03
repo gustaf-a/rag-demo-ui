@@ -18,7 +18,10 @@ public class GenerationHandler(ILogger<GenerationHandler> _logger, ILlmServiceFa
 
     public async Task<ChatResponse> GetRetrievalAugmentedChatResponse(ChatRequest chatRequest)
     {
-        if (chatRequest is null || chatRequest.ChatMessages.IsNullOrEmpty())
+        ArgumentNullException.ThrowIfNull(chatRequest);
+        ArgumentNullException.ThrowIfNull(chatRequest.SearchOptions);
+
+        if (chatRequest.ChatMessages.IsNullOrEmpty())
             throw new ArgumentNullException(nameof(ChatRequest.ChatMessages));
 
         if (chatRequest.ProvidedDocumentSources.IsNullOrEmpty())
@@ -26,7 +29,7 @@ public class GenerationHandler(ILogger<GenerationHandler> _logger, ILlmServiceFa
             var retrievedContextSources = await _retrievalHandler.RetrieveContextForQuery(chatRequest);
             if (retrievedContextSources.IsNullOrEmpty())
             {
-                return new ChatResponse($"Failed to retrieve contextSources for data retrieval. Ensure at least one of {nameof(ChatRequestOptions.UseTextSearch)} or {nameof(ChatRequestOptions.UseVectorSearch)} is enabled.");
+                return new ChatResponse($"Failed to retrieve contextSources for data retrieval. Ensure search options are correct and database has data.");
             }
 
             chatRequest.ProvidedDocumentSources = retrievedContextSources;
@@ -39,8 +42,8 @@ public class GenerationHandler(ILogger<GenerationHandler> _logger, ILlmServiceFa
 
     private async Task<ChatResponse> GetChatResponseInternal(ChatRequest chatRequest)
     {
-        var llmService = _llmServiceFactory.Create(chatRequest.ChatRequestOptions);
+        var llmService = _llmServiceFactory.Create(chatRequest.ChatOptions);
 
-        return await llmService.GetChatResponse(chatRequest.ChatMessages, chatRequest.ProvidedDocumentSources, chatRequest.ChatRequestOptions);
+        return await llmService.GetChatResponse(chatRequest.ChatMessages, chatRequest.ProvidedDocumentSources, chatRequest.ChatOptions);
     }
 }
