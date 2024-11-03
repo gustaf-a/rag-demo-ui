@@ -1,0 +1,26 @@
+## Patient 1: John Doe
+- **Patient ID:** 001
+- **Date of Birth:** 1985-07-12
+- **Gender:** Male
+- **Blood Type:** O+
+- **Allergies:** Penicillin, Nuts
+- **Current Medications:** 
+  - Metformin 500mg (twice daily)
+  - Lisinopril 10mg (once daily)
+- **Chronic Conditions:** 
+  - Type 2 Diabetes
+  - Hypertension
+- **Recent Visits:**
+  - **Date:** 2024-08-20
+    - **Visit Type:** Routine Checkup
+    - **Vitals:**
+      - Blood Pressure: 130/85 mmHg
+      - Heart Rate: 72 bpm
+      - Blood Sugar (Fasting): 140 mg/dL
+    - **Doctor's Notes:** Blood sugar levels slightly elevated. Continue current medication. Recommended dietary changes to manage glucose levels more effectively.
+  - **Date:** 2024-09-15
+    - **Visit Type:** Diabetes Management
+    - **Labs:**
+      - HbA1c: 7.2% (High)
+      - Lipid Profile: Cholesterol 210 mg/dL
+    - **Doctor's Notes:** HbA1c remains elevated. Discussed possible insulin therapy if levels do not improve by next visit. Continue current medication and monitor blood sugar daily.

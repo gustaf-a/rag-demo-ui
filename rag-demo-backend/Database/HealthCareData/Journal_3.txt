@@ -1,0 +1,322 @@
+## Patient 3: David Lee
+- **Patient ID:** 003
+- **Date of Birth:** 1972-03-22
+- **Gender:** Male
+- **Blood Type:** B-
+- **Allergies:** None
+- **Current Medications:** 
+  - Atorvastatin 20mg (once daily)
+  - Aspirin 81mg (once daily)
+  - Metoprolol 50mg (twice daily)
+- **Chronic Conditions:** 
+  - Hyperlipidemia
+  - Cardiovascular Disease (History of Myocardial Infarction)
+  - Hypertension
+  - Type 2 Diabetes Mellitus
+- **Family History:**
+  - Father: Deceased (Heart Disease)
+  - Mother: Alive (Type 2 Diabetes)
+  - Siblings: Two brothers (one with hypertension, one healthy)
+
+### Current Visits:
+#### **Date:** 2024-08-05
+- **Visit Type:** Cardiovascular Follow-Up
+- **Vitals:**
+  - Blood Pressure: 125/80 mmHg
+  - Heart Rate: 60 bpm
+- **Labs:**
+  - LDL: 90 mg/dL
+  - HDL: 55 mg/dL
+  - Triglycerides: 130 mg/dL
+- **Doctor's Notes:** Post-myocardial infarction recovery is progressing well. Lipid profile within target range. Continue current medication regimen and cardiac rehab exercises. Encourage adherence to diet and exercise plan.
+
+#### **Date:** 2024-09-18
+- **Visit Type:** Lipid Panel Check
+- **Labs:**
+  - LDL: 85 mg/dL
+  - HDL: 55 mg/dL
+  - Triglycerides: 140 mg/dL
+- **Doctor's Notes:** Lipid levels are stable. Continue with lifestyle changes and medication. Schedule follow-up in 3 months.
+
+### Historical Visits:
+
+#### **2023**
+
+##### **Date:** 2023-11-15
+- **Visit Type:** Routine Physical Examination
+- **Vitals:**
+  - Blood Pressure: 130/85 mmHg
+  - Heart Rate: 72 bpm
+    - Temperature: 98.6°F
+    - Weight: 200 lbs
+    - BMI: 28.7
+- **Labs:**
+  - Fasting Glucose: 130 mg/dL
+  - HbA1c: 7.2%
+  - Cholesterol: Total 210 mg/dL, LDL 110 mg/dL, HDL 50 mg/dL, Triglycerides 150 mg/dL
+- **Diagnoses:**
+  - Hypertension
+  - Type 2 Diabetes Mellitus
+  - Hyperlipidemia
+- **Prescriptions:**
+  - Metformin 500mg (twice daily)
+  - Lisinopril 20mg (once daily)
+  - Atorvastatin 20mg (once daily)
+- **Doctor's Notes:** Initiate diabetes management with Metformin. Monitor blood pressure and blood glucose regularly. Schedule follow-up in 6 months.
+
+##### **Date:** 2023-05-22
+- **Visit Type:** Emergency Department
+- **Reason for Visit:** Chest Pain
+- **Vitals on Arrival:**
+  - Blood Pressure: 150/95 mmHg
+  - Heart Rate: 90 bpm
+    - Respiratory Rate: 18/min
+    - Oxygen Saturation: 96% on room air
+- **Diagnosis:**
+  - Acute Coronary Syndrome (Unstable Angina)
+- **Treatment:**
+  - Administered Nitroglycerin and Aspirin
+  - Admitted for observation
+- **Hospital Course:**
+  - Underwent Coronary Angiography; minor blockage observed, managed medically.
+  - Discharged with adjusted medications: increased dose of Atorvastatin, added Aspirin.
+- **Doctor's Notes:** Emphasize adherence to medication and lifestyle modifications. Schedule follow-up with cardiology.
+
+#### **2022**
+
+##### **Date:** 2022-10-10
+- **Visit Type:** Follow-Up Appointment
+- **Vitals:**
+  - Blood Pressure: 128/82 mmHg
+  - Heart Rate: 68 bpm
+- **Labs:**
+  - HbA1c: 7.0%
+  - LDL: 105 mg/dL
+- **Diagnoses:**
+  - Stable Type 2 Diabetes
+  - Controlled Hypertension
+- **Prescriptions:**
+  - Continue current medications
+- **Doctor's Notes:** Good control of diabetes and hypertension. Encourage continuation of diet and exercise. Next routine check in 6 months.
+
+##### **Date:** 2022-03-05
+- **Visit Type:** Annual Physical
+- **Vitals:**
+  - Blood Pressure: 135/88 mmHg
+  - Heart Rate: 75 bpm
+    - Weight: 205 lbs
+    - BMI: 29.1
+- **Labs:**
+  - Fasting Glucose: 125 mg/dL
+  - HbA1c: 7.5%
+  - Cholesterol: Total 220 mg/dL, LDL 115 mg/dL, HDL 48 mg/dL, Triglycerides 160 mg/dL
+- **Diagnoses:**
+  - Type 2 Diabetes Mellitus (Suboptimal Control)
+  - Hypertension
+  - Hyperlipidemia
+- **Prescriptions:**
+  - Increased Metformin to 1000mg (twice daily)
+  - Added Metoprolol 50mg (once daily)
+- **Doctor's Notes:** Adjust diabetes and hypertension management due to suboptimal control. Monitor closely and schedule follow-up in 3 months.
+
+#### **2021**
+
+##### **Date:** 2021-12-20
+- **Visit Type:** Cardiovascular Screening
+- **Vitals:**
+  - Blood Pressure: 140/90 mmHg
+  - Heart Rate: 80 bpm
+- **Labs:**
+  - LDL: 120 mg/dL
+  - HDL: 45 mg/dL
+  - Triglycerides: 170 mg/dL
+- **Diagnoses:**
+  - Prehypertension
+  - Dyslipidemia
+- **Prescriptions:**
+  - Initiated Atorvastatin 20mg (once daily)
+- **Doctor's Notes:** Start lipid-lowering therapy. Recommend dietary modifications and regular exercise. Follow-up in 6 months.
+
+##### **Date:** 2021-06-18
+- **Visit Type:** Urgent Care
+- **Reason for Visit:** Elevated Blood Sugar
+- **Vitals:**
+  - Blood Pressure: 130/85 mmHg
+  - Heart Rate: 78 bpm
+- **Labs:**
+  - Random Glucose: 160 mg/dL
+- **Diagnoses:**
+  - Impaired Glucose Tolerance
+- **Prescriptions:**
+  - Lifestyle modification advice
+  - Schedule follow-up for further evaluation
+- **Doctor's Notes:** Encourage weight loss and increased physical activity. Monitor blood glucose levels regularly.
+
+#### **2020**
+
+##### **Date:** 2020-09-25
+- **Visit Type:** Initial Consultation
+- **Reason for Visit:** Routine Check-Up
+- **Vitals:**
+  - Blood Pressure: 145/90 mmHg
+  - Heart Rate: 82 bpm
+    - Weight: 210 lbs
+    - BMI: 29.9
+- **Labs:**
+  - Fasting Glucose: 110 mg/dL
+  - HbA1c: 6.8%
+  - Cholesterol: Total 200 mg/dL, LDL 100 mg/dL, HDL 50 mg/dL, Triglycerides 150 mg/dL
+- **Diagnoses:**
+  - Borderline Hypertension
+  - Prediabetes
+  - Hyperlipidemia
+- **Prescriptions:**
+  - Advise lifestyle changes
+  - Schedule follow-up in 6 months
+- **Doctor's Notes:** Monitor blood pressure and glucose levels. Emphasize importance of diet and exercise to prevent progression to diabetes and cardiovascular disease.
+
+##### **Date:** 2020-04-12
+- **Visit Type:** Flu Vaccination
+- **Reason for Visit:** Annual Immunization
+- **Procedures:**
+  - Received Influenza Vaccine
+- **Doctor's Notes:** Patient tolerated the vaccine well. No adverse reactions noted. Encourage annual vaccinations.
+
+#### **2019**
+
+##### **Date:** 2019-11-30
+- **Visit Type:** Emergency Department
+- **Reason for Visit:** Shortness of Breath
+- **Vitals on Arrival:**
+  - Blood Pressure: 150/95 mmHg
+  - Heart Rate: 85 bpm
+    - Respiratory Rate: 22/min
+    - Oxygen Saturation: 93% on room air
+- **Diagnosis:**
+  - Acute Exacerbation of Hypertension
+- **Treatment:**
+  - Administered antihypertensive medications
+    - Labetalol IV
+  - Monitored in ED for 24 hours
+- **Hospital Course:**
+  - Stabilized with medication adjustment
+  - Discharged with new prescription for Lisinopril 10mg (once daily)
+- **Doctor's Notes:** Adjust antihypertensive regimen to better control blood pressure. Schedule outpatient follow-up.
+
+##### **Date:** 2019-05-14
+- **Visit Type:** Primary Care Follow-Up
+- **Vitals:**
+  - Blood Pressure: 148/92 mmHg
+  - Heart Rate: 80 bpm
+    - Weight: 208 lbs
+    - BMI: 29.5
+- **Labs:**
+  - Fasting Glucose: 115 mg/dL
+  - HbA1c: 6.5%
+  - Cholesterol: Total 195 mg/dL, LDL 98 mg/dL, HDL 52 mg/dL, Triglycerides 145 mg/dL
+- **Diagnoses:**
+  - Hypertension
+  - Prediabetes
+  - Hyperlipidemia
+- **Prescriptions:**
+  - Initiate Lisinopril 10mg (once daily)
+  - Continue Atorvastatin 20mg (once daily)
+- **Doctor's Notes:** Begin antihypertensive therapy. Emphasize dietary changes and increased physical activity. Follow-up in 3 months.
+
+#### **2018**
+
+##### **Date:** 2018-12-05
+- **Visit Type:** Routine Check-Up
+- **Vitals:**
+  - Blood Pressure: 140/90 mmHg
+  - Heart Rate: 78 bpm
+    - Weight: 205 lbs
+    - BMI: 29.3
+- **Labs:**
+  - Fasting Glucose: 100 mg/dL
+  - HbA1c: 5.8%
+  - Cholesterol: Total 185 mg/dL, LDL 90 mg/dL, HDL 55 mg/dL, Triglycerides: 130 mg/dL
+- **Diagnoses:**
+  - Borderline Hypertension
+    - Risk factors noted: Family history of heart disease
+- **Prescriptions:**
+  - Recommend lifestyle modifications (diet, exercise)
+- **Doctor's Notes:** Monitor blood pressure regularly. Encourage weight loss to reduce hypertension risk.
+
+##### **Date:** 2018-06-20
+- **Visit Type:** Specialist Consultation
+- **Reason for Visit:** Pre-Diabetes Evaluation
+- **Vitals:**
+  - Blood Pressure: 138/88 mmHg
+  - Heart Rate: 76 bpm
+- **Labs:**
+  - Oral Glucose Tolerance Test (OGTT): 140 mg/dL at 2 hours
+- **Diagnoses:**
+  - Prediabetes
+- **Prescriptions:**
+  - Initiate Metformin 500mg (once daily)
+- **Doctor's Notes:** Start Metformin to manage blood glucose levels. Emphasize importance of lifestyle changes to prevent progression to Type 2 Diabetes.
+
+---
+
+## Summary of Chronic Conditions and Management
+
+1. **Hypertension:**
+   - **Diagnosis Date:** 2018-06-20
+   - **Management:**
+     - Lifestyle modifications (diet, exercise)
+     - Medications: Lisinopril, Metoprolol
+     - Regular monitoring of blood pressure
+
+2. **Type 2 Diabetes Mellitus:**
+   - **Diagnosis Date:** 2023-11-15
+   - **Management:**
+     - Medications: Metformin
+     - Regular HbA1c and glucose monitoring
+     - Dietary and exercise regimen
+
+3. **Hyperlipidemia:**
+   - **Diagnosis Date:** 2018-06-20
+   - **Management:**
+     - Medications: Atorvastatin
+     - Lipid profile monitoring
+     - Dietary modifications
+
+4. **Cardiovascular Disease:**
+   - **History of Myocardial Infarction:**
+     - **Date:** 2023-05-22 (Initial MI event)
+     - **Management:**
+       - Medications: Aspirin, Atorvastatin, Metoprolol
+       - Cardiac rehabilitation
+       - Lifestyle modifications
+
+## Preventive Care and Vaccinations
+
+- **Flu Vaccinations:** Annually administered, most recent on 2020-04-12
+- **COVID-19 Vaccinations:** (Not listed but can be added if desired)
+- **Screenings:**
+  - **2019-09-10:** Colonoscopy (Normal)
+  - **2020-10-10:** Prostate-Specific Antigen (PSA) test (Elevated, under further evaluation)
+
+## Social History
+
+- **Occupation:** Accountant
+- **Lifestyle:**
+  - **Smoking:** Non-smoker
+  - **Alcohol:** Occasional (1-2 drinks per week)
+  - **Exercise:** Reports walking 3 times a week
+- **Diet:** High in fats and carbohydrates, attempting to make healthier choices
+- **Support System:** Married, two adult children
+
+## Notes on Adherence and Education
+
+- **Medication Adherence:** Generally good, occasional missed doses reported
+- **Education Provided:**
+  - Importance of medication adherence
+  - Dietary counseling with a nutritionist
+  - Enrollment in a cardiac rehabilitation program post-MI
+  - Education on recognizing signs of hypoglycemia and hypertensive emergencies
+
+---
+
+*This journal is a simulated example for educational purposes and does not represent real patient data.*
