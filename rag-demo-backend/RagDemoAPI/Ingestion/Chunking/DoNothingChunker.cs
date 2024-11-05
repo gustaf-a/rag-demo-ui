@@ -12,7 +12,7 @@ public class DoNothingChunker(IConfiguration configuration, ILlmServiceFactory l
         return content.Length >= _ingestionOptions.MaxChunkWords;
     }
 
-    public Task<IEnumerable<string>> DoChunking(IngestDataRequest request, string content)
+    public Task<IEnumerable<string>> Execute(IngestDataRequest request, string content)
     {
         IEnumerable<string> chunks = new List<string>
         {

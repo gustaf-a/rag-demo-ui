@@ -13,7 +13,7 @@ public class SlidingWindowChunker(IConfiguration configuration, ILlmServiceFacto
         return true;
     }
 
-    public async Task<IEnumerable<string>> DoChunking(IngestDataRequest request, string content)
+    public async Task<IEnumerable<string>> Execute(IngestDataRequest request, string content)
     {
         var contentChunks = GetChunks(request.IngestDataOptions, content, _ingestionOptions.SlidingWindowWordsPerChunk, _ingestionOptions.SlidingWindowOverlapWords);
 
