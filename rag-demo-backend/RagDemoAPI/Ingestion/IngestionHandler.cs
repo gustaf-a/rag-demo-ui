@@ -30,7 +30,7 @@ public class IngestionHandler(ILogger<IngestionHandler> _logger, IPostgreSqlServ
         {
             var content = await File.ReadAllTextAsync(file);
 
-            var chunkingHandler = _chunkingHandlerFactory.CreateChunkingHandler(request, file, content);
+            var chunkingHandler = _chunkingHandlerFactory.Create(request, file, content);
 
             _logger.LogInformation($"Chunking {file}: Using {chunkingHandler.Name}.");
 

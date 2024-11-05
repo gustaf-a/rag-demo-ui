@@ -4,11 +4,11 @@ namespace RagDemoAPI.Ingestion.Chunking
 {
     public class ChunkingHandlerFactory(IEnumerable<IChunkingHandler> _chunkingHandlers) : IChunkingHandlerFactory
     {
-        public IChunkingHandler CreateChunkingHandler(IngestDataRequest request, string filePath, string fileContent)
+        public IChunkingHandler Create(IngestDataRequest request, string filePath, string fileContent)
         {
             var usableChunkingHandlers = _chunkingHandlers.Where(ch => ch.IsSuitable(request, fileContent));
 
-            return _chunkingHandlers.Last();
+            return usableChunkingHandlers.Last();
         }
 
         public IEnumerable<string> GetChunkingHandlerNames()

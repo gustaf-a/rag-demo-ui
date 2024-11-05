@@ -3,5 +3,5 @@
 public interface IChunkingHandlerFactory
 {
     IEnumerable<string> GetChunkingHandlerNames();
-    IChunkingHandler CreateChunkingHandler(Models.IngestDataRequest request, string filePath, string fileContent);
+    IChunkingHandler Create(Models.IngestDataRequest request, string filePath, string fileContent);
 }
