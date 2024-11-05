@@ -3,9 +3,9 @@ using RagDemoAPI.Models;
 
 namespace RagDemoAPI.Ingestion.Chunking;
 
-public class DoNothingChunkingHandler(IConfiguration configuration, ILlmServiceFactory llmServiceFactory) : ChunkingBase(configuration, llmServiceFactory), IChunkingHandler
+public class DoNothingChunker(IConfiguration configuration, ILlmServiceFactory llmServiceFactory) : ChunkerBase(configuration, llmServiceFactory), IChunker
 {
-    public string Name => nameof(DoNothingChunkingHandler);
+    public string Name => nameof(DoNothingChunker);
 
     public bool IsSuitable(IngestDataRequest request, string content)
     {

@@ -5,12 +5,12 @@ using RagDemoAPI.Models;
 
 namespace RagDemoAPI.Ingestion.Chunking;
 
-public class ChunkingBase
+public class ChunkerBase
 {
     protected readonly IngestionOptions _ingestionOptions;
     protected readonly ILlmServiceFactory _llmServiceFactory;
 
-    public ChunkingBase(IConfiguration configuration, ILlmServiceFactory llmServiceFactory)
+    public ChunkerBase(IConfiguration configuration, ILlmServiceFactory llmServiceFactory)
     {
         _ingestionOptions = configuration.GetSection(IngestionOptions.Ingestion).Get<IngestionOptions>()
             ?? throw new ArgumentNullException(nameof(IngestionOptions));

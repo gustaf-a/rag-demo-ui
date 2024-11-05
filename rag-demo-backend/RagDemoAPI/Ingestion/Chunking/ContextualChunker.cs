@@ -3,10 +3,10 @@ using RagDemoAPI.Models;
 
 namespace RagDemoAPI.Ingestion.Chunking;
 
-public class ContextualChunkingHandler(IConfiguration configuration, ILlmServiceFactory llmServiceFactory) : ChunkingBase(configuration, llmServiceFactory), IChunkingHandler
+public class ContextualChunker(IConfiguration configuration, ILlmServiceFactory llmServiceFactory) : ChunkerBase(configuration, llmServiceFactory), IChunker
 {
 
-    public string Name => nameof(ContextualChunkingHandler);
+    public string Name => nameof(ContextualChunker);
 
     public bool IsSuitable(IngestDataRequest request, string content)
     {

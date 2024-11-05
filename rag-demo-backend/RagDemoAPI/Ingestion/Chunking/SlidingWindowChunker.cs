@@ -4,9 +4,9 @@ using RagDemoAPI.Models;
 namespace RagDemoAPI.Ingestion.Chunking;
 
 
-public class SlidingWindowChunkingHandler(IConfiguration configuration, ILlmServiceFactory llmServiceFactory) : ChunkingBase(configuration, llmServiceFactory), IChunkingHandler
+public class SlidingWindowChunker(IConfiguration configuration, ILlmServiceFactory llmServiceFactory) : ChunkerBase(configuration, llmServiceFactory), IChunker
 {
-    public string Name => nameof(SlidingWindowChunkingHandler);
+    public string Name => nameof(SlidingWindowChunker);
 
     public bool IsSuitable(IngestDataRequest request, string content)
     {

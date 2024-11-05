@@ -2,7 +2,7 @@
 
 namespace RagDemoAPI.Ingestion.Chunking;
 
-public interface IChunkingHandler
+public interface IChunker
 {
     abstract string Name { get; }
     bool IsSuitable(IngestDataRequest request, string content);
