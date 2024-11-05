@@ -1,19 +1,20 @@
 ﻿using RagDemoAPI.Ingestion.Chunking;
+using RagDemoAPI.Ingestion.PreProcessing;
 using RagDemoAPI.Models;
 using RagDemoAPI.Services;
 
 namespace RagDemoAPI.Ingestion;
 
-public class IngestionHandler(ILogger<IngestionHandler> _logger, IPostgreSqlService _postgreSqlService, IChunkingHandlerFactory _chunkingHandlerFactory, IEmbeddingService _embeddingService) : IIngestionHandler
+public class IngestionHandler(ILogger<IngestionHandler> _logger, IPostgreSqlService _postgreSqlService, IContentPreProcessorFactory _contentPreProcessorFactory, IChunkerFactory _chunkerFactory, IEmbeddingService _embeddingService) : IIngestionHandler
 {
-    public IEnumerable<string> GetChunkingHandlerNames()
+    public IEnumerable<string> GetChunkerNames()
     {
-        return _chunkingHandlerFactory.GetChunkingHandlerNames();
+        return _chunkerFactory.GetChunkerNames();
     }
 
     //TODO Make general ingest from request which uses DataImporterFactory and collects data. Website, folder, file, azure container etc
 
-    public async Task IngestDataFromFolderAsync(IngestDataRequest request)
+    public async Task IngestDataFromFolder(IngestDataRequest request)
     {
         _logger.LogInformation($"Starting to ingest data from {request.FolderPath}.");
 
@@ -21,27 +22,45 @@ public class IngestionHandler(ILogger<IngestionHandler> _logger, IPostgreSqlServ
 
         _logger.LogInformation($"Found {files.Count()} files to ingest.");
 
-        await ChunkAndIngestForLocalFilesAsync(request, files);
+        await ChunkAndIngestForLocalFiles(request, files);
     }
 
-    private async Task ChunkAndIngestForLocalFilesAsync(IngestDataRequest request, IEnumerable<string> files)
+    private async Task ChunkAndIngestForLocalFiles(IngestDataRequest request, IEnumerable<string> files)
     {
         foreach (var file in files)
         {
             var content = await File.ReadAllTextAsync(file);
 
-            var chunkingHandler = _chunkingHandlerFactory.Create(request, file, content);
+            var preProcessor = _contentPreProcessorFactory.Create(file);
 
-            _logger.LogInformation($"Chunking {file}: Using {chunkingHandler.Name}.");
+            var preprocessedContent = preProcessor.DoPreProcessing(content);
 
-            var chunks = await chunkingHandler.DoChunking(request, content);
+            var chunker = _chunkerFactory.Create(request, file, content);
 
+            _logger.LogInformation($"Chunking {file}: Using {chunker.Name}.");
+
+            var chunks = await chunker.DoChunking(request, content);
+
+            var metaData = CreateMetaDataForFile(file, request.FolderPath);
+            
             foreach (var chunk in chunks)
             {
-                var embedding = await _embeddingService.GetEmbeddingsAsync(chunk);
+                var embedding = await _embeddingService.GetEmbeddings(chunk);
 
-                await _postgreSqlService.InsertDataAsync(content, embedding);
+                await _postgreSqlService.InsertData(content, embedding, metaData);
             }
         }
+    }
+
+    private static EmbeddingMetaData CreateMetaDataForFile(string file, string folderPath)
+    {
+        //TODO Improve metadata
+        return new EmbeddingMetaData
+        {
+            CreatedDateTime = DateTime.UtcNow,
+            Source = Path.GetFileNameWithoutExtension(file),
+            Uri = folderPath,
+            Category = ""
+        };
     }
 }

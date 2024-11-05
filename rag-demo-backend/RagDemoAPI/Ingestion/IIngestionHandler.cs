@@ -4,7 +4,7 @@ namespace RagDemoAPI.Ingestion
 {
     public interface IIngestionHandler
     {
-        IEnumerable<string> GetChunkingHandlerNames();
-        Task IngestDataFromFolderAsync(IngestDataRequest request);
+        IEnumerable<string> GetChunkerNames();
+        Task IngestDataFromFolder(IngestDataRequest request);
     }
 }
