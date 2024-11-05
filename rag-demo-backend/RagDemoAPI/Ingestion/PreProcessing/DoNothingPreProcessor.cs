@@ -1,8 +1,10 @@
 ﻿namespace RagDemoAPI.Ingestion.PreProcessing;
 
-public class DoNothingContentPreProcessor : IContentPreProcessor
+public class DoNothingPreProcessor : IPreProcessor
 {
-    public string DoPreProcessing(string fileContent)
+    public string Name => nameof(DoNothingPreProcessor);
+
+    public string Execute(string fileContent)
     {
         return fileContent;
     }

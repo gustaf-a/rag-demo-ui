@@ -1,8 +1,8 @@
 ﻿namespace RagDemoAPI.Ingestion.PreProcessing;
 
-public class ContentPreProcessorFactory(IEnumerable<IContentPreProcessor> _contentPreProcessors) : IContentPreProcessorFactory
+public class PreProcessorFactory(IEnumerable<IPreProcessor> _contentPreProcessors) : IPreProcessorFactory
 {
-    public IContentPreProcessor Create(string filePath)
+    public IPreProcessor Create(string filePath)
     {
         var fileExtension = Path.GetExtension(filePath);
 

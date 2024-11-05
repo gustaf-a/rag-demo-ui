@@ -2,16 +2,18 @@
 
 namespace RagDemoAPI.Ingestion.PreProcessing;
 
-public class MarkDownContentPreProcessor : IContentPreProcessor
+public class MarkDownPreProcessor : IPreProcessor
 {
     private readonly List<string> _applicableFileExtensions = [".md"];
+
+    public string Name => nameof(MarkDownPreProcessor);
 
     public bool IsSuitable(string filePath)
     {
         return _applicableFileExtensions.Contains(Path.GetExtension(filePath), StringComparer.InvariantCultureIgnoreCase);
     }
 
-    public string DoPreProcessing(string fileContent)
+    public string Execute(string fileContent)
     {
         if (string.IsNullOrEmpty(fileContent))
             return string.Empty;
