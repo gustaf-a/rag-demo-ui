@@ -2,5 +2,5 @@
 
 public interface IEmbeddingService
 {
-    Task<float[]> GetEmbeddingsAsync(string content);
+    Task<float[]> GetEmbeddings(string content);
 }

@@ -10,7 +10,7 @@ public class EmbeddingService(Kernel _kernel) : IEmbeddingService
 {
     private readonly ITextEmbeddingGenerationService _textEmbeddingService = _kernel.GetRequiredService<ITextEmbeddingGenerationService>();
 
-    public async Task<float[]> GetEmbeddingsAsync(string content)
+    public async Task<float[]> GetEmbeddings(string content)
     {
         if (string.IsNullOrWhiteSpace(content))
             return null;
