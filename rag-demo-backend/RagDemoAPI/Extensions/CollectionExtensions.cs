@@ -7,6 +7,11 @@ public static class CollectionExtensions
         return collection is null || !collection.Any();
     }
 
+    public static bool IsNullOrEmpty(this IDictionary<string, string> collection)
+    {
+        return collection is null || !collection.Any();
+    }
+
     public static float[] ConvertToFloatArray(this IList<ReadOnlyMemory<float>> list)
     {
         int totalLength = 0;
