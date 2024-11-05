@@ -1,17 +1,16 @@
-﻿using RagDemoAPI.Configuration;
-using RagDemoAPI.Generation.LlmServices;
+﻿using RagDemoAPI.Generation.LlmServices;
 using RagDemoAPI.Models;
 
 namespace RagDemoAPI.Ingestion.Chunking;
-public class ContextualChunkingHandler(IConfiguration configuration, ILlmServiceFactory _llmServiceFactory) : ChunkingBase, IChunkingHandler
+
+public class ContextualChunkingHandler(IConfiguration configuration, ILlmServiceFactory llmServiceFactory) : ChunkingBase(configuration, llmServiceFactory), IChunkingHandler
 {
-    private readonly IngestionOptions _ingestionOptions = configuration.GetSection(IngestionOptions.Ingestion).Get<IngestionOptions>() ?? throw new ArgumentNullException(nameof(IngestionOptions));
 
     public string Name => nameof(ContextualChunkingHandler);
 
     public bool IsSuitable(IngestDataRequest request, string content)
     {
-        if (_ingestionOptions.ContextualRetrievalWordsPerChunk <= content.Length)
+        if (_ingestionOptions.ContextualRetrievalWordsPerChunk >= content.Length)
             return false;
 
         return true;
@@ -19,7 +18,7 @@ public class ContextualChunkingHandler(IConfiguration configuration, ILlmService
 
     public async Task<IEnumerable<string>> DoChunking(IngestDataRequest request, string content)
     {
-        var contentChunks = GetChunks(content, _ingestionOptions.ContextualRetrievalWordsPerChunk, 0);
+        var contentChunks = GetChunks(request.IngestDataOptions, content, _ingestionOptions.ContextualRetrievalWordsPerChunk, 0);
 
         var chunksWithContext = new List<string>();
 

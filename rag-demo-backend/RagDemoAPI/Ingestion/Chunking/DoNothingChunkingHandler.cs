@@ -1,12 +1,10 @@
-﻿using RagDemoAPI.Configuration;
+﻿using RagDemoAPI.Generation.LlmServices;
 using RagDemoAPI.Models;
 
 namespace RagDemoAPI.Ingestion.Chunking;
 
-public class DoNothingChunkingHandler(IConfiguration configuration) : ChunkingBase, IChunkingHandler
+public class DoNothingChunkingHandler(IConfiguration configuration, ILlmServiceFactory llmServiceFactory) : ChunkingBase(configuration, llmServiceFactory), IChunkingHandler
 {
-    private readonly IngestionOptions _ingestionOptions = configuration.GetSection(IngestionOptions.Ingestion).Get<IngestionOptions>() ?? throw new ArgumentNullException(nameof(IngestionOptions));
-
     public string Name => nameof(DoNothingChunkingHandler);
 
     public bool IsSuitable(IngestDataRequest request, string content)

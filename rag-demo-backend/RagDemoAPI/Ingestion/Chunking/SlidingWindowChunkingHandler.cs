@@ -1,12 +1,11 @@
-﻿using RagDemoAPI.Configuration;
+﻿using RagDemoAPI.Generation.LlmServices;
 using RagDemoAPI.Models;
 
 namespace RagDemoAPI.Ingestion.Chunking;
 
-public class SlidingWindowChunkingHandler(IConfiguration configuration) : ChunkingBase, IChunkingHandler
-{
-    private readonly IngestionOptions _ingestionOptions = configuration.GetSection(IngestionOptions.Ingestion).Get<IngestionOptions>() ?? throw new ArgumentNullException(nameof(IngestionOptions));
 
+public class SlidingWindowChunkingHandler(IConfiguration configuration, ILlmServiceFactory llmServiceFactory) : ChunkingBase(configuration, llmServiceFactory), IChunkingHandler
+{
     public string Name => nameof(SlidingWindowChunkingHandler);
 
     public bool IsSuitable(IngestDataRequest request, string content)
@@ -16,7 +15,7 @@ public class SlidingWindowChunkingHandler(IConfiguration configuration) : Chunki
 
     public async Task<IEnumerable<string>> DoChunking(IngestDataRequest request, string content)
     {
-        var contentChunks = GetChunks(content, _ingestionOptions.SlidingWindowWordsPerChunk, _ingestionOptions.SlidingWindowOverlapWords);
+        var contentChunks = GetChunks(request.IngestDataOptions, content, _ingestionOptions.SlidingWindowWordsPerChunk, _ingestionOptions.SlidingWindowOverlapWords);
 
         return await Task.FromResult(contentChunks);
     }
