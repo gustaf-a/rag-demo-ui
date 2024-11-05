@@ -6,6 +6,11 @@ public class RetrievedDocument
     {
     }
 
+    public RetrievedDocument(EmbeddingsRowModel embeddingsRowModel)
+    {
+        //TODO 
+    }
+
     public RetrievedDocument(string sourceUri, string content)
     {
         Uri = new Uri(sourceUri);

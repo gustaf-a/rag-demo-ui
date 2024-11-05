@@ -8,14 +8,14 @@
         public string TextSearchContent { get; set; }
         public string TextSearchMetaData { get; set; }
 
-        public IEnumerable<string> CategoriesInclude { get; set; } = [];
-        public IEnumerable<string> CategoriesExclude { get; set; } = [];
+        public Dictionary<string,string> MetaDataFiltersInclude { get; set; } = [];
+        public Dictionary<string, string> MetaDataFiltersExclude { get; set; } = [];
 
-        public string SearchContent { get; set; }
+        public string SemanticSearchContent { get; set; }
         
         public bool UseSemanticRanker { get; set; } = false;
         public int SemanticRankerCandidatesToRetrieve { get; set; } = 30;
         public bool UseSemanticCaptions { get; set; } = false;
-        public bool SemanticSearchGenerateSummaryOfMessageHistory { get; internal set; }
+        public int SemanticSearchGenerateSummaryOfNMessages { get; set; } = 0;
     }
 }
