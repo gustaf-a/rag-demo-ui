@@ -11,7 +11,6 @@ public class IngestionHandler(ILogger<IngestionHandler> _logger, IPostgreSqlServ
     {
         return _chunkerFactory.GetChunkerNames();
     }
-    
 
     public async Task IngestDataFromFolder(IngestDataRequest request)
     {
@@ -29,20 +28,20 @@ public class IngestionHandler(ILogger<IngestionHandler> _logger, IPostgreSqlServ
     {
         foreach (var file in files)
         {
-            //TODO Replace with data importer
+            //TODO Replace with data importer?
             var content = await File.ReadAllTextAsync(file);
 
             var preprocessedContent = DoPreProcessing(_contentPreProcessorFactory, file, content);
             
-            var chunks = await DoChunking(_chunkerFactory, request, file, preprocessedContent);
-
             var metaData = CreateMetaData(request, file, preprocessedContent);
+
+            var chunks = await DoChunking(_chunkerFactory, request, file, preprocessedContent);
 
             foreach (var chunk in chunks)
             {
                 var embedding = await _embeddingService.GetEmbeddings(chunk);
 
-                await _postgreSqlService.InsertData(content, embedding, metaData);
+                await _postgreSqlService.InsertData(chunk, embedding, metaData);
             }
         }
     }
