@@ -12,15 +12,15 @@ namespace RagDemoAPI.Controllers;
 public class GenerationController(ILogger<GenerationController> _logger, IConfiguration configuration, IGenerationHandler _chatHandler) : ControllerBase
 {
     [HttpPost("get-chat-response")]
-    public async Task<IActionResult> GetChatResponse([FromBody] IEnumerable<ChatMessage> chatMessages)
+    public async Task<IActionResult> GetChatResponse([FromBody] ChatRequest chatRequest)
     {
-        var response = await _chatHandler.GetChatResponse(chatMessages);
+        var response = await _chatHandler.GetChatResponse(chatRequest.ChatMessages);
 
         return Ok(response);
     }
 
     [HttpPost("get-rag-response")]
-    public async Task<IActionResult> GetChatResponse([FromBody] ChatRequest chatRequest)
+    public async Task<IActionResult> GetChatResponseWithRag([FromBody] ChatRequest chatRequest)
     {
         var response = await _chatHandler.GetRetrievalAugmentedChatResponse(chatRequest);
 

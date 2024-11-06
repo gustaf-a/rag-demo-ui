@@ -15,6 +15,11 @@ public class ChatResponse
         ChatMessages.Add(new ChatMessage(ChatMessageRoles.Assistant, text));
     }
 
+    public ChatResponse(string text, List<RetrievedDocument> sourcesUsed) : this(text)
+    {
+        Citations = sourcesUsed;
+    }
+
     public ChatResponse(string text, string intent, IEnumerable<Azure.AI.OpenAI.Chat.ChatCitation> citations) : this(text)
     {
         Citations = citations.ToChatMessageCitations();

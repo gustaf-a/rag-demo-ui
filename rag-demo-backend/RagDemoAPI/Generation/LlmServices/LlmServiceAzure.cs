@@ -23,7 +23,10 @@ public class LlmServiceAzure(IConfiguration configuration) : ILlmService
 
         var chatClient = GetAzureChatClient();
 
-        ChatCompletionOptions options = new();
+        ChatCompletionOptions options = new()
+        {
+            Temperature = (float)chatRequestOptions.Temperature
+        };
 
         var clientResult = await chatClient.CompleteChatAsync(
             chatHistory,
@@ -34,7 +37,7 @@ public class LlmServiceAzure(IConfiguration configuration) : ILlmService
         var chatResultContext = chatresult.GetMessageContext();
         if (chatResultContext is null)
         {
-            return new ChatResponse(chatresult.Content[0].Text);
+            return new ChatResponse(chatresult.Content[0].Text, retrievedContextSources.ToList());
         }
 
         return new ChatResponse(chatresult.Content[0].Text, intent: chatResultContext.Intent, citations: chatResultContext.Citations);

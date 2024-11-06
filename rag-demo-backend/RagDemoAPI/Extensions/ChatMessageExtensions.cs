@@ -39,7 +39,7 @@ public static class ChatMessageExtensions
             sb.AppendLine();
         }
 
-        chatHistory.Add(new OpenAI.Chat.UserChatMessage(
+        chatHistory.Insert(0, new OpenAI.Chat.UserChatMessage(
 $"""
 <sources>
 {sb}

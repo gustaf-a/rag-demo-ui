@@ -9,6 +9,9 @@ public class GenerationHandler(ILogger<GenerationHandler> _logger, ILlmServiceFa
 {
     public async Task<ChatResponse> GetChatResponse(IEnumerable<ChatMessage> chatMessages)
     {
+        if (chatMessages.IsNullOrEmpty())
+            throw new ArgumentNullException(nameof(chatMessages));
+
         var llmService = _llmServiceFactory.Create();
 
         var chatResponse = await llmService.GetChatResponse(chatMessages);
