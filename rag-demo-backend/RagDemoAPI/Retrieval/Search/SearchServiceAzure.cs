@@ -12,7 +12,7 @@ namespace RagDemoAPI.Retrieval.Search;
 public class SearchServiceAzure(IConfiguration configuration, ILlmServiceFactory _llmServiceFactory, IEmbeddingService _embeddingService) : ISearchService
 {
     private readonly AzureOptions _azureOptions = configuration.GetSection(AzureOptions.Azure).Get<AzureOptions>() ?? throw new ArgumentNullException(nameof(AzureOptions));
-    
+
     public async Task<IEnumerable<RetrievedDocument>> RetrieveDocuments(ChatRequest chatRequest)
     {
         var chatMessages = chatRequest.ChatMessages;
@@ -23,14 +23,15 @@ public class SearchServiceAzure(IConfiguration configuration, ILlmServiceFactory
         return await RetrieveDocumentsInternal(searchOptions, searchContent);
     }
 
+    //TODO Move to base class
     private string GetQueryContentForSearch(IEnumerable<ChatMessage> chatMessages, SearchOptions searchOptions)
     {
         if (chatMessages.IsNullOrEmpty())
             return string.Empty;
 
-        if (searchOptions.SemanticSearchGenerateSummaryOfMessageHistory)
+        if (searchOptions.SemanticSearchGenerateSummaryOfNMessages > 0)
         {
-            //TODO generate a summary of all messages.
+            //TODO generate a summary of last n messages.
             throw new NotImplementedException();
         }
         else
@@ -41,7 +42,7 @@ public class SearchServiceAzure(IConfiguration configuration, ILlmServiceFactory
 
     public async Task<IEnumerable<RetrievedDocument>> RetrieveDocuments(SearchRequest searchRequest)
     {
-        return await RetrieveDocumentsInternal(searchRequest.SearchOptions, searchRequest.SearchOptions.SearchContent);
+        return await RetrieveDocumentsInternal(searchRequest.SearchOptions, searchRequest.SearchOptions.SemanticSearchContent);
     }
 
     private async Task<IEnumerable<RetrievedDocument>> RetrieveDocumentsInternal(SearchOptions searchOptions, string searchContent)
@@ -58,13 +59,13 @@ public class SearchServiceAzure(IConfiguration configuration, ILlmServiceFactory
     private async Task<float[]> GenerateQueryEmbeddingsInternal(string semanticSearchContent)
     {
         return !string.IsNullOrWhiteSpace(semanticSearchContent)
-                                        ? await _embeddingService.GetEmbeddingsAsync(semanticSearchContent)
+                                        ? await _embeddingService.GetEmbeddings(semanticSearchContent)
                                         : [];
     }
-    
+
     private async Task<string> GenerateSearchQueryForTextSearch(string queryContent, SearchOptions searchOptions)
     {
-        if(string.IsNullOrWhiteSpace(searchOptions.TextSearchContent)
+        if (string.IsNullOrWhiteSpace(searchOptions.TextSearchContent)
             && string.IsNullOrWhiteSpace(searchOptions.TextSearchMetaData))
             return string.Empty;
 
@@ -98,7 +99,7 @@ Generate a search query for this content:
     {
         var azureSearchOptions = new Azure.Search.Documents.SearchOptions
         {
-            Filter = CreateSearchOptionsFilter(searchOptions),
+            Filter = CreateMetaDataFilters(searchOptions),
             Size = 3
         };
 
@@ -187,34 +188,63 @@ Generate a search query for this content:
         return new RetrievedDocument(sourcePage, content);
     }
 
-    private static string CreateSearchOptionsFilter(SearchOptions searchOptions)
+    private static string CreateMetaDataFilters(SearchOptions searchOptions)
     {
-        var categoriesToExclude = searchOptions.CategoriesExclude.ToList();
-        var categoriesToInclude = searchOptions.CategoriesInclude.ToList();
-
-        if (categoriesToExclude.IsNullOrEmpty() && categoriesToInclude.IsNullOrEmpty())
+        if (searchOptions.MetaDataFiltersExclude.IsNullOrEmpty()
+            && searchOptions.MetaDataFiltersInclude.IsNullOrEmpty())
             return string.Empty;
 
         var filterParts = new List<string>();
 
-        if (!categoriesToExclude.IsNullOrEmpty())
+        if (!searchOptions.MetaDataFiltersExclude.IsNullOrEmpty())
         {
-            var excludeFilters = categoriesToExclude
-                .Select(category => $"category ne '{category.EscapeODataValue()}'");
-            var excludeFilter = string.Join(" and ", excludeFilters);
-            filterParts.Add($"({excludeFilter})");
+            foreach (var filterKeyValuePair in searchOptions.MetaDataFiltersExclude)
+            {
+                switch (filterKeyValuePair.Key.ToLower())
+                {
+                    case "category":
+                        filterParts.Add(CreateMetaDataFilterString("category", include: true));
+                        break;
+                    default:
+                        throw new NotSupportedException($"Meta data filter for {filterKeyValuePair.Key} not supported.");
+
+                }
+
+                //var excludeFilters = searchOptions.MetaDataFiltersExclude
+                //    .Select(category => $"category ne '{category.EscapeODataValue()}'");
+                //var excludeFilter = string.Join(" and ", excludeFilters);
+                //filterParts.Add($"({excludeFilter})");
+            }
         }
 
-        if (!categoriesToInclude.IsNullOrEmpty())
+        if (!searchOptions.MetaDataFiltersInclude.IsNullOrEmpty())
         {
-            var includeFilters = categoriesToInclude
-                .Select(category => $"category eq '{category.EscapeODataValue()}'");
-            var includeFilter = string.Join(" or ", includeFilters);
-            filterParts.Add($"({includeFilter})");
+            foreach (var filterKeyValuePair in searchOptions.MetaDataFiltersExclude)
+            {
+                switch (filterKeyValuePair.Key.ToLower())
+                {
+                    case "category":
+                        filterParts.Add(CreateMetaDataFilterString("category", include: false));
+                        break;
+                    default:
+                        throw new NotSupportedException($"Meta data filter for {filterKeyValuePair.Key} not supported.");
+
+                }
+
+                //    var includeFilters = searchOptions.MetaDataFiltersInclude
+                //    .Select(category => $"category eq '{category.EscapeODataValue()}'");
+                //var includeFilter = string.Join(" or ", includeFilters);
+                //filterParts.Add($"({includeFilter})");
+            }
         }
 
         var finalFilter = string.Join(" and ", filterParts);
 
         return finalFilter;
+    }
+
+    private static string CreateMetaDataFilterString(string metaDataPropertyName, bool include)
+    {
+        return $"";
     }
 }
