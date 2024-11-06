@@ -12,12 +12,12 @@ public class IngestionController(ILogger<IngestionController> _logger, IConfigur
 {
     private readonly AzureOptions _azureOptions = configuration.GetSection(AzureOptions.Azure).Get<AzureOptions>() ?? throw new ArgumentNullException(nameof(AzureOptions));
 
-    [HttpGet("chunking-handlers")]
-    public async Task<IActionResult> GetChunkingHandlers()
+    [HttpGet("chunkers")]
+    public async Task<IActionResult> GetChunkers()
     {
-        var chunkingHandlerNames = _ingestionHandler.GetChunkingHandlerNames();
+        var chunkerNames = _ingestionHandler.GetChunkerNames();
 
-        return Ok(chunkingHandlerNames);
+        return Ok(chunkerNames);
     }
 
     [HttpPost("reset-database")]
@@ -25,7 +25,7 @@ public class IngestionController(ILogger<IngestionController> _logger, IConfigur
     {
         try
         {
-            await _postgreSqlService.ResetDatabaseAsync();
+            await _postgreSqlService.ResetDatabase();
             return Ok("Database reset successfully.");
         }
         catch (Exception ex)
@@ -39,7 +39,7 @@ public class IngestionController(ILogger<IngestionController> _logger, IConfigur
     {
         try
         {
-            await _postgreSqlService.SetupTablesAsync();
+            await _postgreSqlService.SetupTables();
             return Ok("Tables set up successfully.");
         }
         catch (Exception ex)
@@ -55,7 +55,7 @@ public class IngestionController(ILogger<IngestionController> _logger, IConfigur
 
         try
         {
-            await _ingestionHandler.IngestDataFromFolderAsync(request);
+            await _ingestionHandler.IngestDataFromFolder(request);
 
             return Ok("Data ingested successfully.");
         }
