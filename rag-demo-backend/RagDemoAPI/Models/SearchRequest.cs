@@ -2,6 +2,6 @@
 {
     public class SearchRequest
     {
-        public SearchOptions SearchOptions { get; set; } = new();
+        public SearchOptions SearchOptions { get; set; }
     }
 }

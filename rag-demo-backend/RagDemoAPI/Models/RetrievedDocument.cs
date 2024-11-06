@@ -8,7 +8,10 @@ public class RetrievedDocument
 
     public RetrievedDocument(EmbeddingsRowModel embeddingsRowModel)
     {
-        //TODO 
+        Content = embeddingsRowModel.Content;
+        ChunkId = embeddingsRowModel.Id.ToString();
+        Title = Path.GetFileName(embeddingsRowModel.Metadata.Uri);
+        Uri = new Uri(embeddingsRowModel.Metadata.Uri);
     }
 
     public RetrievedDocument(string sourceUri, string content)

@@ -12,15 +12,15 @@ namespace RagDemoAPI.Controllers;
 [Route("retrieval")]
 public class RetrievalController(ILogger<RetrievalController> _logger, IConfiguration configuration, IRetrievalHandler _retrievalHandler) : ControllerBase
 {
-    [HttpGet("chat-sources")]
-    public async Task<IActionResult> GetSourcesForChatRequest([FromBody] ChatRequest chatRequest)
+    [HttpPost("search")]
+    public async Task<IActionResult> PerformSearch([FromBody] SearchRequest searchRequest)
     {
-        var retrievedContextSources = await _retrievalHandler.RetrieveContextForQuery(chatRequest);
-        if (retrievedContextSources.IsNullOrEmpty())
+        var searchResults = await _retrievalHandler.DoSearch(searchRequest);
+        if (searchResults.IsNullOrEmpty())
         {
             return NotFound();
         }
 
-        return Ok(retrievedContextSources);
+        return Ok(searchResults);
     }
 }
