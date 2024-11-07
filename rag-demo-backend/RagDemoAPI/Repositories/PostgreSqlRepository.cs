@@ -4,6 +4,7 @@ using RagDemoAPI.Extensions;
 using RagDemoAPI.Models;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace RagDemoAPI.Repositories;
 
@@ -111,19 +112,13 @@ public class PostgreSqlRepository : IPostgreSqlRepository
         }
 
         if (!queryParameters.MetaDataFilterInclude.IsNullOrEmpty())
-        {
-            throw new NotImplementedException();
-        }
+            whereClauses.AddRange(queryParameters.MetaDataFilterInclude);
 
         if (!queryParameters.MetaDataFilterExclude.IsNullOrEmpty())
-        {
-            throw new NotImplementedException();
-        }
+            whereClauses.Add($"NOT ({string.Join(" OR ", queryParameters.MetaDataFilterExclude)})");
 
         if (whereClauses.Any())
-        {
             sqlBuilder.AppendLine("WHERE " + string.Join(" AND ", whereClauses));
-        }
 
         var embeddingsString = $"[{string.Join(',', queryParameters.EmbeddingQuery.Select(e => e.ToString()))}]";
         sqlBuilder.AppendLine($"ORDER BY embedding <=> '{embeddingsString}'");

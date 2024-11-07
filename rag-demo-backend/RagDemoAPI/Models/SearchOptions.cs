@@ -8,8 +8,8 @@
         public string? TextSearchContent { get; set; } = null;
         public string? TextSearchMetaData { get; set; } = null;
 
-        public Dictionary<string,string> MetaDataFiltersInclude { get; set; } = [];
-        public Dictionary<string, string> MetaDataFiltersExclude { get; set; } = [];
+        public Dictionary<string, IEnumerable<string>> MetaDataFiltersInclude { get; set; } = [];
+        public Dictionary<string, IEnumerable<string>> MetaDataFiltersExclude { get; set; } = [];
 
         public string? SemanticSearchContent { get; set; } = null;
 

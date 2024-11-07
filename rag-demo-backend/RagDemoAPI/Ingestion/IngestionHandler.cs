@@ -1,11 +1,12 @@
 ﻿using RagDemoAPI.Ingestion.Chunking;
 using RagDemoAPI.Ingestion.PreProcessing;
 using RagDemoAPI.Models;
+using RagDemoAPI.Repositories;
 using RagDemoAPI.Services;
 
 namespace RagDemoAPI.Ingestion;
 
-public class IngestionHandler(ILogger<IngestionHandler> _logger, IPostgreSqlService _postgreSqlService, IPreProcessorFactory _contentPreProcessorFactory, IChunkerFactory _chunkerFactory, IMetaDataCreatorFactory _metaDataCreatorFactory,IEmbeddingService _embeddingService) : IIngestionHandler
+public class IngestionHandler(ILogger<IngestionHandler> _logger, IPostgreSqlRepository _postgreSqlService, IPreProcessorFactory _contentPreProcessorFactory, IChunkerFactory _chunkerFactory, IMetaDataCreatorFactory _metaDataCreatorFactory,IEmbeddingService _embeddingService) : IIngestionHandler
 {
     public IEnumerable<string> GetChunkerNames()
     {

@@ -2,13 +2,13 @@ using Microsoft.AspNetCore.Mvc;
 using RagDemoAPI.Configuration;
 using RagDemoAPI.Ingestion;
 using RagDemoAPI.Models;
-using RagDemoAPI.Services;
+using RagDemoAPI.Repositories;
 
 namespace RagDemoAPI.Controllers;
 
 [ApiController]
 [Route("Ingestion")]
-public class IngestionController(ILogger<IngestionController> _logger, IConfiguration configuration, IPostgreSqlService _postgreSqlService, IIngestionHandler _ingestionHandler) : ControllerBase
+public class IngestionController(ILogger<IngestionController> _logger, IConfiguration configuration, IPostgreSqlRepository _postgreSqlService, IIngestionHandler _ingestionHandler) : ControllerBase
 {
     private readonly AzureOptions _azureOptions = configuration.GetSection(AzureOptions.Azure).Get<AzureOptions>() ?? throw new ArgumentNullException(nameof(AzureOptions));
 
