@@ -6,6 +6,7 @@ using RagDemoAPI.Ingestion;
 using RagDemoAPI.Ingestion.Chunking;
 using RagDemoAPI.Ingestion.MetaDataCreation;
 using RagDemoAPI.Ingestion.PreProcessing;
+using RagDemoAPI.Repositories;
 using RagDemoAPI.Retrieval;
 using RagDemoAPI.Retrieval.Search;
 using RagDemoAPI.Services;
@@ -115,7 +116,7 @@ namespace RagDemoAPI
             builder.Services.AddScoped<ISearchService, SearchServicePostgreSql>();
             
             builder.Services.AddScoped<IEmbeddingService, EmbeddingService>();
-            builder.Services.AddSingleton<IPostgreSqlService, PostgreSqlService>();
+            builder.Services.AddSingleton<IPostgreSqlRepository, PostgreSqlRepository>();
         }
     }
 }

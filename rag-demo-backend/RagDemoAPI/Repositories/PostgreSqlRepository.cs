@@ -2,23 +2,23 @@
 using RagDemoAPI.Configuration;
 using RagDemoAPI.Extensions;
 using RagDemoAPI.Models;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
 
-namespace RagDemoAPI.Services;
+namespace RagDemoAPI.Repositories;
 
-public class PostgreSqlService : IPostgreSqlService
+public class PostgreSqlRepository : IPostgreSqlRepository
 {
     private readonly PostgreSqlOptions _options;
     private readonly NpgsqlConnection _connection;
 
-    public PostgreSqlService(IConfiguration configuration)
+    public PostgreSqlRepository(IConfiguration configuration)
     {
         _options = configuration.GetSection(PostgreSqlOptions.PostgreSql).Get<PostgreSqlOptions>() ?? throw new ArgumentNullException(nameof(PostgreSqlOptions));
         _connection = new NpgsqlConnection(_options.ConnectionString);
     }
 
+    //TODO Initialize DB? Or add to readme. CREATE EXTENSION IF NOT EXISTS vectorscale CASCADE;
 
     public async Task ResetDatabase()
     {
@@ -31,6 +31,9 @@ public class PostgreSqlService : IPostgreSqlService
 
     public async Task SetupTables()
     {
+        //TODO Replace embedding type with:
+        //embedding VECTOR(1536)
+        //dynamic, but drive by what? which config? EmbeddingService prob?
 
         const string createTableQuery = @"
             CREATE TABLE IF NOT EXISTS embeddings (
@@ -47,6 +50,13 @@ public class PostgreSqlService : IPostgreSqlService
     public async Task SetupIndex()
     {
         //TODO create index
+        //        const string createDiskAnnQuery =
+        //@"
+        //CREATE EXTENSION IF NOT EXISTS pg_diskann CASCADE;
+        //CREATE INDEX embeddings_diskann_idx ON embeddings USING diskann (embedding vector_cosine_ops);
+        //";
+
+        //        await ExecuteQuery(createDiskAnnQuery);
     }
 
     public async Task InsertData(string content, float[] embedding, EmbeddingMetaData metaData)
@@ -102,12 +112,12 @@ public class PostgreSqlService : IPostgreSqlService
 
         if (!queryParameters.MetaDataFilterInclude.IsNullOrEmpty())
         {
-            throw new NotImplementedException();    
+            throw new NotImplementedException();
         }
-        
+
         if (!queryParameters.MetaDataFilterExclude.IsNullOrEmpty())
         {
-            throw new NotImplementedException();    
+            throw new NotImplementedException();
         }
 
         if (whereClauses.Any())
@@ -118,7 +128,7 @@ public class PostgreSqlService : IPostgreSqlService
         var embeddingsString = $"[{string.Join(',', queryParameters.EmbeddingQuery.Select(e => e.ToString()))}]";
         sqlBuilder.AppendLine($"ORDER BY embedding <=> '{embeddingsString}'");
 
-        if(queryParameters.ItemsToSkip > 0)
+        if (queryParameters.ItemsToSkip > 0)
         {
             sqlBuilder.AppendLine("LIMIT @ItemsToRetrieve OFFSET @ItemsToSkip");
             parameters.Add("@ItemsToRetrieve", queryParameters.ItemsToRetrieve);

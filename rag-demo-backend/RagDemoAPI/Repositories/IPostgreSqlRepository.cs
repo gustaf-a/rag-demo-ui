@@ -1,8 +1,8 @@
 ﻿using RagDemoAPI.Models;
 
-namespace RagDemoAPI.Services;
+namespace RagDemoAPI.Repositories;
 
-public interface IPostgreSqlService
+public interface IPostgreSqlRepository
 {
     Task ResetDatabase();
     Task SetupTables();
