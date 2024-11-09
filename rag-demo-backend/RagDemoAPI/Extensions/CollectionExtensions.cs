@@ -1,13 +1,13 @@
 ﻿namespace RagDemoAPI.Extensions;
 
 public static class CollectionExtensions
-{
-    public static bool IsNullOrEmpty(this IEnumerable<object> collection)
+{  
+    public static bool IsNullOrEmpty<T>(this IEnumerable<T> collection)
     {
         return collection is null || !collection.Any();
     }
-
-    public static bool IsNullOrEmpty(this IDictionary<string, string> collection)
+    
+    public static bool IsNullOrEmpty<T1, T2>(this IDictionary<T1, IEnumerable<T2>> collection)
     {
         return collection is null || !collection.Any();
     }
