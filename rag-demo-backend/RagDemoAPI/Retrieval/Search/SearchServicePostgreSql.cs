@@ -11,7 +11,7 @@ public class SearchServicePostgreSql(ILogger<SearchServicePostgreSql> _logger,
                                      IConfiguration configuration,
                                      IPostgreSqlRepository _postgreSqlService,
                                      IEmbeddingService _embeddingService,
-                                     ILlmServiceFactory llmServiceFactory) 
+                                     ILlmServiceFactory llmServiceFactory)
             : SearchServiceBase(llmServiceFactory), ISearchService
 {
     private readonly PostgreSqlOptions _postgreSqlOptions = configuration.GetSection(PostgreSqlOptions.PostgreSql).Get<PostgreSqlOptions>() ?? throw new ArgumentNullException(nameof(PostgreSqlOptions));
@@ -20,8 +20,8 @@ public class SearchServicePostgreSql(ILogger<SearchServicePostgreSql> _logger,
     {
         var searchOptions = chatRequest.SearchOptions;
 
-        if(string.IsNullOrWhiteSpace(searchOptions.SemanticSearchContent))
-            searchOptions.SemanticSearchContent = GetQueryContentFromChatMessages(chatRequest.ChatMessages, searchOptions);
+        if (string.IsNullOrWhiteSpace(searchOptions.SemanticSearchContent))
+            searchOptions.SemanticSearchContent = await GetQueryContentFromChatMessages(chatRequest.ChatMessages, searchOptions);
 
         return await RetrieveDocumentsInternal(searchOptions);
     }
@@ -95,7 +95,7 @@ public class SearchServicePostgreSql(ILogger<SearchServicePostgreSql> _logger,
             {
                 if (string.IsNullOrWhiteSpace(filterValue))
                     continue;
-            
+
                 string value = filterValue.PostgreSqlEscapeSqlLiteral();
 
                 string postgreSqlFilter = $"metadata {PostgreSqlJsonBContainsOperator} '{{\"{key}\": \"{value}\"}}'";

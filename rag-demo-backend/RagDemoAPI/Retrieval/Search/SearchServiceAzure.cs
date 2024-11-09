@@ -9,7 +9,10 @@ using SearchOptions = RagDemoAPI.Models.SearchOptions;
 
 namespace RagDemoAPI.Retrieval.Search;
 
-public class SearchServiceAzure(IConfiguration configuration, ILlmServiceFactory _llmServiceFactory, IEmbeddingService _embeddingService) : ISearchService
+public class SearchServiceAzure(IConfiguration configuration,
+                                ILlmServiceFactory _llmServiceFactory,
+                                IEmbeddingService _embeddingService)
+    : SearchServiceBase(_llmServiceFactory), ISearchService
 {
     private readonly AzureOptions _azureOptions = configuration.GetSection(AzureOptions.Azure).Get<AzureOptions>() ?? throw new ArgumentNullException(nameof(AzureOptions));
 
@@ -18,26 +21,9 @@ public class SearchServiceAzure(IConfiguration configuration, ILlmServiceFactory
         var chatMessages = chatRequest.ChatMessages;
         var searchOptions = chatRequest.SearchOptions;
 
-        var searchContent = GetQueryContentForSearch(chatMessages, searchOptions);
+        var searchContent = await GetQueryContentFromChatMessages(chatMessages, searchOptions);
 
         return await RetrieveDocumentsInternal(searchOptions, searchContent);
-    }
-
-    //TODO Move to base class
-    private string GetQueryContentForSearch(IEnumerable<ChatMessage> chatMessages, SearchOptions searchOptions)
-    {
-        if (chatMessages.IsNullOrEmpty())
-            return string.Empty;
-
-        if (searchOptions.SemanticSearchGenerateSummaryOfNMessages > 0)
-        {
-            //TODO generate a summary of last n messages.
-            throw new NotImplementedException();
-        }
-        else
-        {
-            return chatMessages.Last().Content;
-        }
     }
 
     public async Task<IEnumerable<RetrievedDocument>> RetrieveDocuments(SearchRequest searchRequest)
@@ -65,9 +51,11 @@ public class SearchServiceAzure(IConfiguration configuration, ILlmServiceFactory
 
     private async Task<string> GenerateSearchQueryForTextSearch(string queryContent, SearchOptions searchOptions)
     {
-        if (string.IsNullOrWhiteSpace(searchOptions.TextSearchContent)
-            && string.IsNullOrWhiteSpace(searchOptions.TextSearchMetaData))
-            return string.Empty;
+        if (!searchOptions.ContentMustIncludeWords.IsNullOrEmpty()
+            || !searchOptions.ContentMustNotIncludeWords.IsNullOrEmpty())
+        {
+            throw new NotSupportedException();
+        }
 
         var llmService = _llmServiceFactory.Create(searchOptions);
 
@@ -103,7 +91,7 @@ Generate a search query for this content:
             Size = 3
         };
 
-        if (searchOptions.UseSemanticRanker)
+        if (searchOptions.UseSemanticReRanker)
         {
             azureSearchOptions.QueryType = SearchQueryType.Semantic;
             azureSearchOptions.SemanticSearch = new()
@@ -119,7 +107,7 @@ Generate a search query for this content:
         {
             var vectorizedQueryEmbeddings = new VectorizedQuery(queryEmbeddings)
             {
-                KNearestNeighborsCount = searchOptions.UseSemanticRanker
+                KNearestNeighborsCount = searchOptions.UseSemanticReRanker
                     ? searchOptions.SemanticRankerCandidatesToRetrieve
                     : searchOptions.ItemsToRetrieve
             };
