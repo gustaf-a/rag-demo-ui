@@ -18,7 +18,7 @@ public class RetrievalController(ILogger<RetrievalController> _logger, IConfigur
         var searchResults = await _retrievalHandler.DoSearch(searchRequest);
         if (searchResults.IsNullOrEmpty())
         {
-            return NotFound();
+            return NoContent();
         }
 
         return Ok(searchResults);

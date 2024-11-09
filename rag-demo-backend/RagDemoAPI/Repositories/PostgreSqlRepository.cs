@@ -99,16 +99,16 @@ public class PostgreSqlRepository : IPostgreSqlRepository
         sqlBuilder.AppendLine("SELECT *");
         sqlBuilder.AppendLine("FROM embeddings");
 
-        if (!string.IsNullOrWhiteSpace(queryParameters.TextQuery))
+        if (!queryParameters.ContentMustIncludeWords.IsNullOrEmpty())
         {
-            whereClauses.Add("to_tsvector('english', text_column) @@ plainto_tsquery('english', @TextQuery)");
-            parameters.Add("@TextQuery", queryParameters.TextQuery);
+            for (int i = 0; i < queryParameters.ContentMustIncludeWords.Count(); i++)
+                AddColumnFilter(whereClauses, parameters, "content", isInclude: true, paramName: $"@TextQueryIncl{i}", queryParameters.ContentMustIncludeWords.ElementAt(i));
         }
 
-        if (!string.IsNullOrWhiteSpace(queryParameters.MetaDataSearchQuery))
+        if (!queryParameters.ContentMustNotIncludeWords.IsNullOrEmpty())
         {
-            whereClauses.Add("(metadata::jsonb @> @MetaDataQuery::jsonb)");
-            parameters.Add("@MetaDataQuery", queryParameters.MetaDataSearchQuery);
+            for (int i = 0; i < queryParameters.ContentMustNotIncludeWords.Count(); i++)
+                AddColumnFilter(whereClauses, parameters, "content", isInclude: false, paramName: $"@TextQueryExcl{i}", queryParameters.ContentMustNotIncludeWords.ElementAt(i));
         }
 
         if (!queryParameters.MetaDataFilterInclude.IsNullOrEmpty())
@@ -154,6 +154,12 @@ public class PostgreSqlRepository : IPostgreSqlRepository
             var exMess = ex.Message;
         }
         return null;
+    }
+
+    private static void AddColumnFilter(List<string> whereClauses, Dictionary<string, object> parameters, string tableColumn, bool isInclude, string paramName, string word)
+    {
+        whereClauses.Add($"{(isInclude ? "" : "NOT ")}{tableColumn} ILIKE '%' || {paramName} || '%'");
+        parameters.Add(paramName, word);
     }
 
     private static EmbeddingsRowModel CreateEmbeddingsRowModelMapFunction(NpgsqlDataReader reader)

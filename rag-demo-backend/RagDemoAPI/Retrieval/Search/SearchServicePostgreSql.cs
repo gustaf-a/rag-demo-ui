@@ -1,12 +1,18 @@
 ﻿using RagDemoAPI.Configuration;
 using RagDemoAPI.Extensions;
+using RagDemoAPI.Generation.LlmServices;
 using RagDemoAPI.Models;
 using RagDemoAPI.Repositories;
 using RagDemoAPI.Services;
 
 namespace RagDemoAPI.Retrieval.Search;
 
-public class SearchServicePostgreSql(ILogger<SearchServicePostgreSql> _logger, IConfiguration configuration, IPostgreSqlRepository _postgreSqlService, IEmbeddingService _embeddingService) : ISearchService
+public class SearchServicePostgreSql(ILogger<SearchServicePostgreSql> _logger,
+                                     IConfiguration configuration,
+                                     IPostgreSqlRepository _postgreSqlService,
+                                     IEmbeddingService _embeddingService,
+                                     ILlmServiceFactory llmServiceFactory) 
+            : SearchServiceBase(llmServiceFactory), ISearchService
 {
     private readonly PostgreSqlOptions _postgreSqlOptions = configuration.GetSection(PostgreSqlOptions.PostgreSql).Get<PostgreSqlOptions>() ?? throw new ArgumentNullException(nameof(PostgreSqlOptions));
 
@@ -18,23 +24,6 @@ public class SearchServicePostgreSql(ILogger<SearchServicePostgreSql> _logger, I
             searchOptions.SemanticSearchContent = GetQueryContentFromChatMessages(chatRequest.ChatMessages, searchOptions);
 
         return await RetrieveDocumentsInternal(searchOptions);
-    }
-
-    //TODO Move to base class
-    private string GetQueryContentFromChatMessages(IEnumerable<ChatMessage> chatMessages, SearchOptions searchOptions)
-    {
-        if (chatMessages.IsNullOrEmpty())
-            return string.Empty;
-
-        if (searchOptions.SemanticSearchGenerateSummaryOfNMessages > 0)
-        {
-            //TODO generate a summary of all messages.
-            throw new NotImplementedException();
-        }
-        else
-        {
-            return chatMessages.Last().Content;
-        }
     }
 
     public async Task<IEnumerable<RetrievedDocument>> RetrieveDocuments(SearchRequest searchRequest)
@@ -57,14 +46,13 @@ public class SearchServicePostgreSql(ILogger<SearchServicePostgreSql> _logger, I
 
         var queryParameters = new PostgreSqlQueryParameters
         {
-            TextQuery = searchOptions.TextSearchContent,
-            MetaDataSearchQuery = searchOptions.TextSearchMetaData,
+            ContentMustIncludeWords = searchOptions.ContentMustIncludeWords.PostgreSqlEscapeSqlLiteral(),
+            ContentMustNotIncludeWords = searchOptions.ContentMustNotIncludeWords.PostgreSqlEscapeSqlLiteral(),
             EmbeddingQuery = embeddingQuery,
             MetaDataFilterInclude = CreateMetaDataFilter(searchOptions.MetaDataFiltersInclude),
             MetaDataFilterExclude = CreateMetaDataFilter(searchOptions.MetaDataFiltersExclude),
             ItemsToRetrieve = searchOptions.ItemsToRetrieve,
             ItemsToSkip = searchOptions.ItemsToSkip,
-            UseSemanticCaptions = searchOptions.UseSemanticCaptions,
             SemanticRankerCandidatesToRetrieve = searchOptions.SemanticRankerCandidatesToRetrieve
         };
 
@@ -101,14 +89,14 @@ public class SearchServicePostgreSql(ILogger<SearchServicePostgreSql> _logger, I
                 throw new ArgumentException($"MetaDataFilter {filter.Key} needs to have values.");
             }
 
-            string key = EscapeSqlIdentifier(filter.Key);
+            string key = filter.Key.PostgreSqlEscapeSqlIdentifier();
 
             foreach (var filterValue in filter.Value)
             {
                 if (string.IsNullOrWhiteSpace(filterValue))
                     continue;
             
-                string value = EscapeSqlLiteral(filterValue);
+                string value = filterValue.PostgreSqlEscapeSqlLiteral();
 
                 string postgreSqlFilter = $"metadata {PostgreSqlJsonBContainsOperator} '{{\"{key}\": \"{value}\"}}'";
                 postgreSqlFilters.Add(postgreSqlFilter);
@@ -116,19 +104,5 @@ public class SearchServicePostgreSql(ILogger<SearchServicePostgreSql> _logger, I
         }
 
         return postgreSqlFilters;
-    }
-
-    private static string EscapeSqlIdentifier(string identifier)
-    {
-        return identifier.Replace("\"", "\"\"");
-    }
-
-    private static string EscapeSqlLiteral(string literal)
-    {
-        // In PostgreSQL, single quotes are escaped by doubling them
-        return literal
-            .Replace("\\", "\\\\")
-            .Replace("\"", "\"\"")
-            .Replace("'", "''");
     }
 }
