@@ -51,4 +51,34 @@ public static class StringExtensions
     {
         return cleanedParagraph.Split(_betweenWordsSeparator, StringSplitOptions.RemoveEmptyEntries);
     }
+
+    public static IEnumerable<string> PostgreSqlEscapeSqlIdentifier(this IEnumerable<string> identifier)
+    {
+        if (identifier.IsNullOrEmpty())
+            return Enumerable.Empty<string>();
+
+        return identifier.Select(i => i.PostgreSqlEscapeSqlIdentifier());
+    }
+
+    public static string PostgreSqlEscapeSqlIdentifier(this string identifier)
+    {
+        return identifier.Replace("\"", "\"\"");
+    }
+
+    public static IEnumerable<string> PostgreSqlEscapeSqlLiteral(this IEnumerable<string> literals)
+    {
+        if(literals.IsNullOrEmpty()) 
+            return Enumerable.Empty<string>();
+
+        return literals.Select(l => l.PostgreSqlEscapeSqlIdentifier());
+    }
+
+    public static string PostgreSqlEscapeSqlLiteral(this string literal)
+    {
+        // In PostgreSQL, single quotes are escaped by doubling them
+        return literal
+            .Replace("\\", "\\\\")
+            .Replace("\"", "\"\"")
+            .Replace("'", "''");
+    }
 }

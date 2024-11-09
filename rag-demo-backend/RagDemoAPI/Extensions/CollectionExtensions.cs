@@ -34,4 +34,21 @@ public static class CollectionExtensions
 
         return array;
     }
+
+    public static IEnumerable<T> TakeLastOrAll<T>(this IList<T> collection, int count)
+    {
+        if (collection == null)
+            throw new ArgumentNullException(nameof(collection), "Source cannot be null.");
+        if (count < 0)
+            throw new ArgumentOutOfRangeException(nameof(count), "Count cannot be negative.");
+
+        if (count == 0)
+            yield break;
+
+        int start = Math.Max(collection.Count() - count, 0);
+        for (int i = start; i < collection.Count(); i++)
+        {
+            yield return collection[i];
+        }
+    }
 }

@@ -5,6 +5,11 @@ namespace RagDemoAPI.Extensions;
 
 public static class ChatMessageExtensions
 {
+    public static IEnumerable<string> ToRows(this IEnumerable<ChatMessage> messages)
+    {
+        return messages.Select(m => $"{m.Role}: {m.Content}");
+    }
+
     public static List<OpenAI.Chat.ChatMessage> ToOpenAiChatMessages(this IEnumerable<ChatMessage> messages)
     {
         var chatHistory = new List<OpenAI.Chat.ChatMessage>();
