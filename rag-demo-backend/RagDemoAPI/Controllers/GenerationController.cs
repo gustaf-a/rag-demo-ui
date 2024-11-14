@@ -14,7 +14,7 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     [HttpPost("get-chat-response")]
     public async Task<IActionResult> GetChatResponse([FromBody] ChatRequest chatRequest)
     {
-        var response = await _chatHandler.GetChatResponse(chatRequest.ChatMessages);
+        var response = await _chatHandler.GetChatResponse(chatRequest);
 
         return Ok(response);
     }
@@ -26,6 +26,7 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
 
         return Ok(response);
     }
+
 
     //TODO RAG med alla steg returned så kan inspektera
 

@@ -12,14 +12,17 @@ public class LlmServiceAzure(IConfiguration configuration) : ILlmService
 {
     private readonly AzureOptions _azureOptions = configuration.GetSection(AzureOptions.Azure).Get<AzureOptions>() ?? throw new ArgumentNullException(nameof(AzureOptions));
 
-    public async Task<ChatResponse> GetChatResponse(IEnumerable<Models.ChatMessage> chatMessages)
+    public async Task<ChatResponse> GetChatResponse(IEnumerable<Models.ChatMessage> chatMessages, ChatOptions chatRequestOptions)
     {
-        return await GetChatResponse(chatMessages, [], new ChatOptions());
+        return await GetChatResponse(chatMessages, [], chatRequestOptions);
     }
 
     public async Task<ChatResponse> GetChatResponse(IEnumerable<Models.ChatMessage> chatMessages, IEnumerable<RetrievedDocument> retrievedContextSources, ChatOptions chatRequestOptions)
     {
         var chatHistory = chatMessages.ToOpenAiChatMessages(retrievedContextSources);
+
+        if (!chatRequestOptions.PluginsToUse.IsNullOrEmpty())
+            throw new NotSupportedException("Please use different LlmService for plugins.");
 
         var chatClient = GetAzureChatClient();
 

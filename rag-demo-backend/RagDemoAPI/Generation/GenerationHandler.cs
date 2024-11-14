@@ -7,14 +7,15 @@ namespace RagDemoAPI.Generation;
 
 public class GenerationHandler(ILogger<GenerationHandler> _logger, ILlmServiceFactory _llmServiceFactory, IRetrievalHandler _retrievalHandler) : IGenerationHandler
 {
-    public async Task<ChatResponse> GetChatResponse(IEnumerable<ChatMessage> chatMessages)
+    public async Task<ChatResponse> GetChatResponse(ChatRequest chatRequest)
     {
-        if (chatMessages.IsNullOrEmpty())
-            throw new ArgumentNullException(nameof(chatMessages));
+        ArgumentNullException.ThrowIfNull(chatRequest);
+        if (chatRequest.ChatMessages.IsNullOrEmpty())
+            throw new ArgumentNullException(nameof(chatRequest.ChatMessages));
 
-        var llmService = _llmServiceFactory.Create();
+        var llmService = _llmServiceFactory.Create(chatRequest.ChatOptions);
 
-        var chatResponse = await llmService.GetChatResponse(chatMessages);
+        var chatResponse = await llmService.GetChatResponse(chatRequest.ChatMessages, chatRequest.ChatOptions);
 
         return chatResponse;
     }

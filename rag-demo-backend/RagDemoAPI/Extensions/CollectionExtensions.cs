@@ -51,4 +51,15 @@ public static class CollectionExtensions
             yield return collection[i];
         }
     }
+
+    public static T? GetByClassName<T>(this IEnumerable<T> collection, string name) where T : class
+    {
+        if (collection == null)
+            throw new ArgumentNullException(nameof(collection), "The collection cannot be null.");
+
+        if (name == null)
+            throw new ArgumentNullException(nameof(name), "The name cannot be null.");
+
+        return collection.FirstOrDefault(item => item.GetType().Name.Equals(name, StringComparison.Ordinal));
+    }
 }

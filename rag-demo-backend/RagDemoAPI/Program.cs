@@ -6,6 +6,7 @@ using RagDemoAPI.Ingestion;
 using RagDemoAPI.Ingestion.Chunking;
 using RagDemoAPI.Ingestion.MetaDataCreation;
 using RagDemoAPI.Ingestion.PreProcessing;
+using RagDemoAPI.Plugins;
 using RagDemoAPI.Repositories;
 using RagDemoAPI.Retrieval;
 using RagDemoAPI.Retrieval.Search;
@@ -109,6 +110,11 @@ namespace RagDemoAPI
             builder.Services.AddScoped<IGenerationHandler, GenerationHandler>();
             builder.Services.AddScoped<ILlmServiceFactory, LlmServiceFactory>();
             builder.Services.AddScoped<ILlmService, LlmServiceAzure>();
+            builder.Services.AddScoped<ILlmService, LlmServiceSemanticKernel>();
+
+            builder.Services.AddScoped<IPluginHandler, PluginHandler>();
+            builder.Services.AddScoped<IPlugin, DatePlugin>();
+            builder.Services.AddScoped<IPlugin, TimePlugin>();
 
             builder.Services.AddScoped<IRetrievalHandler, RetrievalHandler>();
             builder.Services.AddScoped<ISearchServiceFactory, SearchServiceFactory>();

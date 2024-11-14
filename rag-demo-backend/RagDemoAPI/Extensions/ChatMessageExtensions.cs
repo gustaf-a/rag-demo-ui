@@ -77,17 +77,20 @@ $"""
     {
         var chatHistory = messages.ToSemanticKernelChatMessages();
 
-        var sb = new StringBuilder();
+        if (!retrievedDocuments.IsNullOrEmpty())
+        {
+            var sb = new StringBuilder();
 
-        foreach (var document in retrievedDocuments)
-            sb.AppendLine(document.ToString());
+            foreach (var document in retrievedDocuments)
+                sb.AppendLine(document.ToString());
 
-        chatHistory.AddUserMessage(
+            chatHistory.AddUserMessage(
 $"""
 <sources to use>
 {sb}
 </sources>
 """);
+        }
 
         return chatHistory;
     }

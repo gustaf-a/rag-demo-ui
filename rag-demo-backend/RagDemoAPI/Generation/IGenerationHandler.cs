@@ -4,7 +4,7 @@ namespace RagDemoAPI.Generation
 {
     public interface IGenerationHandler
     {
-        Task<ChatResponse> GetChatResponse(IEnumerable<ChatMessage> chatMessages);
+        Task<ChatResponse> GetChatResponse(ChatRequest chatRequest);
         Task<ChatResponse> GetRetrievalAugmentedChatResponse(ChatRequest chatRequest);
     }
 }
