@@ -1,4 +1,5 @@
-﻿using RagDemoAPI.Models;
+﻿using RagDemoAPI.Extensions;
+using RagDemoAPI.Models;
 
 namespace RagDemoAPI.Ingestion.Chunking
 {
@@ -6,9 +7,24 @@ namespace RagDemoAPI.Ingestion.Chunking
     {
         public IChunker Create(IngestDataRequest request, string filePath, string fileContent)
         {
-            var usableChunkers = _chunkers.Where(ch => ch.IsSuitable(request, fileContent));
+            var chunkersToUse = GetSelectedChunkers(request.IngestDataOptions);
 
-            return usableChunkers.Last();
+            foreach (var chunker in chunkersToUse)
+                if(chunker.IsSuitable(request, fileContent))
+                    return chunker;
+
+            throw new Exception($"No suitable chunker found for file {filePath}.");
+        }
+
+        private IEnumerable<IChunker> GetSelectedChunkers(IngestDataOptions ingestDataOptions)
+        {
+            if (ingestDataOptions.SelectedChunkers.IsNullOrEmpty())
+                return _chunkers;
+
+            return ingestDataOptions.SelectedChunkers
+                .Select(chunkerName 
+                    => _chunkers.GetByClassName(chunkerName) 
+                        ?? throw new Exception($"Failed to find chunker with name {chunkerName}."));
         }
 
         public IEnumerable<string> GetChunkerNames()
