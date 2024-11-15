@@ -1,4 +1,5 @@
 ﻿using RagDemoAPI.Ingestion.Chunking;
+using RagDemoAPI.Ingestion.FileReaders;
 using RagDemoAPI.Ingestion.PreProcessing;
 using RagDemoAPI.Models;
 using RagDemoAPI.Repositories;
@@ -13,41 +14,61 @@ public class IngestionHandler(ILogger<IngestionHandler> _logger, IPostgreSqlRepo
         return _chunkerFactory.GetChunkerNames();
     }
 
-    public async Task IngestDataFromFolder(IngestDataRequest request)
+    public async Task IngestData(IngestDataRequest request)
     {
-        _logger.LogInformation($"Starting to ingest data from {request.FolderPath}.");
+        ArgumentNullException.ThrowIfNull(nameof(request));
+        ArgumentNullException.ThrowIfNull(nameof(request.DatabaseOptions));
 
-        //TODO Make general file-getter ingest from request which uses DataImporterFactory and collects data. Website, folder, file, azure container etc
-        var files = Directory.GetFiles(request.FolderPath);
+        if (!await _postgreSqlService.TableExists(request.DatabaseOptions!))
+            throw new Exception($"Invalid table name: Table does not exist.");
 
-        _logger.LogInformation($"Found {files.Count()} files to ingest.");
+        if(request.FolderPath != null)
+        {
+            _logger.LogInformation($"Starting to ingest data from local folder: {request.FolderPath}.");
 
-        await IngestLocalFiles(request, files);
+            IFileReader fileReader = new LocalFileReader(request.FolderPath);
+
+            await IngestFiles(fileReader, request);
+        }
+
+        if(request.IngestFromAzureContainerOptions != null)
+        {
+            var azureContainerOptions = request.IngestFromAzureContainerOptions;
+
+            _logger.LogInformation($"Starting to ingest data from Azure container: {azureContainerOptions.ContainerName}.");
+
+            IFileReader fileReader = new AzureBlobFileReader(azureContainerOptions);
+
+            await IngestFiles(fileReader, request);
+        }
     }
 
-    private async Task IngestLocalFiles(IngestDataRequest request, IEnumerable<string> files)
+    private async Task IngestFiles(IFileReader fileReader, IngestDataRequest request)
     {
-        foreach (var file in files)
+        var fileCount = await fileReader.GetFileCount();
+
+        _logger.LogInformation($"Found {fileCount} files to ingest.");
+
+        for (int i = 0; i < fileCount; i++)
         {
-            //TODO Replace with data importer?
-            var content = await File.ReadAllTextAsync(file);
+            var ingestionSource = await fileReader.GetNextFileContent();
 
-            var preprocessedContent = DoPreProcessing(_contentPreProcessorFactory, file, content);
+            var preprocessedContent = DoPreProcessing(ingestionSource.Name, ingestionSource.Content);
             
-            var metaData = CreateMetaData(request, file, preprocessedContent);
+            var metaData = CreateMetaData(request, ingestionSource.Name, preprocessedContent);
 
-            var chunks = await DoChunking(_chunkerFactory, request, file, preprocessedContent);
+            var chunks = await DoChunking(request, ingestionSource.Name, preprocessedContent);
 
             foreach (var chunk in chunks)
             {
                 var embedding = await _embeddingService.GetEmbeddings(chunk);
 
-                await _postgreSqlService.InsertData(chunk, embedding, metaData);
+                await _postgreSqlService.InsertData(request.DatabaseOptions, chunk, embedding, metaData);
             }
         }
     }
 
-    private string DoPreProcessing(IPreProcessorFactory _contentPreProcessorFactory, string file, string content)
+    private string DoPreProcessing(string file, string content)
     {
         var preProcessor = _contentPreProcessorFactory.Create(file);
 
@@ -57,7 +78,7 @@ public class IngestionHandler(ILogger<IngestionHandler> _logger, IPostgreSqlRepo
         return preprocessedContent;
     }
 
-    private async Task<IEnumerable<string>> DoChunking(IChunkerFactory _chunkerFactory, IngestDataRequest request, string file, string preprocessedContent)
+    private async Task<IEnumerable<string>> DoChunking(IngestDataRequest request, string file, string preprocessedContent)
     {
         var chunker = _chunkerFactory.Create(request, file, preprocessedContent);
 
