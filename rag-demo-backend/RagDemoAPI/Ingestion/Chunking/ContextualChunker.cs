@@ -22,6 +22,7 @@ public class ContextualChunker(IConfiguration configuration, ILlmServiceFactory 
 
         var chunksWithContext = new List<string>();
 
+        //TODO Use caching
         var llmService = _llmServiceFactory.Create(request);
 
         foreach (var contentChunk in contentChunks)
@@ -58,11 +59,9 @@ Above is the entire document and below is the chunk within the document which we
 <chunk> 
 {contentChunk} 
 </chunk> 
-Please create a short context which helps situate the chunk in the document. Answer ONLY with the short context which explains the context of the chunk.
+Please create a short context which helps situate the chunk in the document. Answer ONLY with the short context which explains the context of the chunk and do not repeat the chunk.
 """;
 
-        //TODO Use caching
-        //TODO send in list of only one plugin to llmService
         var completionResponse = await llmService.GetCompletionSimple(contextEnrichedChunkPrompt);
 
         return completionResponse;

@@ -26,9 +26,4 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
 
         return Ok(response);
     }
-
-
-    //TODO RAG med alla steg returned så kan inspektera
-
-    //TODO RAG i flera steg så användaren kan klicka bort vissa källor så de inte används
 }

@@ -9,7 +9,6 @@ public class LlmServiceFactory(IEnumerable<ILlmService> _llmServices) : ILlmServ
     {
         if (!chatRequestOptions.PluginsToUse.IsNullOrEmpty())
             return CreateWithPlugins(chatRequestOptions);
-        //TODO Add plugins if needed
 
         return Create();
     }
