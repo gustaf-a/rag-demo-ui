@@ -2,13 +2,12 @@ using Microsoft.AspNetCore.Mvc;
 using RagDemoAPI.Configuration;
 using RagDemoAPI.Ingestion;
 using RagDemoAPI.Models;
-using RagDemoAPI.Repositories;
 
 namespace RagDemoAPI.Controllers;
 
 [ApiController]
 [Route("Ingestion")]
-public class IngestionController(ILogger<IngestionController> _logger, IConfiguration configuration, IPostgreSqlRepository _postgreSqlService, IIngestionHandler _ingestionHandler) : ControllerBase
+public class IngestionController(ILogger<IngestionController> _logger, IConfiguration configuration, IIngestionHandler _ingestionHandler) : ControllerBase
 {
     private readonly AzureOptions _azureOptions = configuration.GetSection(AzureOptions.Azure).Get<AzureOptions>() ?? throw new ArgumentNullException(nameof(AzureOptions));
 
@@ -20,42 +19,18 @@ public class IngestionController(ILogger<IngestionController> _logger, IConfigur
         return Ok(chunkerNames);
     }
 
-    [HttpPost("reset-database")]
-    public async Task<IActionResult> ResetDatabase()
-    {
-        try
-        {
-            await _postgreSqlService.ResetDatabase();
-            return Ok("Database reset successfully.");
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Error setting up tables: {ex.Message}");
-        }
-    }
-
-    [HttpPost("setup-tables")]
-    public async Task<IActionResult> SetupTables()
-    {
-        try
-        {
-            await _postgreSqlService.SetupTables();
-            return Ok("Tables set up successfully.");
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, $"Error setting up tables: {ex.Message}");
-        }
-    }
-
     [HttpPost("ingest-data")]
     public async Task<IActionResult> IngestData([FromBody] IngestDataRequest request)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(request?.FolderPath);
+        ArgumentNullException.ThrowIfNull(nameof(request));
+
+        if (string.IsNullOrWhiteSpace(request.FolderPath)
+            && request.IngestFromAzureContainerOptions is null)
+            throw new Exception($"Either {nameof(request.FolderPath)} or {nameof(request.IngestFromAzureContainerOptions)} must contain information.");
 
         try
         {
-            await _ingestionHandler.IngestDataFromFolder(request);
+            await _ingestionHandler.IngestData(request);
 
             return Ok("Data ingested successfully.");
         }
