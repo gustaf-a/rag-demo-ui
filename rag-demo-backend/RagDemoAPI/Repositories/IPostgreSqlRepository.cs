@@ -4,8 +4,10 @@ namespace RagDemoAPI.Repositories;
 
 public interface IPostgreSqlRepository
 {
-    Task ResetDatabase();
-    Task SetupTables();
-    Task InsertData(string content, float[] embedding, EmbeddingMetaData metaData);
-    Task<IEnumerable<RetrievedDocument>> RetrieveData(PostgreSqlQueryParameters queryParameters);
+    Task ResetTable(DatabaseOptions databaseOptions);
+    Task SetupTable(DatabaseOptions databaseOptions);
+    Task InsertData(DatabaseOptions databaseOptions, string content, float[] embedding, EmbeddingMetaData metaData);
+    Task<IEnumerable<RetrievedDocument>> RetrieveData(DatabaseOptions databaseOptions, PostgreSqlQueryParameters queryParameters);
+    Task<IEnumerable<string>> GetTableNames();
+    Task<bool> TableExists(DatabaseOptions databaseOptions);
 }
