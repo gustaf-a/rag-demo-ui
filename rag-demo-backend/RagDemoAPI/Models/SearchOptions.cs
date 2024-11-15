@@ -2,6 +2,8 @@
 {
     public class SearchOptions
     {
+        public DatabaseOptions DatabaseOptions { get; set; } = new DatabaseOptions();
+
         public int ItemsToRetrieve { get; set; } = 3;
         public int ItemsToSkip { get; set; } = 0;
 
