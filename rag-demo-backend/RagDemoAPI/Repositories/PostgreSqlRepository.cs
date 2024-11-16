@@ -20,8 +20,10 @@ public class PostgreSqlRepository : IPostgreSqlRepository
 
     //TODO Initialize DB? Or add to readme. CREATE EXTENSION IF NOT EXISTS vectorscale CASCADE;
 
-    public async Task<bool> TableExists(DatabaseOptions databaseOptions)
+    public async Task<bool> DoesTableExist(DatabaseOptions databaseOptions)
     {
+        databaseOptions.TableName = databaseOptions.TableName.ToLower();
+
         var tableNames = await GetTableNames();
 
         return tableNames.Contains(databaseOptions.TableName);
@@ -78,7 +80,7 @@ public class PostgreSqlRepository : IPostgreSqlRepository
 
         //        await ExecuteQuery(createDiskAnnQuery);
     }
-
+    
     public async Task InsertData(DatabaseOptions databaseOptions, string content, float[] embedding, EmbeddingMetaData metaData)
     {
         string insertQuery = $@"
@@ -166,7 +168,7 @@ public class PostgreSqlRepository : IPostgreSqlRepository
             if (queryResult == null || !queryResult.Any())
                 return Enumerable.Empty<RetrievedDocument>();
 
-            return queryResult.Select(qr => new RetrievedDocument(qr));
+            return queryResult.Select(qr => new RetrievedDocument(databaseOptions.TableName, qr));
         }
         catch (Exception ex)
         {
