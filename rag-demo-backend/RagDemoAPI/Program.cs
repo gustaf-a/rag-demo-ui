@@ -4,7 +4,6 @@ using RagDemoAPI.Generation;
 using RagDemoAPI.Generation.LlmServices;
 using RagDemoAPI.Ingestion;
 using RagDemoAPI.Ingestion.Chunking;
-using RagDemoAPI.Ingestion.MetaDataCreation;
 using RagDemoAPI.Ingestion.PreProcessing;
 using RagDemoAPI.Plugins;
 using RagDemoAPI.Repositories;
@@ -99,9 +98,6 @@ namespace RagDemoAPI
             builder.Services.AddScoped<IPreProcessor, MarkDownPreProcessor>();
             builder.Services.AddScoped<IPreProcessor, DoNothingPreProcessor>();
 
-            builder.Services.AddScoped<IMetaDataCreatorFactory, MetaDataCreatorFactory>();
-            builder.Services.AddScoped<IMetaDataCreator, BasicMetaDataCreator>();
-            
             builder.Services.AddScoped<IChunkerFactory, ChunkerFactory>();
             builder.Services.AddScoped<IChunker, DoNothingChunker>();
             builder.Services.AddScoped<IChunker, SlidingWindowChunker>();

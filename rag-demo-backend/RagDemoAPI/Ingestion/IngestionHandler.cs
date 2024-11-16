@@ -7,7 +7,7 @@ using RagDemoAPI.Services;
 
 namespace RagDemoAPI.Ingestion;
 
-public class IngestionHandler(ILogger<IngestionHandler> _logger, IPostgreSqlRepository _postgreSqlService, IPreProcessorFactory _contentPreProcessorFactory, IChunkerFactory _chunkerFactory, IMetaDataCreatorFactory _metaDataCreatorFactory,IEmbeddingService _embeddingService) : IIngestionHandler
+public class IngestionHandler(ILogger<IngestionHandler> _logger, IPostgreSqlRepository _postgreSqlService, IPreProcessorFactory _contentPreProcessorFactory, IChunkerFactory _chunkerFactory, IEmbeddingService _embeddingService) : IIngestionHandler
 {
     public IEnumerable<string> GetChunkerNames()
     {
@@ -19,7 +19,7 @@ public class IngestionHandler(ILogger<IngestionHandler> _logger, IPostgreSqlRepo
         ArgumentNullException.ThrowIfNull(nameof(request));
         ArgumentNullException.ThrowIfNull(nameof(request.DatabaseOptions));
 
-        if (!await _postgreSqlService.TableExists(request.DatabaseOptions!))
+        if (!await _postgreSqlService.DoesTableExist(request.DatabaseOptions!))
             throw new Exception($"Invalid table name: Table does not exist.");
 
         if(request.FolderPath != null)
@@ -55,15 +55,13 @@ public class IngestionHandler(ILogger<IngestionHandler> _logger, IPostgreSqlRepo
 
             var preprocessedContent = DoPreProcessing(ingestionSource.Name, ingestionSource.Content);
             
-            var metaData = CreateMetaData(request, ingestionSource.Name, preprocessedContent);
-
             var chunks = await DoChunking(request, ingestionSource.Name, preprocessedContent);
 
             foreach (var chunk in chunks)
             {
                 var embedding = await _embeddingService.GetEmbeddings(chunk);
 
-                await _postgreSqlService.InsertData(request.DatabaseOptions, chunk, embedding, metaData);
+                await _postgreSqlService.InsertData(request.DatabaseOptions!, chunk, embedding, ingestionSource.MetaData);
             }
         }
     }
@@ -86,14 +84,5 @@ public class IngestionHandler(ILogger<IngestionHandler> _logger, IPostgreSqlRepo
 
         var chunks = await chunker.Execute(request, preprocessedContent);
         return chunks;
-    }
-
-    private EmbeddingMetaData CreateMetaData(IngestDataRequest request, string filePath, string content)
-    {
-        var metaDataCreator = _metaDataCreatorFactory.Create(request, filePath, content);
-
-        _logger.LogInformation($"Creating meta data for {filePath}: Using {metaDataCreator.Name}.");
-
-        return metaDataCreator.Execute(request, filePath, content);
     }
 }

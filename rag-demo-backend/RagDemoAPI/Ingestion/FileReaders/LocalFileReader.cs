@@ -2,9 +2,9 @@
 
 namespace RagDemoAPI.Ingestion.FileReaders;
 
-public class LocalFileReader(string folderPath) : IFileReader
+public class LocalFileReader(string _folderPath) : IFileReader
 {
-    private readonly List<string> _files = Directory.GetFiles(folderPath).ToList();
+    private readonly List<string> _files = Directory.GetFiles(_folderPath).ToList();
 
     private int _filesRead = -1;
 
@@ -20,12 +20,26 @@ public class LocalFileReader(string folderPath) : IFileReader
 
         _filesRead++;
 
-        var content = await File.ReadAllTextAsync(_files[_filesRead]);
+        var filePath = _files[_filesRead];
+
+        var content = await File.ReadAllTextAsync(filePath);
+
+        var metaData = CreateMetaData(filePath, content);
 
         return new IngestionSource
         {
             Name = _files[_filesRead],
             Content = content
+        };
+    }
+
+    public EmbeddingMetaData CreateMetaData(string filePath, string content)
+    {
+        return new EmbeddingMetaData
+        {
+            CreatedDateTime = DateTime.UtcNow,
+            Source = _folderPath,
+            Uri = filePath
         };
     }
 }
