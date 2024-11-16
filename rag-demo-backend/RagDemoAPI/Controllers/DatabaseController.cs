@@ -28,6 +28,11 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
     [HttpPost("reset-table")]
     public async Task<IActionResult> ResetTable([FromBody] DatabaseOptions databaseOptions)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(databaseOptions.TableName);
+
+        if (!await _postgreSqlService.DoesTableExist(databaseOptions))
+            throw new Exception($"Table {databaseOptions.TableName} not found.");
+
         try
         {
             await _postgreSqlService.ResetTable(databaseOptions);
@@ -42,6 +47,11 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
     [HttpPost("setup-table")]
     public async Task<IActionResult> SetupTable([FromBody] DatabaseOptions databaseOptions)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(databaseOptions.TableName);
+
+        if (await _postgreSqlService.DoesTableExist(databaseOptions))
+            throw new Exception($"Table {databaseOptions.TableName} already exists. Please use reset table instead.");
+
         try
         {
             await _postgreSqlService.SetupTable(databaseOptions);
