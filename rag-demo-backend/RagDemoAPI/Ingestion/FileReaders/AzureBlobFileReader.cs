@@ -1,18 +1,19 @@
-﻿using Azure;
-using Azure.Storage.Blobs;
+﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using RagDemoAPI.Models;
 
 namespace RagDemoAPI.Ingestion.FileReaders;
 
-public class AzureBlobFileReader : IFileReader
+public class AzureBlobFileReader : FileReaderBase, IFileReader
 {
     private readonly List<string> _blobs = [];
     private readonly BlobContainerClient _containerClient;
     private int _blobsRead = -1;
 
-    public AzureBlobFileReader(IngestFromAzureContainerOptions azureContainerOptions)
+    public AzureBlobFileReader(IngestDataRequest request) : base(request.MetaDataTags)
     {
+        var azureContainerOptions = request.IngestFromAzureContainerOptions;
+
         if (string.IsNullOrWhiteSpace(azureContainerOptions.ConnectionString))
             throw new ArgumentException("Connection string cannot be null or empty.", nameof(azureContainerOptions.ConnectionString));
 
@@ -62,7 +63,7 @@ public class AzureBlobFileReader : IFileReader
         {
             var downloadResult = await blobClient.DownloadContentAsync();
 
-            var metaData = CreateMetaData(blobName, downloadResult);
+            var metaData = CreateMetaData(_containerClient.Uri.AbsoluteUri, $"{_containerClient.Uri.AbsoluteUri}/{blobName}");
 
             return new IngestionSource
             {
@@ -75,15 +76,5 @@ public class AzureBlobFileReader : IFileReader
         {
             throw new InvalidOperationException($"Failed to read blob content for '{blobName}'.", ex);
         }
-    }
-
-    private EmbeddingMetaData CreateMetaData(string blobName, Response<BlobDownloadResult> downloadResult)
-    {
-        return new EmbeddingMetaData
-        {
-            Source = _containerClient.Uri.AbsoluteUri,
-            CreatedDateTime = DateTime.UtcNow,
-            Uri = $"{_containerClient.Uri.AbsoluteUri}/{blobName}"
-        };
     }
 }

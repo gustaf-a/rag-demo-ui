@@ -10,8 +10,8 @@
         public IEnumerable<string>? ContentMustIncludeWords { get; set; } = null;
         public IEnumerable<string>? ContentMustNotIncludeWords { get; set; } = null;
 
-        public Dictionary<string, IEnumerable<string>> MetaDataFiltersInclude { get; set; } = [];
-        public Dictionary<string, IEnumerable<string>> MetaDataFiltersExclude { get; set; } = [];
+        public Dictionary<string, IEnumerable<string>> MetaDataInclude { get; set; } = [];
+        public Dictionary<string, IEnumerable<string>> MetaDataExclude { get; set; } = [];
 
         public string? SemanticSearchContent { get; set; } = null;
 

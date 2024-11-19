@@ -26,18 +26,16 @@ public class IngestionHandler(ILogger<IngestionHandler> _logger, IPostgreSqlRepo
         {
             _logger.LogInformation($"Starting to ingest data from local folder: {request.FolderPath}.");
 
-            IFileReader fileReader = new LocalFileReader(request.FolderPath);
+            IFileReader fileReader = new LocalFileReader(request);
 
             await IngestFiles(fileReader, request);
         }
 
         if(request.IngestFromAzureContainerOptions != null)
         {
-            var azureContainerOptions = request.IngestFromAzureContainerOptions;
+            _logger.LogInformation($"Starting to ingest data from Azure container: {request.IngestFromAzureContainerOptions.ContainerName}.");
 
-            _logger.LogInformation($"Starting to ingest data from Azure container: {azureContainerOptions.ContainerName}.");
-
-            IFileReader fileReader = new AzureBlobFileReader(azureContainerOptions);
+            IFileReader fileReader = new AzureBlobFileReader(request);
 
             await IngestFiles(fileReader, request);
         }
