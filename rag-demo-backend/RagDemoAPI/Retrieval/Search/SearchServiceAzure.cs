@@ -178,15 +178,15 @@ Generate a search query for this content:
 
     private static string CreateMetaDataFilters(SearchOptions searchOptions)
     {
-        if (searchOptions.MetaDataFiltersExclude.IsNullOrEmpty()
-            && searchOptions.MetaDataFiltersInclude.IsNullOrEmpty())
+        if (searchOptions.MetaDataExclude.IsNullOrEmpty()
+            && searchOptions.MetaDataInclude.IsNullOrEmpty())
             return string.Empty;
 
         var filterParts = new List<string>();
 
-        if (!searchOptions.MetaDataFiltersExclude.IsNullOrEmpty())
+        if (!searchOptions.MetaDataExclude.IsNullOrEmpty())
         {
-            foreach (var filterKeyValuePair in searchOptions.MetaDataFiltersExclude)
+            foreach (var filterKeyValuePair in searchOptions.MetaDataExclude)
             {
                 switch (filterKeyValuePair.Key.ToLower())
                 {
@@ -205,9 +205,9 @@ Generate a search query for this content:
             }
         }
 
-        if (!searchOptions.MetaDataFiltersInclude.IsNullOrEmpty())
+        if (!searchOptions.MetaDataInclude.IsNullOrEmpty())
         {
-            foreach (var filterKeyValuePair in searchOptions.MetaDataFiltersExclude)
+            foreach (var filterKeyValuePair in searchOptions.MetaDataExclude)
             {
                 switch (filterKeyValuePair.Key.ToLower())
                 {
