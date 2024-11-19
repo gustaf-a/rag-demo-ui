@@ -18,8 +18,6 @@ public class PostgreSqlRepository : IPostgreSqlRepository
         _connection = new NpgsqlConnection(_options.ConnectionString);
     }
 
-    //TODO Initialize DB? Or add to readme. CREATE EXTENSION IF NOT EXISTS vectorscale CASCADE;
-
     public async Task<bool> DoesTableExist(DatabaseOptions databaseOptions)
     {
         databaseOptions.TableName = databaseOptions.TableName.ToLower();
@@ -44,6 +42,35 @@ public class PostgreSqlRepository : IPostgreSqlRepository
             query,
             parameters,
             reader => reader.GetString(reader.GetOrdinal("table_name"))
+        );
+    }
+
+    public async Task<IEnumerable<string>> GetUniqueMetaDataTagKeys(DatabaseOptions databaseOptions)
+    {
+        string query = $@"
+            SELECT DISTINCT jsonb_object_keys(metadata->'Tags') AS unique_keys
+            FROM {databaseOptions.TableName};
+        ";
+
+        return await ExecuteQueryAsync(
+            query,
+            [],
+            reader => reader.GetString(reader.GetOrdinal("unique_keys"))
+        );
+    }
+
+    public async Task<IEnumerable<string>> GetUniqueMetaDataTagValues(DatabaseOptions databaseOptions, string tag)
+    {
+        string query = $@"
+            SELECT DISTINCT metadata->'Tags'->>'{tag}' AS tag_value
+            FROM {databaseOptions.TableName}
+            WHERE metadata->'Tags' ? '{tag}';
+        ";
+
+        return await ExecuteQueryAsync(
+            query,
+            [],
+            reader => reader.GetString(reader.GetOrdinal("tag_value"))
         );
     }
 

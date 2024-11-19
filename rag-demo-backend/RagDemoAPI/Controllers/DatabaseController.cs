@@ -21,17 +21,18 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, $"Failed to get tables.");
+
             return StatusCode(500, $"Error getting names of tables: {ex.Message}");
         }
     }
 
+    //TODO Remove table
+
     [HttpPost("reset-table")]
     public async Task<IActionResult> ResetTable([FromBody] DatabaseOptions databaseOptions)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(databaseOptions.TableName);
-
-        if (!await _postgreSqlService.DoesTableExist(databaseOptions))
-            throw new Exception($"Table {databaseOptions.TableName} not found.");
+        await CheckTableExists(databaseOptions);
 
         try
         {
@@ -40,6 +41,8 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, $"Failed to reset table: {databaseOptions.TableName}");
+
             return StatusCode(500, $"Error setting up tables: {ex.Message}");
         }
     }
@@ -47,10 +50,7 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
     [HttpPost("setup-table")]
     public async Task<IActionResult> SetupTable([FromBody] DatabaseOptions databaseOptions)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(databaseOptions.TableName);
-
-        if (await _postgreSqlService.DoesTableExist(databaseOptions))
-            throw new Exception($"Table {databaseOptions.TableName} already exists. Please use reset table instead.");
+        await CheckTableExists(databaseOptions);
 
         try
         {
@@ -59,7 +59,55 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, $"Failed to set up table: {databaseOptions.TableName}");
+
             return StatusCode(500, $"Error setting up table: {ex.Message}");
         }
+    }
+
+    [HttpPost("get-unique-tag-values/{tag}")]
+    public async Task<IActionResult> GetUniqueMetaDataTagValues(string tag, [FromBody]DatabaseOptions databaseOptions)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(tag);
+
+        await CheckTableExists(databaseOptions);
+
+        try
+        {
+            var projectNames = await _postgreSqlService.GetUniqueMetaDataTagValues(databaseOptions, tag);
+            return Ok(projectNames);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Failed to get {tag} values.");
+
+            return StatusCode(500, $"Error getting {tag} values: {ex.Message}");
+        }
+    }
+    
+    [HttpPost("get-unique-tag-keys")]
+    public async Task<IActionResult> GetUniqueMetaDataTagKeys([FromBody]DatabaseOptions databaseOptions)
+    {
+        await CheckTableExists(databaseOptions);
+
+        try
+        {
+            var projectNames = await _postgreSqlService.GetUniqueMetaDataTagKeys(databaseOptions);
+            return Ok(projectNames);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Failed to get tag keys {databaseOptions.TableName}.");
+
+            return StatusCode(500, $"Failed to get tag keys {databaseOptions.TableName}: {ex.Message}");
+        }
+    }
+
+    private async Task CheckTableExists(DatabaseOptions databaseOptions)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(databaseOptions.TableName);
+
+        if (!await _postgreSqlService.DoesTableExist(databaseOptions))
+            throw new Exception($"Table {databaseOptions.TableName} not found.");
     }
 }
