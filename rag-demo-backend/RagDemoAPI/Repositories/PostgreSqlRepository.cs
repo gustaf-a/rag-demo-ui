@@ -18,15 +18,6 @@ public class PostgreSqlRepository : IPostgreSqlRepository
         _connection = new NpgsqlConnection(_options.ConnectionString);
     }
 
-    public async Task<bool> DoesTableExist(DatabaseOptions databaseOptions)
-    {
-        databaseOptions.TableName = databaseOptions.TableName.ToLower();
-
-        var tableNames = await GetTableNames();
-
-        return tableNames.Contains(databaseOptions.TableName);
-    }
-
     public async Task<IEnumerable<string>> GetTableNames()
     {
         string query = @"
@@ -74,13 +65,25 @@ public class PostgreSqlRepository : IPostgreSqlRepository
         );
     }
 
+    public async Task<bool> DoesTableExist(DatabaseOptions databaseOptions)
+    {
+        var tableNames = await GetTableNames();
+
+        return tableNames.Contains(databaseOptions.TableName);
+    }
+
     public async Task ResetTable(DatabaseOptions databaseOptions)
+    {
+        await DeleteTable(databaseOptions);
+
+        await CreateEmbeddingsTable(databaseOptions);
+    }
+
+    public async Task DeleteTable(DatabaseOptions databaseOptions)
     {
         string dropTableQuery = $"DROP TABLE IF EXISTS {databaseOptions.TableName};";
 
         await ExecuteQuery(dropTableQuery);
-
-        await CreateEmbeddingsTable(databaseOptions);
     }
 
     public async Task CreateEmbeddingsTable(DatabaseOptions databaseOptions)

@@ -27,9 +27,25 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
         }
     }
 
-    //TODO Remove table
+    [HttpDelete("remove-table")]
+    public async Task<IActionResult> RemoveTable([FromBody] DatabaseOptions databaseOptions)
+    {
+        await CheckTableExists(databaseOptions);
 
-    [HttpGet("reset-table")]
+        try
+        {
+            await _postgreSqlService.DeleteTable(databaseOptions);
+            return Ok("Table removed successfully.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Failed to remove table: {databaseOptions.TableName}");
+
+            return StatusCode(500, $"Failed to remove table {databaseOptions.TableName}: {ex.Message}");
+        }
+    }
+
+    [HttpPost("reset-table")]
     public async Task<IActionResult> ResetTable([FromBody] DatabaseOptions databaseOptions)
     {
         await CheckTableExists(databaseOptions);
@@ -50,7 +66,12 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
     [HttpPost("create-embeddings-table")]
     public async Task<IActionResult> CreateEmbeddingsTable([FromBody] DatabaseOptions databaseOptions)
     {
-        await CheckTableExists(databaseOptions);
+        ArgumentException.ThrowIfNullOrWhiteSpace(databaseOptions.TableName);
+
+        databaseOptions.TableName = databaseOptions.TableName.ToLower();
+
+        if (await _postgreSqlService.DoesTableExist(databaseOptions))
+            throw new Exception($"Table {databaseOptions.TableName} already exists.");
 
         try
         {
@@ -106,6 +127,8 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
     private async Task CheckTableExists(DatabaseOptions databaseOptions)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(databaseOptions.TableName);
+
+        databaseOptions.TableName = databaseOptions.TableName.ToLower();
 
         if (!await _postgreSqlService.DoesTableExist(databaseOptions))
             throw new Exception($"Table {databaseOptions.TableName} not found.");
