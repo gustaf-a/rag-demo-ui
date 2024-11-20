@@ -2,7 +2,7 @@
 {
     public class SearchOptions
     {
-        public DatabaseOptions DatabaseOptions { get; set; } = new DatabaseOptions();
+        public string EmbeddingsTableName { get; set; }
 
         public int ItemsToRetrieve { get; set; } = 3;
         public int ItemsToSkip { get; set; } = 0;

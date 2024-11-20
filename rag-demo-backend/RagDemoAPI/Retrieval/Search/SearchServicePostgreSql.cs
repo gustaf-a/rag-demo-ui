@@ -58,7 +58,7 @@ public class SearchServicePostgreSql(ILogger<SearchServicePostgreSql> _logger,
 
         try
         {
-            var retrievedDocuments = await _postgreSqlService.RetrieveData(searchOptions.DatabaseOptions, queryParameters);
+            var retrievedDocuments = await _postgreSqlService.RetrieveData(searchOptions.EmbeddingsTableName, queryParameters);
 
             return retrievedDocuments;
         }

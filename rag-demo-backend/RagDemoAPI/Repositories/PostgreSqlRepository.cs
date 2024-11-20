@@ -139,7 +139,7 @@ public class PostgreSqlRepository : IPostgreSqlRepository
         }
     }
 
-    public async Task<IEnumerable<RetrievedDocument>> RetrieveData(DatabaseOptions databaseOptions, PostgreSqlQueryParameters queryParameters)
+    public async Task<IEnumerable<RetrievedDocument>> RetrieveData(string embeddingsTableName, PostgreSqlQueryParameters queryParameters)
     {
         ArgumentNullException.ThrowIfNull(queryParameters);
 
@@ -148,7 +148,7 @@ public class PostgreSqlRepository : IPostgreSqlRepository
         var parameters = new Dictionary<string, object>();
 
         sqlBuilder.AppendLine("SELECT *");
-        sqlBuilder.AppendLine($"FROM {databaseOptions.TableName}");
+        sqlBuilder.AppendLine($"FROM {embeddingsTableName}");
 
         if (!queryParameters.ContentMustIncludeWords.IsNullOrEmpty())
         {
@@ -187,6 +187,7 @@ public class PostgreSqlRepository : IPostgreSqlRepository
         }
 
         var retrieveDataQuery = sqlBuilder.ToString();
+
         try
         {
             var queryResult = await ExecuteQueryAsync(
@@ -198,12 +199,13 @@ public class PostgreSqlRepository : IPostgreSqlRepository
             if (queryResult == null || !queryResult.Any())
                 return Enumerable.Empty<RetrievedDocument>();
 
-            return queryResult.Select(qr => new RetrievedDocument(databaseOptions.TableName, qr));
+            return queryResult.Select(qr => new RetrievedDocument(embeddingsTableName, qr));
         }
         catch (Exception ex)
         {
             var exMess = ex.Message;
         }
+
         return null;
     }
 

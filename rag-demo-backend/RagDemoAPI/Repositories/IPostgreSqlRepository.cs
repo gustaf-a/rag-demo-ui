@@ -13,6 +13,6 @@ public interface IPostgreSqlRepository
     Task<IEnumerable<string>> GetUniqueMetaDataTagValues(DatabaseOptions databaseOptions, string tag);
 
     Task InsertData(DatabaseOptions databaseOptions, string content, float[] embedding, EmbeddingMetaData metaData);
-    Task<IEnumerable<RetrievedDocument>> RetrieveData(DatabaseOptions databaseOptions, PostgreSqlQueryParameters queryParameters);
+    Task<IEnumerable<RetrievedDocument>> RetrieveData(string embeddingsTableName, PostgreSqlQueryParameters queryParameters);
     Task<IEnumerable<string>> GetUniqueMetaDataTagKeys(DatabaseOptions databaseOptions);
 }
