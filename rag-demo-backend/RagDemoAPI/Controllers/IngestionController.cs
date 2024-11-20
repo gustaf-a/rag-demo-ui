@@ -11,7 +11,7 @@ public class IngestionController(ILogger<IngestionController> _logger, IConfigur
 {
     private readonly AzureOptions _azureOptions = configuration.GetSection(AzureOptions.Azure).Get<AzureOptions>() ?? throw new ArgumentNullException(nameof(AzureOptions));
 
-    [HttpGet("chunkers")]
+    [HttpGet("get-chunkers")]
     public async Task<IActionResult> GetChunkers()
     {
         var chunkerNames = _ingestionHandler.GetChunkerNames();
