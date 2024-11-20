@@ -7,7 +7,7 @@ public interface IPostgreSqlRepository
     Task<IEnumerable<string>> GetTableNames();
     Task<bool> DoesTableExist(DatabaseOptions databaseOptions);
     Task ResetTable(DatabaseOptions databaseOptions);
-    Task SetupTable(DatabaseOptions databaseOptions);
+    Task CreateEmbeddingsTable(DatabaseOptions databaseOptions);
 
     Task<IEnumerable<string>> GetUniqueMetaDataTagValues(DatabaseOptions databaseOptions, string tag);
 

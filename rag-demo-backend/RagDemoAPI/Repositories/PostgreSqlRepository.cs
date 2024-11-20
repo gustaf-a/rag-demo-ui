@@ -80,10 +80,10 @@ public class PostgreSqlRepository : IPostgreSqlRepository
 
         await ExecuteQuery(dropTableQuery);
 
-        await SetupTable(databaseOptions);
+        await CreateEmbeddingsTable(databaseOptions);
     }
 
-    public async Task SetupTable(DatabaseOptions databaseOptions)
+    public async Task CreateEmbeddingsTable(DatabaseOptions databaseOptions)
     {
         string createTableQuery = $@"
             CREATE TABLE IF NOT EXISTS {databaseOptions.TableName} (

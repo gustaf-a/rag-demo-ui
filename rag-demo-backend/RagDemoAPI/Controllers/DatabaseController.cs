@@ -29,7 +29,7 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
 
     //TODO Remove table
 
-    [HttpPost("reset-table")]
+    [HttpGet("reset-table")]
     public async Task<IActionResult> ResetTable([FromBody] DatabaseOptions databaseOptions)
     {
         await CheckTableExists(databaseOptions);
@@ -47,21 +47,21 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
         }
     }
 
-    [HttpPost("setup-table")]
-    public async Task<IActionResult> SetupTable([FromBody] DatabaseOptions databaseOptions)
+    [HttpPost("create-embeddings-table")]
+    public async Task<IActionResult> CreateEmbeddingsTable([FromBody] DatabaseOptions databaseOptions)
     {
         await CheckTableExists(databaseOptions);
 
         try
         {
-            await _postgreSqlService.SetupTable(databaseOptions);
+            await _postgreSqlService.CreateEmbeddingsTable(databaseOptions);
             return Ok($"Table {databaseOptions.TableName} set up successfully with {databaseOptions.EmbeddingsDimensions} embedding dimensions.");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Failed to set up table: {databaseOptions.TableName}");
+            _logger.LogError(ex, $"Failed to create embeddings table: {databaseOptions.TableName}");
 
-            return StatusCode(500, $"Error setting up table: {ex.Message}");
+            return StatusCode(500, $"Failed to create embeddings table: {ex.Message}");
         }
     }
 
