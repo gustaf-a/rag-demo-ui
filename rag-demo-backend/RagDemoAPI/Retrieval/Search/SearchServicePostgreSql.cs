@@ -98,7 +98,7 @@ public class SearchServicePostgreSql(ILogger<SearchServicePostgreSql> _logger,
 
                 string value = filterValue.PostgreSqlEscapeSqlLiteral();
 
-                string postgreSqlFilter = $"metadata {PostgreSqlJsonBContainsOperator} '{{\"{key}\": \"{value}\"}}'";
+                string postgreSqlFilter = $"metadata {PostgreSqlJsonBContainsOperator} '{{\"{nameof(EmbeddingMetaData.Tags)}\": {{\"{key}\": \"{value}\"}}}}'";
                 postgreSqlFilters.Add(postgreSqlFilter);
             }
         }
