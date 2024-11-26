@@ -45,7 +45,7 @@ public class LlmServiceAzure(IConfiguration configuration) : ILlmService
         var chatResultContext = chatresult.GetMessageContext();
         if (chatResultContext is null)
         {
-            return new ChatResponse(chatresult.Content[0].Text, retrievedContextSources.ToList());
+            return new ChatResponse(chatresult.Content[0].Text, retrievedContextSources.IsNullOrEmpty() ? [] : retrievedContextSources.ToList());
         }
 
         return new ChatResponse(chatresult.Content[0].Text, intent: chatResultContext.Intent, citations: chatResultContext.Citations);
