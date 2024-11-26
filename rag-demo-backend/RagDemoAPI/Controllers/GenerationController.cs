@@ -62,6 +62,22 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     /// }  
     /// ```
     /// 
+    /// ## RAG chat request with search filters:
+    /// ```   
+    /// {  
+    ///    "chatMessages": [
+    ///    {  
+    ///        "role": "user",  
+    ///        "content": "How long until Jane's next meeting?"  
+    ///    }  
+    ///    ],
+    ///    "searchOptions": {
+    ///        "embeddingsTableName": "embeddings1",
+    ///        "itemsToRetrieve": 3
+    ///    }  
+    /// }  
+    /// ```
+    /// 
     /// ## RAG chat request with 1 plugin:
     /// ```   
     /// {  
