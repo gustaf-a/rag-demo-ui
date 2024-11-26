@@ -81,7 +81,31 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     ///        "embeddingsTableName": "embeddings1",
     ///        "itemsToRetrieve": 3
     ///    }  
-    /// }  
+    /// }
+    /// ```
+    /// 
+    /// ## RAG chat request with 1 plugin without auto invoking of plugins. For human-in-the-loop or animating message progress
+    /// ```
+    /// {
+    ///     "chatMessages": [
+    ///     {
+    ///         "role": "user",
+    ///         "content": "How many days until Jane's next follow up?"
+    ///     }
+    ///     ],
+    ///     "searchOptions": {
+    ///         "embeddingsTableName": "embeddings1",
+    ///         "itemsToRetrieve": 2,
+    ///         "itemsToSkip": 0
+    ///     },
+    ///     "chatOptions": {
+    ///         "temperature": 0.2,
+    ///         "pluginsToUse": [
+    ///             "DatePlugin"
+    ///         ],
+    ///	    "PluginsAutoInvoke":false
+    ///     }
+    /// }
     /// ```
     /// </remarks>
     /// <param name="chatRequest"></param>
@@ -100,6 +124,8 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     /// 
     /// </summary>
     /// <remarks>
+    /// 
+    /// //TODO Add example
     /// </remarks>
     /// <param name="continueChatRequest"></param>
     /// <returns></returns>

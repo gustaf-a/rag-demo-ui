@@ -12,6 +12,25 @@ namespace RagDemoAPI.Controllers;
 [Route("retrieval")]
 public class RetrievalController(ILogger<RetrievalController> _logger, IConfiguration configuration, IRetrievalHandler _retrievalHandler) : ControllerBase
 {
+    /// <summary>
+    /// Searches a table using text and or semantic search.
+    /// </summary>
+    /// <remarks>
+    /// #  Examples
+    /// 
+    /// ## Simple semantic search request:
+    /// ```   
+    /// {
+    ///     "searchOptions": {
+    ///         "embeddingsTableName": "embeddings1",
+    ///         "itemsToRetrieve": 3,
+    ///         "semanticSearchContent": "John's medicines"
+    ///     }
+    /// }
+    /// ```
+    /// </remarks>
+    /// <param name="searchRequest"></param>
+    /// <returns></returns>
     [HttpPost("search")]
     public async Task<IActionResult> PerformSearch([FromBody] SearchRequest searchRequest)
     {
