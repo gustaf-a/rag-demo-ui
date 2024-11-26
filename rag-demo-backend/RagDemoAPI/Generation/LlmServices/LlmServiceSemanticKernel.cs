@@ -5,7 +5,6 @@ using RagDemoAPI.Extensions;
 using RagDemoAPI.Models;
 using RagDemoAPI.Plugins;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using ChatOptions = RagDemoAPI.Models.ChatOptions;
 
 namespace RagDemoAPI.Generation.LlmServices;

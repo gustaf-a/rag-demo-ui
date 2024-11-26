@@ -17,26 +17,72 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     /// If ProvidedDocumentSources are included, they will be used instead of searching.
     /// </summary>
     /// <remarks>
-    /// Example request:
-    /// {
-    ///  "embeddingsTableName": "embeddings1",
-    ///  "chatMessages": [
-    ///    {
-    ///      "role": "user",
-    ///      "content": "How long until Jane's next meeting?"
-    ///    }
-    ///  ],
-    ///  "chatOptions": {
-    ///    "temperature": 0.2,
-    ///    "pluginsToUse": [
-    ///      "DatePlugin"
+    /// #  Examples
+    /// 
+    /// ## Simple chat request:
+    /// ```   
+    /// {  
+    ///    "chatMessages": [
+    ///    {  
+    ///        "role": "user",  
+    ///        "content": "What do you think about RAG systems for LLMs? Keep it short."  
+    ///    }  
     ///    ]
-    ///  },
-    ///  "searchOptions": {
-    ///    "embeddingsTableName": "embeddings1",
-    ///    "itemsToRetrieve": 3
+    /// }  
+    /// ```
+    /// 
+    /// ## Simple chat request with chat options high temperature for more creative answers:
+    /// ```   
+    /// {  
+    ///    "chatMessages": [
+    ///    {  
+    ///        "role": "user",  
+    ///        "content": "What do you think about RAG systems for LLMs? Keep it short."  
+    ///    }  
+    ///    ],
+    ///    "chatOptions": {  
+    ///        "temperature": 0.9
     ///    }
-    ///}
+    /// }  
+    /// ```
+    /// 
+    /// ## RAG chat request:
+    /// ```   
+    /// {  
+    ///    "chatMessages": [
+    ///    {  
+    ///        "role": "user",  
+    ///        "content": "How long until Jane's next meeting?"  
+    ///    }  
+    ///    ],
+    ///    "searchOptions": {
+    ///        "embeddingsTableName": "embeddings1",
+    ///        "itemsToRetrieve": 3
+    ///    }  
+    /// }  
+    /// ```
+    /// 
+    /// ## RAG chat request with 1 plugin:
+    /// ```   
+    /// {  
+    ///    "chatMessages": [
+    ///    {  
+    ///        "role": "user",  
+    ///        "content": "How long until Jane's next meeting?"  
+    ///    }  
+    ///    ],  
+    ///    "chatOptions": {  
+    ///        "temperature": 0.2,  
+    ///        "pluginsToUse": [
+    ///            "DatePlugin"
+    ///        ]  
+    ///    },  
+    ///    "searchOptions": {
+    ///        "embeddingsTableName": "embeddings1",
+    ///        "itemsToRetrieve": 3
+    ///    }  
+    /// }  
+    /// ```
     /// </remarks>
     /// <param name="chatRequest"></param>
     /// <returns></returns>

@@ -11,10 +11,11 @@ public class GenerationHandler(ILogger<GenerationHandler> _logger, ILlmServiceFa
     public async Task<ChatResponse> GetChatResponse(ChatRequest chatRequest)
     {
         ArgumentNullException.ThrowIfNull(chatRequest);
-        ArgumentNullException.ThrowIfNull(chatRequest.SearchOptions);
 
         if (chatRequest.ChatMessages.IsNullOrEmpty())
             throw new ArgumentNullException(nameof(ChatRequest.ChatMessages));
+
+        chatRequest.ChatOptions ??= new ChatOptions();
 
         if (chatRequest.SearchOptions != null
             && chatRequest.ProvidedDocumentSources.IsNullOrEmpty())
