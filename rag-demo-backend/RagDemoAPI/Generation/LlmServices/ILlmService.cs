@@ -6,6 +6,7 @@ namespace RagDemoAPI.Generation.LlmServices
     {
         Task<ChatResponse> GetChatResponse(IEnumerable<ChatMessage> chatMessages, ChatOptions chatRequestOptions);
         Task<ChatResponse> GetChatResponse(IEnumerable<ChatMessage> chatMessages, IEnumerable<RetrievedDocument> retrievedContextSources, ChatOptions chatRequestOptions);
+        Task<ChatResponse> ContinueChatResponse(string previousChatHistoryJson, IEnumerable<ChatMessage> chatMessages, IEnumerable<RetrievedDocument> retrievedContextSources, ChatOptions chatRequestOptions);
         Task<string> GetCompletionSimple(string contextEnrichedChunkPrompt);
     }
 }

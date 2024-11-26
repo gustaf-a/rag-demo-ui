@@ -1,3 +1,4 @@
+using Microsoft.OpenApi.Models;
 using Microsoft.SemanticKernel;
 using RagDemoAPI.Configuration;
 using RagDemoAPI.Generation;
@@ -10,6 +11,7 @@ using RagDemoAPI.Repositories;
 using RagDemoAPI.Retrieval;
 using RagDemoAPI.Retrieval.Search;
 using RagDemoAPI.Services;
+using System.Reflection;
 
 namespace RagDemoAPI
 {
@@ -35,7 +37,13 @@ namespace RagDemoAPI
             });
 
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "RAG Demo API", Version = "v1" });
+
+                var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+            });
 
             builder.Services.AddHttpClient();
 

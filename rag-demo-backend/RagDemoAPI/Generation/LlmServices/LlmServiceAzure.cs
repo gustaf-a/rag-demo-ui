@@ -12,12 +12,17 @@ public class LlmServiceAzure(IConfiguration configuration) : ILlmService
 {
     private readonly AzureOptions _azureOptions = configuration.GetSection(AzureOptions.Azure).Get<AzureOptions>() ?? throw new ArgumentNullException(nameof(AzureOptions));
 
+    public Task<ChatResponse> ContinueChatResponse(string previousChatHistoryJson, IEnumerable<Models.ChatMessage> chatMessages, IEnumerable<RetrievedDocument> retrievedContextSources, ChatOptions chatRequestOptions)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<ChatResponse> GetChatResponse(IEnumerable<Models.ChatMessage> chatMessages, ChatOptions chatRequestOptions)
     {
         return await GetChatResponse(chatMessages, [], chatRequestOptions);
     }
 
-    public async Task<ChatResponse> GetChatResponse(IEnumerable<Models.ChatMessage> chatMessages, IEnumerable<RetrievedDocument> retrievedContextSources, ChatOptions chatRequestOptions)
+    public async Task<ChatResponse> GetChatResponse(IEnumerable<Models.ChatMessage> chatMessages, IEnumerable<Models.RetrievedDocument> retrievedContextSources, ChatOptions chatRequestOptions)
     {
         var chatHistory = chatMessages.ToOpenAiChatMessages(retrievedContextSources);
 

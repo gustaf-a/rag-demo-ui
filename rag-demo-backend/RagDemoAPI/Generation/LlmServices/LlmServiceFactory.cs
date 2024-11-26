@@ -7,7 +7,13 @@ public class LlmServiceFactory(IEnumerable<ILlmService> _llmServices) : ILlmServ
 {
     public ILlmService Create(ChatOptions chatRequestOptions)
     {
+        if (chatRequestOptions is null)
+            return Create();
+
         if (!chatRequestOptions.PluginsToUse.IsNullOrEmpty())
+            return CreateWithPlugins(chatRequestOptions);
+
+        if(!chatRequestOptions.PluginsAutoInvoke ?? false)
             return CreateWithPlugins(chatRequestOptions);
 
         return Create();

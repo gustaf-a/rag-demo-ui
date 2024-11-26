@@ -1,5 +1,5 @@
-﻿using RagDemoAPI.Models;
-using System.Text;
+﻿using Microsoft.SemanticKernel.ChatCompletion;
+using RagDemoAPI.Models;
 
 namespace RagDemoAPI.Extensions;
 
@@ -29,34 +29,28 @@ public static class ChatMessageExtensions
         return chatHistory;
     }
 
-    public static List<OpenAI.Chat.ChatMessage> ToOpenAiChatMessages(this IEnumerable<ChatMessage> messages, IEnumerable<RetrievedDocument> retrievedDocuments)
+    public static List<OpenAI.Chat.ChatMessage> ToOpenAiChatMessages(this IEnumerable<ChatMessage> messages, IEnumerable<Models.RetrievedDocument> retrievedDocuments)
     {
         var chatHistory = messages.ToOpenAiChatMessages();
 
         if (!retrievedDocuments.Any())
             return chatHistory;
 
-        var sb = new StringBuilder();
-
-        foreach (var document in retrievedDocuments)
-        {
-            sb.AppendLine(document.ToString());
-            sb.AppendLine();
-        }
+        var sourcesString = retrievedDocuments.ToSourcesString();
 
         chatHistory.Insert(0, new OpenAI.Chat.UserChatMessage(
 $"""
 <sources>
-{sb}
+{sourcesString}
 </sources>
 """));
 
         return chatHistory;
     }
 
-    public static Microsoft.SemanticKernel.ChatCompletion.ChatHistory ToSemanticKernelChatMessages(this IEnumerable<Models.ChatMessage> messages)
+    public static ChatHistory ToSemanticKernelChatMessages(this IEnumerable<Models.ChatMessage> messages)
     {
-        var chatHistory = new Microsoft.SemanticKernel.ChatCompletion.ChatHistory();
+        var chatHistory = new ChatHistory();
 
         foreach (var message in messages)
         {
@@ -66,6 +60,8 @@ $"""
                 chatHistory.AddSystemMessage(message.Content);
             else if (string.Equals(message.Role, ChatMessageRoles.Assistant, StringComparison.InvariantCultureIgnoreCase))
                 chatHistory.AddAssistantMessage(message.Content);
+            else if (string.Equals(message.Role, ChatMessageRoles.Tool, StringComparison.InvariantCultureIgnoreCase))
+                chatHistory.AddMessage(AuthorRole.Tool, message.Content);
             else
                 throw new NotSupportedException($"Unsupported chat message role encountered: {message.Role}");
         }
@@ -73,23 +69,14 @@ $"""
         return chatHistory;
     }
 
-    public static Microsoft.SemanticKernel.ChatCompletion.ChatHistory ToSemanticKernelChatMessages(this IEnumerable<ChatMessage> messages, IEnumerable<RetrievedDocument> retrievedDocuments)
+    public static ChatHistory ToSemanticKernelChatMessages(this IEnumerable<ChatMessage> messages, IEnumerable<Models.RetrievedDocument> retrievedDocuments)
     {
         var chatHistory = messages.ToSemanticKernelChatMessages();
 
         if (!retrievedDocuments.IsNullOrEmpty())
         {
-            var sb = new StringBuilder();
-
-            foreach (var document in retrievedDocuments)
-                sb.AppendLine(document.ToString());
-
-            chatHistory.AddUserMessage(
-$"""
-<sources to use>
-{sb}
-</sources>
-""");
+            var sourcesString = retrievedDocuments.ToSourcesString();
+            chatHistory.AddUserMessage(sourcesString);
         }
 
         return chatHistory;

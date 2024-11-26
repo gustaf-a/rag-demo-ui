@@ -16,7 +16,7 @@ public class SearchServiceAzure(IConfiguration configuration,
 {
     private readonly AzureOptions _azureOptions = configuration.GetSection(AzureOptions.Azure).Get<AzureOptions>() ?? throw new ArgumentNullException(nameof(AzureOptions));
 
-    public async Task<IEnumerable<RetrievedDocument>> RetrieveDocuments(ChatRequest chatRequest)
+    public async Task<IEnumerable<Models.RetrievedDocument>> RetrieveDocuments(ChatRequest chatRequest)
     {
         var chatMessages = chatRequest.ChatMessages;
         var searchOptions = chatRequest.SearchOptions;
@@ -26,12 +26,12 @@ public class SearchServiceAzure(IConfiguration configuration,
         return await RetrieveDocumentsInternal(searchOptions, searchContent);
     }
 
-    public async Task<IEnumerable<RetrievedDocument>> RetrieveDocuments(SearchRequest searchRequest)
+    public async Task<IEnumerable<Models.RetrievedDocument>> RetrieveDocuments(SearchRequest searchRequest)
     {
         return await RetrieveDocumentsInternal(searchRequest.SearchOptions, searchRequest.SearchOptions.SemanticSearchContent);
     }
 
-    private async Task<IEnumerable<RetrievedDocument>> RetrieveDocumentsInternal(SearchOptions searchOptions, string searchContent)
+    private async Task<IEnumerable<Models.RetrievedDocument>> RetrieveDocumentsInternal(SearchOptions searchOptions, string searchContent)
     {
         var queryEmbeddings = await GenerateQueryEmbeddingsInternal(searchContent);
 
@@ -83,7 +83,7 @@ Generate a search query for this content:
         return createSearchQueryPrompt;
     }
 
-    private async Task<IEnumerable<RetrievedDocument>> RetrieveDocumentsInternal(SearchOptions searchOptions, float[]? queryEmbeddings = null, string? textSearchQuery = null)
+    private async Task<IEnumerable<Models.RetrievedDocument>> RetrieveDocumentsInternal(SearchOptions searchOptions, float[]? queryEmbeddings = null, string? textSearchQuery = null)
     {
         var azureSearchOptions = new Azure.Search.Documents.SearchOptions
         {
@@ -128,11 +128,11 @@ Generate a search query for this content:
             throw new Exception("Failed to get search results.");
         }
 
-        var retrievedDocuments = new List<RetrievedDocument>();
+        var retrievedDocuments = new List<Models.RetrievedDocument>();
 
         foreach (var searchDocument in searchResultResponse.Value.GetResults())
         {
-            RetrievedDocument retrievedDocument = GetRetrievedDocument(searchDocument, searchOptions.UseSemanticCaptions);
+            Models.RetrievedDocument retrievedDocument = GetRetrievedDocument(searchDocument, searchOptions.UseSemanticCaptions);
 
             if (retrievedDocument != null)
                 retrievedDocuments.Add(retrievedDocument);
@@ -142,7 +142,7 @@ Generate a search query for this content:
     }
 
 
-    private RetrievedDocument GetRetrievedDocument(SearchResult<SearchDocument> searchDocument, bool useSemanticCaptions)
+    private Models.RetrievedDocument GetRetrievedDocument(SearchResult<SearchDocument> searchDocument, bool useSemanticCaptions)
     {
         searchDocument.Document.TryGetValue("sourcepage", out var sourcePageValue);
 
@@ -173,7 +173,7 @@ Generate a search query for this content:
 
         var content = string.Join(" . ", contentValues).RemoveNewLines();
 
-        return new RetrievedDocument(sourcePage, content);
+        return new Models.RetrievedDocument(sourcePage, content);
     }
 
     private static string CreateMetaDataFilters(SearchOptions searchOptions)

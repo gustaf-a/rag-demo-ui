@@ -4,6 +4,9 @@ using Microsoft.SemanticKernel.Connectors.OpenAI;
 using RagDemoAPI.Extensions;
 using RagDemoAPI.Models;
 using RagDemoAPI.Plugins;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using ChatOptions = RagDemoAPI.Models.ChatOptions;
 
 namespace RagDemoAPI.Generation.LlmServices;
 
@@ -18,7 +21,32 @@ public class LlmServiceSemanticKernel(IConfiguration configuration, Kernel _kern
     public async Task<ChatResponse> GetChatResponse(IEnumerable<Models.ChatMessage> chatMessages, IEnumerable<RetrievedDocument> retrievedContextSources, ChatOptions chatOptions)
     {
         var chatResponse = await GetChatResponseInternal(chatMessages.ToSemanticKernelChatMessages(retrievedContextSources), chatOptions);
-        
+
+        chatResponse.Citations = retrievedContextSources.ToList();
+
+        return chatResponse;
+    }
+
+    public async Task<ChatResponse> ContinueChatResponse(string previousChatHistoryJson, IEnumerable<Models.ChatMessage> chatMessages, IEnumerable<Models.RetrievedDocument> retrievedContextSources, ChatOptions chatRequestOptions)
+    {
+        if(string.IsNullOrWhiteSpace(previousChatHistoryJson))
+            throw new Exception($"Cannot continue chat if previous chat history is nothing.");
+
+        var chatHistory = JsonSerializer.Deserialize<ChatHistory>(previousChatHistoryJson);
+        if (chatHistory.IsNullOrEmpty())
+            throw new Exception($"Failed to decode previous chathistory in {nameof(LlmServiceSemanticKernel)}.");
+
+        if (!retrievedContextSources.IsNullOrEmpty())
+        {
+            var sourcesString = retrievedContextSources.ToSourcesString();
+            chatHistory.AddUserMessage(sourcesString);
+        }
+
+        if (!chatMessages.IsNullOrEmpty())
+            chatHistory.AddToChatHistory(chatMessages);
+
+        var chatResponse = await GetChatResponseInternal(chatHistory, chatRequestOptions);
+
         chatResponse.Citations = retrievedContextSources.ToList();
 
         return chatResponse;
@@ -35,7 +63,12 @@ public class LlmServiceSemanticKernel(IConfiguration configuration, Kernel _kern
         {
             _pluginHandler.AddPlugins(_kernel, chatOptions.PluginsToUse);
 
-            openAIPromptExecutionSettings.FunctionChoiceBehavior = FunctionChoiceBehavior.Auto();
+            FunctionChoiceBehaviorOptions options = new() { AllowParallelCalls = chatOptions.AllowMultiplePluginCallsPerCompletion };
+
+            openAIPromptExecutionSettings.FunctionChoiceBehavior
+                = (chatOptions.PluginUseRequired ?? false)
+                    ? FunctionChoiceBehavior.Required(options: options, autoInvoke: chatOptions.PluginsAutoInvoke ?? true)
+                    : FunctionChoiceBehavior.Auto(options: options, autoInvoke: chatOptions.PluginsAutoInvoke ?? true);
         }
 
         var chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>();
@@ -43,9 +76,9 @@ public class LlmServiceSemanticKernel(IConfiguration configuration, Kernel _kern
         var result = await chatCompletionService.GetChatMessageContentAsync(
            chatHistory,
            executionSettings: openAIPromptExecutionSettings,
-           kernel: _kernel) 
+           kernel: _kernel)
             ?? throw new Exception($"Failed to get chat completion response.");
-        
+
         return new ChatResponse(result.Content)
         {
             ChatHistory = chatHistory

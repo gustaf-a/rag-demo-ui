@@ -16,7 +16,7 @@ public class SearchServicePostgreSql(ILogger<SearchServicePostgreSql> _logger,
 {
     private readonly PostgreSqlOptions _postgreSqlOptions = configuration.GetSection(PostgreSqlOptions.PostgreSql).Get<PostgreSqlOptions>() ?? throw new ArgumentNullException(nameof(PostgreSqlOptions));
 
-    public async Task<IEnumerable<RetrievedDocument>> RetrieveDocuments(ChatRequest chatRequest)
+    public async Task<IEnumerable<Models.RetrievedDocument>> RetrieveDocuments(ChatRequest chatRequest)
     {
         var searchOptions = chatRequest.SearchOptions;
 
@@ -26,12 +26,12 @@ public class SearchServicePostgreSql(ILogger<SearchServicePostgreSql> _logger,
         return await RetrieveDocumentsInternal(searchOptions);
     }
 
-    public async Task<IEnumerable<RetrievedDocument>> RetrieveDocuments(SearchRequest searchRequest)
+    public async Task<IEnumerable<Models.RetrievedDocument>> RetrieveDocuments(SearchRequest searchRequest)
     {
         return await RetrieveDocumentsInternal(searchRequest.SearchOptions);
     }
 
-    private async Task<IEnumerable<RetrievedDocument>> RetrieveDocumentsInternal(SearchOptions searchOptions)
+    private async Task<IEnumerable<Models.RetrievedDocument>> RetrieveDocumentsInternal(SearchOptions searchOptions)
     {
         ArgumentNullException.ThrowIfNull(searchOptions);
 

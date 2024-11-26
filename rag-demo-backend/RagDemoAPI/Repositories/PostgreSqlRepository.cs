@@ -110,7 +110,7 @@ public class PostgreSqlRepository : IPostgreSqlRepository
 
         //        await ExecuteQuery(createDiskAnnQuery);
     }
-    
+
     public async Task InsertData(DatabaseOptions databaseOptions, string content, float[] embedding, EmbeddingMetaData metaData)
     {
         string insertQuery = $@"
@@ -139,7 +139,7 @@ public class PostgreSqlRepository : IPostgreSqlRepository
         }
     }
 
-    public async Task<IEnumerable<RetrievedDocument>> RetrieveData(string embeddingsTableName, PostgreSqlQueryParameters queryParameters)
+    public async Task<IEnumerable<Models.RetrievedDocument>> RetrieveData(string embeddingsTableName, PostgreSqlQueryParameters queryParameters)
     {
         ArgumentNullException.ThrowIfNull(queryParameters);
 
@@ -188,25 +188,16 @@ public class PostgreSqlRepository : IPostgreSqlRepository
 
         var retrieveDataQuery = sqlBuilder.ToString();
 
-        try
-        {
-            var queryResult = await ExecuteQueryAsync(
-                retrieveDataQuery,
-                parameters,
-                CreateEmbeddingsRowModelMapFunction
-            );
+        var queryResult = await ExecuteQueryAsync(
+            retrieveDataQuery,
+            parameters,
+            CreateEmbeddingsRowModelMapFunction
+        );
 
-            if (queryResult == null || !queryResult.Any())
-                return Enumerable.Empty<RetrievedDocument>();
+        if (queryResult == null || !queryResult.Any())
+            return Enumerable.Empty<Models.RetrievedDocument>();
 
-            return queryResult.Select(qr => new RetrievedDocument(embeddingsTableName, qr));
-        }
-        catch (Exception ex)
-        {
-            var exMess = ex.Message;
-        }
-
-        return null;
+        return queryResult.Select(qr => new Models.RetrievedDocument(embeddingsTableName, qr));
     }
 
     private static void AddColumnFilter(List<string> whereClauses, Dictionary<string, object> parameters, string tableColumn, bool isInclude, string paramName, string word)
