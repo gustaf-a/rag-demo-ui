@@ -28,6 +28,22 @@ public class RetrievalController(ILogger<RetrievalController> _logger, IConfigur
     ///     }
     /// }
     /// ```
+    /// 
+    /// ## Semantic search request with metadata filter (uses Tags):
+    /// ```   
+    /// {
+    ///   "searchOptions": {
+    ///     "embeddingsTableName": "embeddings1",
+    ///     "itemsToRetrieve": 5,
+    ///     "semanticSearchContent": "John's medicines",
+    ///     "metaDataInclude": {
+    ///       "project": [
+    ///         "Health Care 10x"
+    ///       ]
+    ///     }
+    ///   }
+    /// }
+    /// ```
     /// </remarks>
     /// <param name="searchRequest"></param>
     /// <returns></returns>
