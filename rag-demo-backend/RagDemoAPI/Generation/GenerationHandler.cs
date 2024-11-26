@@ -33,8 +33,6 @@ public class GenerationHandler(ILogger<GenerationHandler> _logger, ILlmServiceFa
 
         var chatResponse = await llmService.GetChatResponse(chatRequest.ChatMessages, chatRequest.ProvidedDocumentSources, chatRequest.ChatOptions);
 
-        var chatHistoryJson = JsonSerializer.Serialize(chatResponse.ChatHistory);
-
         return chatResponse;
     }
 

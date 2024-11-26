@@ -33,7 +33,7 @@ public static class ChatMessageExtensions
     {
         var chatHistory = messages.ToOpenAiChatMessages();
 
-        if (!retrievedDocuments.Any())
+        if (retrievedDocuments.IsNullOrEmpty())
             return chatHistory;
 
         var sourcesString = retrievedDocuments.ToSourcesString();

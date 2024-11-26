@@ -46,7 +46,7 @@ public class LlmServiceSemanticKernel(IConfiguration configuration, Kernel _kern
 
         var chatResponse = await GetChatResponseInternal(chatHistory, chatRequestOptions);
 
-        chatResponse.Citations = retrievedContextSources.ToList();
+        chatResponse.Citations = retrievedContextSources.IsNullOrEmpty() ? [] : retrievedContextSources.ToList();
 
         return chatResponse;
     }
@@ -76,11 +76,16 @@ public class LlmServiceSemanticKernel(IConfiguration configuration, Kernel _kern
            chatHistory,
            executionSettings: openAIPromptExecutionSettings,
            kernel: _kernel)
-            ?? throw new Exception($"Failed to get chat completion response.");
+            ?? throw new Exception($"Failed to get chat completion response: Received null response from chat completion service using semantic kernel.");
+
+        if (string.IsNullOrWhiteSpace(result.Content))
+            chatHistory.AddAssistantMessage(result.Content);
+
+        //TODO add tool calls to chatHistory
 
         return new ChatResponse(result.Content)
         {
-            ChatHistory = chatHistory
+            ChatHistoryJson = JsonSerializer.Serialize(chatHistory)
         };
     }
 

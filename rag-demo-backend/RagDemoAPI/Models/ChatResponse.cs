@@ -1,5 +1,4 @@
-﻿using Microsoft.SemanticKernel.ChatCompletion;
-using RagDemoAPI.Extensions;
+﻿using RagDemoAPI.Extensions;
 
 namespace RagDemoAPI.Models;
 
@@ -12,9 +11,9 @@ public class ChatResponse
     public string Intent { get; set; }
 
     /// <summary>
-    /// Contains the original question and eventual tool calls
+    /// Contains the original question and tool calls
     /// </summary>
-    public ChatHistory ChatHistory { get; set; } = [];
+    public string ChatHistoryJson { get; set; }
 
     public ChatResponse()
     {
