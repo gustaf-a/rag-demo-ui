@@ -69,15 +69,14 @@ public class DatePlugin : IPlugin
     [Description("Adds a specified number of days to a given date.")]
     public string AddDaysToDate(
         [Description("Date in yyyy-MM-dd format.")] string date,
-        [Description("Number of days to add.")] int days)
+        [Description("Number of days to add as integer.")] string days)
     {
+        if(!int.TryParse(days, out var daysInt))
+            return "Invalid days format. Must be integer.";
+
         if (DateTime.TryParseExact(date, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out DateTime targetDate))
-        {
-            return targetDate.AddDays(days).ToString("yyyy-MM-dd");
-        }
+            return targetDate.AddDays(daysInt).ToString("yyyy-MM-dd");
         else
-        {
             return "Invalid date format. Please use yyyy-MM-dd format.";
-        }
     }
 }
