@@ -398,3 +398,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 rag-demo-backend/RagDemoAPI/appsettings.json
+rag-demo-backend/RagDemoAPI/Properties/ServiceDependencies/RagDemoAPI20241118085132 - Web Deploy/apis1.arm.json
+rag-demo-backend/RagDemoAPI/Properties/ServiceDependencies/RagDemoAPI20241118085132 - Web Deploy/profile.arm.json
+rag-demo-backend/RagDemoAPI/Properties/launchSettings.json
