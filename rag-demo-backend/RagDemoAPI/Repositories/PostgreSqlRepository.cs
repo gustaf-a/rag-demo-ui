@@ -139,7 +139,7 @@ public class PostgreSqlRepository : IPostgreSqlRepository
         }
     }
 
-    public async Task<IEnumerable<Models.RetrievedDocument>> RetrieveData(string embeddingsTableName, PostgreSqlQueryParameters queryParameters)
+    public async Task<IEnumerable<RetrievedDocument>> RetrieveData(string embeddingsTableName, PostgreSqlQueryParameters queryParameters)
     {
         ArgumentNullException.ThrowIfNull(queryParameters);
 

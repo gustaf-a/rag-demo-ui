@@ -10,7 +10,7 @@
 		<!-- Suppresses warnings for missing XML comments -->
 		<NoWarn>$(NoWarn);1591</NoWarn>
 	</PropertyGroup>
-
+	
 	<ItemGroup>
 		<PackageReference Include="Azure.Search.Documents" Version="11.6.0" />
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.23.0" />
@@ -20,5 +20,4 @@
 		<PackageReference Include="Npgsql" Version="8.0.5" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
 	</ItemGroup>
-
 </Project>
