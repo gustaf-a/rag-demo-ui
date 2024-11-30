@@ -8,7 +8,6 @@ public class ChatResponse
     public List<ChatMessage> ChatMessages { get; set; } = [];
 
     public List<RetrievedDocument> Citations { get; set; } = [];
-    public string Intent { get; set; }
 
     /// <summary>
     /// Contains the original question and tool calls
@@ -29,10 +28,9 @@ public class ChatResponse
         Citations = sourcesUsed;
     }
 
-    public ChatResponse(string text, string intent, IEnumerable<Azure.AI.OpenAI.Chat.ChatCitation> citations) : this(text)
+    public ChatResponse(string text, IEnumerable<Azure.AI.OpenAI.Chat.ChatCitation> citations) : this(text)
     {
         Citations = citations.ToChatMessageCitations();
-        Intent = intent;
     }
 }
 

@@ -4,6 +4,13 @@ namespace RagDemoAPI.Plugins;
 
 public class PluginHandler : IPluginHandler
 {
+    private static readonly List<string> _availablePlugins = [nameof(DatePlugin), nameof(TimePlugin)];
+
+    public void AddPlugins(Kernel kernel)
+    {
+        AddPlugins(kernel, _availablePlugins);
+    }
+
     public void AddPlugins(Kernel kernel, IEnumerable<string> pluginNames)
     {
         foreach (var pluginName in pluginNames)

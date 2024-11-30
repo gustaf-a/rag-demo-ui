@@ -48,7 +48,7 @@ public class LlmServiceAzure(IConfiguration configuration) : ILlmService
             return new ChatResponse(chatresult.Content[0].Text, retrievedContextSources.IsNullOrEmpty() ? [] : retrievedContextSources.ToList());
         }
 
-        return new ChatResponse(chatresult.Content[0].Text, intent: chatResultContext.Intent, citations: chatResultContext.Citations);
+        return new ChatResponse(chatresult.Content[0].Text, citations: chatResultContext.Citations);
     }
 
     public async Task<string> GetCompletionSimple(string prompt)

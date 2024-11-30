@@ -2,7 +2,7 @@
 {
     public class ChatRequest
     {
-        public IEnumerable<ChatMessage> ChatMessages { get; set; }
+        public IEnumerable<ChatMessage>? ChatMessages { get; set; }
         public IEnumerable<RetrievedDocument>? ProvidedDocumentSources { get; set; }
         public ChatOptions ChatOptions { get; set; } = new();
 

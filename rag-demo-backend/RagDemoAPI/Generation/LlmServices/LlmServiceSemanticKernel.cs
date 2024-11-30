@@ -4,7 +4,9 @@ using Microsoft.SemanticKernel.Connectors.OpenAI;
 using RagDemoAPI.Extensions;
 using RagDemoAPI.Models;
 using RagDemoAPI.Plugins;
+using System.Text;
 using System.Text.Json;
+using ChatMessage = RagDemoAPI.Models.ChatMessage;
 using ChatOptions = RagDemoAPI.Models.ChatOptions;
 
 namespace RagDemoAPI.Generation.LlmServices;
@@ -26,14 +28,47 @@ public class LlmServiceSemanticKernel(IConfiguration configuration, Kernel _kern
         return chatResponse;
     }
 
-    public async Task<ChatResponse> ContinueChatResponse(string previousChatHistoryJson, IEnumerable<Models.ChatMessage> chatMessages, IEnumerable<Models.RetrievedDocument> retrievedContextSources, ChatOptions chatRequestOptions)
+    public async Task<ChatResponse> ContinueChatResponse(string previousChatHistoryJson, IEnumerable<ChatMessage> chatMessages, IEnumerable<Models.RetrievedDocument> retrievedContextSources, ChatOptions chatRequestOptions)
     {
-        if(string.IsNullOrWhiteSpace(previousChatHistoryJson))
+        if (string.IsNullOrWhiteSpace(previousChatHistoryJson))
             throw new Exception($"Cannot continue chat if previous chat history is nothing.");
 
         var chatHistory = JsonSerializer.Deserialize<ChatHistory>(previousChatHistoryJson);
         if (chatHistory.IsNullOrEmpty())
             throw new Exception($"Failed to decode previous chathistory in {nameof(LlmServiceSemanticKernel)}.");
+
+        if (!chatMessages.IsNullOrEmpty())
+            chatHistory.AddToChatHistory(chatMessages);
+
+        if (chatHistory.LastMessageWasFrom("Assistant"))
+        {
+            var finishReason = chatHistory.GetLastFinishReason();
+            if ("stop".Equals(finishReason, StringComparison.InvariantCulture) || "completed".Equals(finishReason, StringComparison.InvariantCulture))
+            {
+                //finished. Return nothing.
+                return new ChatResponse();
+            }
+            else if ("ToolCalls".Equals(finishReason, StringComparison.InvariantCulture))
+            {
+                //if auto, continue
+                var chatHistoryFromToolCall = await DoToolCalls(_kernel, _pluginHandler, chatMessages, chatHistory);
+
+                if (!(chatRequestOptions.PluginsAutoInvoke ?? true))
+                {
+                    return new ChatResponse
+                    {
+                        ChatHistoryJson = JsonSerializer.Serialize(chatHistoryFromToolCall)
+                    };
+                }
+
+                //Continue as normal
+                chatHistory = chatHistoryFromToolCall;
+            }
+            else
+            {
+                //Not finished. Continue as if is user message.
+            }
+        }
 
         if (!retrievedContextSources.IsNullOrEmpty())
         {
@@ -41,14 +76,39 @@ public class LlmServiceSemanticKernel(IConfiguration configuration, Kernel _kern
             chatHistory.AddUserMessage(sourcesString);
         }
 
-        if (!chatMessages.IsNullOrEmpty())
-            chatHistory.AddToChatHistory(chatMessages);
-
         var chatResponse = await GetChatResponseInternal(chatHistory, chatRequestOptions);
 
         chatResponse.Citations = retrievedContextSources.IsNullOrEmpty() ? [] : retrievedContextSources.ToList();
 
         return chatResponse;
+    }
+
+    private static async Task<ChatHistory> DoToolCalls(Kernel _kernel, IPluginHandler _pluginHandler, IEnumerable<ChatMessage> chatMessages, ChatHistory chatHistory)
+    {
+        var functionCallsInLastChatMessage = FunctionCallContent.GetFunctionCalls(chatHistory.Last());
+        if (functionCallsInLastChatMessage.IsNullOrEmpty())
+            throw new Exception($"Last message finish reason was tool call, but no function calls found.");
+
+        if (!chatMessages.IsNullOrEmpty())
+            throw new Exception($"Cannot execute function call and handle user message at the same time. Please first finish function calling sequence.");
+
+        _pluginHandler.AddPlugins(_kernel);
+
+        foreach (var functionCall in functionCallsInLastChatMessage)
+        {
+            try
+            {
+                var resultContent = await functionCall.InvokeAsync(_kernel);
+
+                chatHistory.Add(resultContent.ToChatMessage());
+            }
+            catch (Exception ex)
+            {
+                chatHistory.Add(new FunctionResultContent(functionCall, ex).ToChatMessage());
+            }
+        }
+
+        return chatHistory;
     }
 
     private async Task<ChatResponse> GetChatResponseInternal(ChatHistory chatHistory, ChatOptions chatOptions)
@@ -78,10 +138,17 @@ public class LlmServiceSemanticKernel(IConfiguration configuration, Kernel _kern
            kernel: _kernel)
             ?? throw new Exception($"Failed to get chat completion response: Received null response from chat completion service using semantic kernel.");
 
-        if (string.IsNullOrWhiteSpace(result.Content))
-            chatHistory.AddAssistantMessage(result.Content);
+        if (!string.IsNullOrWhiteSpace(result.Content))
+            chatHistory.AddMessage(AuthorRole.Assistant, result.Content, metadata: result.Metadata);
 
-        //TODO add tool calls to chatHistory
+        //If not auto need to add to history.
+        //If auto invoke, they will be added automatically to chathistory.
+        if (!(chatOptions.PluginsAutoInvoke ?? true))
+        {
+            var functionCalls = FunctionCallContent.GetFunctionCalls(result);
+            if (!functionCalls.IsNullOrEmpty())
+                chatHistory.Add(result);
+        }
 
         return new ChatResponse(result.Content)
         {

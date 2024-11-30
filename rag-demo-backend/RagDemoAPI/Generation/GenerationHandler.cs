@@ -2,7 +2,6 @@
 using RagDemoAPI.Generation.LlmServices;
 using RagDemoAPI.Models;
 using RagDemoAPI.Retrieval;
-using System.Text.Json;
 
 namespace RagDemoAPI.Generation;
 
@@ -40,8 +39,7 @@ public class GenerationHandler(ILogger<GenerationHandler> _logger, ILlmServiceFa
     {
         ArgumentNullException.ThrowIfNull(continueChatRequest.PreviousChatHistoryJson);
 
-        if (continueChatRequest.ChatRequest is null)
-            continueChatRequest.ChatRequest = new ChatRequest
+        continueChatRequest.ChatRequest ??= new ChatRequest
             {
                 ChatOptions = new ChatOptions
                 {
