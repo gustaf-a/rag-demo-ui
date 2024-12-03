@@ -23,7 +23,7 @@ public class LlmServiceAzure(IConfiguration configuration) : ILlmService
         return await GetChatResponse(chatMessages, [], chatRequestOptions);
     }
 
-    public async Task<ChatResponse> GetChatResponse(IEnumerable<Models.ChatMessage> chatMessages, IEnumerable<Models.RetrievedDocument> retrievedContextSources, ChatOptions chatRequestOptions)
+    public async Task<ChatResponse> GetChatResponse(IEnumerable<Models.ChatMessage> chatMessages, IEnumerable<RetrievedDocument> retrievedContextSources, ChatOptions chatRequestOptions)
     {
         var chatHistory = chatMessages.ToOpenAiChatMessages(retrievedContextSources);
 

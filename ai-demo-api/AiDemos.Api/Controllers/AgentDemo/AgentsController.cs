@@ -14,7 +14,7 @@ public class AgentsController(ILogger<AgentsController> _logger) : ControllerBas
     {
         //TODO Handler gets names of agents available
 
-        return Ok(names);
+        return Ok();
     }
 
     //TODO Solve task with agents

@@ -1,5 +1,5 @@
-﻿using AiDemos.Api.Generation.LlmServices;
-using AiDemos.Api.Models;
+﻿using AiDemos.Api.Models;
+using Shared.Search;
 
 namespace AiDemos.Api.Retrieval;
 

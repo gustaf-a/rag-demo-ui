@@ -100,6 +100,28 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     /// }
     /// ```
     /// 
+    /// ## Chat request with search plugin letting model decide how to search for data
+    /// This is less reliable as the model doesn't always understand when it needs to search for information.
+    /// The good thing is that the model can make multiple searches for different things.
+    /// 
+    /// ```
+    /// {  
+    ///    "chatMessages": [
+    ///    {  
+    ///        "role": "user",  
+    ///        "content": "How long until Jane's next meeting? Search in the database."  
+    ///    }  
+    ///    ],  
+    ///    "chatOptions": {  
+    ///        "temperature": 0.2,  
+    ///        "pluginsToUse": [
+    ///             "DatePlugin",
+    ///             "SearchDatabasePlugin"
+    ///        ]  
+    ///    }  
+    /// }
+    /// ```
+    /// 
     /// ## RAG chat request with 1 plugin without auto invoking of plugins. For human-in-the-loop or animating message progress
     /// ```
     /// {

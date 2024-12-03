@@ -29,7 +29,7 @@ public static class ChatMessageExtensions
         return chatHistory;
     }
 
-    public static List<OpenAI.Chat.ChatMessage> ToOpenAiChatMessages(this IEnumerable<ChatMessage> messages, IEnumerable<Models.RetrievedDocument> retrievedDocuments)
+    public static List<OpenAI.Chat.ChatMessage> ToOpenAiChatMessages(this IEnumerable<ChatMessage> messages, IEnumerable<RetrievedDocument> retrievedDocuments)
     {
         var chatHistory = messages.ToOpenAiChatMessages();
 
@@ -69,7 +69,7 @@ $"""
         return chatHistory;
     }
 
-    public static ChatHistory ToSemanticKernelChatMessages(this IEnumerable<ChatMessage> messages, IEnumerable<Models.RetrievedDocument> retrievedDocuments)
+    public static ChatHistory ToSemanticKernelChatMessages(this IEnumerable<ChatMessage> messages, IEnumerable<RetrievedDocument> retrievedDocuments)
     {
         var chatHistory = messages.ToSemanticKernelChatMessages();
 

@@ -7,7 +7,7 @@ using AiDemos.Api.Models;
 using AiDemos.Api.Repositories;
 using AiDemos.Api.Services;
 
-namespace AiDemos.Api.Retrieval.Search;
+namespace Shared.Search;
 
 public class SearchServicePostgreSql(ILogger<SearchServicePostgreSql> _logger,
                                      IConfiguration configuration,

@@ -196,9 +196,9 @@ public class PostgreSqlRepository : IPostgreSqlRepository
         );
 
         if (queryResult == null || !queryResult.Any())
-            return Enumerable.Empty<Models.RetrievedDocument>();
+            return Enumerable.Empty<RetrievedDocument>();
 
-        return queryResult.Select(qr => new Models.RetrievedDocument(embeddingsTableName, qr));
+        return queryResult.Select(qr => new RetrievedDocument(embeddingsTableName, qr));
     }
 
     private static void AddColumnFilter(List<string> whereClauses, Dictionary<string, object> parameters, string tableColumn, bool isInclude, string paramName, string word)

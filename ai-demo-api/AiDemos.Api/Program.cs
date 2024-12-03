@@ -7,12 +7,12 @@ using AiDemos.Api.Generation.LlmServices;
 using AiDemos.Api.Ingestion;
 using AiDemos.Api.Ingestion.Chunking;
 using AiDemos.Api.Ingestion.PreProcessing;
-using AiDemos.Api.Plugins;
+using Shared.Plugins;
 using AiDemos.Api.Repositories;
 using AiDemos.Api.Retrieval;
-using AiDemos.Api.Retrieval.Search;
 using AiDemos.Api.Services;
 using System.Reflection;
+using Shared.Search;
 
 namespace AiDemos.Api;
 
@@ -48,10 +48,11 @@ public class Program
 
         builder.Services.AddHttpClient();
 
-        SetupAzure(builder);
-        SetupSemanticKernel(builder);
-
         SetupServices(builder);
+
+        SetupAzure(builder);
+
+        SetupSemanticKernel(builder);
 
         var app = builder.Build();
 
@@ -119,6 +120,7 @@ public class Program
 
         builder.Services.AddScoped<IPluginHandler, PluginHandler>();
         builder.Services.AddScoped<IPlugin, DatePlugin>();
+        builder.Services.AddScoped<IPlugin, SearchDatabasePlugin>();
         builder.Services.AddScoped<IPlugin, TimePlugin>();
 
         builder.Services.AddScoped<IRetrievalHandler, RetrievalHandler>();

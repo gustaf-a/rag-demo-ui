@@ -6,13 +6,13 @@ namespace AiDemos.Api.Extensions;
 public static class RetrievedDocumentExtensions
 {
 #pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-    public static List<Models.RetrievedDocument> ToChatMessageCitations(this IEnumerable<Azure.AI.OpenAI.Chat.ChatCitation> azureChatCitations)
+    public static List<RetrievedDocument> ToChatMessageCitations(this IEnumerable<Azure.AI.OpenAI.Chat.ChatCitation> azureChatCitations)
     {
-        var citations = new List<Models.RetrievedDocument>();
+        var citations = new List<RetrievedDocument>();
 
         foreach (var azureChatCitation in azureChatCitations)
         {
-            citations.Add(new Models.RetrievedDocument
+            citations.Add(new RetrievedDocument
             {
                 Title = azureChatCitation.Title,
                 Content = azureChatCitation.Content,

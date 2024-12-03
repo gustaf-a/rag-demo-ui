@@ -1,13 +1,12 @@
 ﻿using Microsoft.SemanticKernel;
 using System.ComponentModel;
 
-namespace AiDemos.Api.Plugins;
-
-//TODO Register in program and test this plugin
+namespace Shared.Plugins;
 
 /// <summary>
 /// A plugin that provides date related features.
 /// </summary>
+#pragma warning disable CA1822 // Mark members as static
 public class DatePlugin : IPlugin
 {
     [KernelFunction("get_current_date")]

@@ -1,7 +1,6 @@
 ﻿using AiDemos.Api.Models;
-using AiDemos.Api.Retrieval.Search;
 
-namespace AiDemos.Api.Generation.LlmServices;
+namespace Shared.Search;
 
 public class SearchServiceFactory(IEnumerable<ISearchService> _searchServices) : ISearchServiceFactory
 {

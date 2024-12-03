@@ -3,7 +3,7 @@ using AiDemos.Api.Generation.LlmServices;
 using AiDemos.Api.Models;
 using System.Text;
 
-namespace AiDemos.Api.Retrieval.Search;
+namespace Shared.Search;
 
 public abstract class SearchServiceBase(ILlmServiceFactory _llmServiceFactory)
 {
@@ -26,7 +26,7 @@ public abstract class SearchServiceBase(ILlmServiceFactory _llmServiceFactory)
             querySb.AppendLine(chatMessageRow);
 
         querySb.AppendLine("</chatMessages>");
-        
+
         querySb.AppendLine();
 
         var summarizeMessagesQuery =

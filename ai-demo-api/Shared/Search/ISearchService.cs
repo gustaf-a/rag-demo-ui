@@ -1,6 +1,6 @@
 ﻿using AiDemos.Api.Models;
 
-namespace AiDemos.Api.Retrieval.Search
+namespace Shared.Search
 {
     public interface ISearchService
     {

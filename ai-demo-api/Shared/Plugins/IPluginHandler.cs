@@ -1,6 +1,6 @@
 ﻿using Microsoft.SemanticKernel;
 
-namespace AiDemos.Api.Plugins;
+namespace Shared.Plugins;
 
 public interface IPluginHandler
 {

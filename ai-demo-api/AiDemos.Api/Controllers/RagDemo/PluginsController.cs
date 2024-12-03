@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using AiDemos.Api.Plugins;
+using Shared.Plugins;
 
 namespace AiDemos.Api.Controllers.RagDemo;
 

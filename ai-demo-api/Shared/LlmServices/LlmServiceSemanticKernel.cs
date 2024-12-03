@@ -4,7 +4,7 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using AiDemos.Api.Extensions;
 using AiDemos.Api.Models;
-using AiDemos.Api.Plugins;
+using Shared.Plugins;
 using System.Text.Json;
 using ChatMessage = AiDemos.Api.Models.ChatMessage;
 using ChatOptions = AiDemos.Api.Models.ChatOptions;
@@ -28,7 +28,7 @@ public class LlmServiceSemanticKernel(IConfiguration configuration, Kernel _kern
         return chatResponse;
     }
 
-    public async Task<ChatResponse> ContinueChatResponse(string previousChatHistoryJson, IEnumerable<ChatMessage> chatMessages, IEnumerable<Models.RetrievedDocument> retrievedContextSources, ChatOptions chatRequestOptions)
+    public async Task<ChatResponse> ContinueChatResponse(string previousChatHistoryJson, IEnumerable<ChatMessage> chatMessages, IEnumerable<RetrievedDocument> retrievedContextSources, ChatOptions chatRequestOptions)
     {
         if (string.IsNullOrWhiteSpace(previousChatHistoryJson))
             throw new Exception($"Cannot continue chat if previous chat history is nothing.");
