@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AiDemos.Api", "AiDemos.Api\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RagDemo", "RagDemo\RagDemo.csproj", "{A1F68454-D50A-471E-8096-1D2CAEAFD615}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "..\shared\Shared\Shared.csproj", "{4B5B7B8F-C971-4744-9C32-1080BBE16DD2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{18B451AA-4181-42A9-8CDA-3B379E87C957}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,10 +25,10 @@ Global
 		{A1F68454-D50A-471E-8096-1D2CAEAFD615}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1F68454-D50A-471E-8096-1D2CAEAFD615}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1F68454-D50A-471E-8096-1D2CAEAFD615}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4B5B7B8F-C971-4744-9C32-1080BBE16DD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4B5B7B8F-C971-4744-9C32-1080BBE16DD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4B5B7B8F-C971-4744-9C32-1080BBE16DD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4B5B7B8F-C971-4744-9C32-1080BBE16DD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18B451AA-4181-42A9-8CDA-3B379E87C957}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18B451AA-4181-42A9-8CDA-3B379E87C957}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18B451AA-4181-42A9-8CDA-3B379E87C957}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18B451AA-4181-42A9-8CDA-3B379E87C957}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
