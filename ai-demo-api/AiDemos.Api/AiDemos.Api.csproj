@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="Properties\serviceDependencies.json" />
+    <Content Remove="Properties\serviceDependencies.RagDemoAPI20241118085132 - Web Deploy.json" />
+    <Content Remove="Properties\ServiceDependencies\RagDemoAPI20241118085132 - Web Deploy\apis1.arm.json" />
+    <Content Remove="Properties\ServiceDependencies\RagDemoAPI20241118085132 - Web Deploy\profile.arm.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_WebToolingArtifacts Remove="Properties\PublishProfiles\RagDemoAPI20241118085132 - Web Deploy.pubxml" />
+    <_WebToolingArtifacts Remove="Properties\serviceDependencies.json" />
+    <_WebToolingArtifacts Remove="Properties\serviceDependencies.RagDemoAPI20241118085132 - Web Deploy.json" />
+    <_WebToolingArtifacts Remove="Properties\ServiceDependencies\RagDemoAPI20241118085132 - Web Deploy\apis1.arm.json" />
+    <_WebToolingArtifacts Remove="Properties\ServiceDependencies\RagDemoAPI20241118085132 - Web Deploy\profile.arm.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Properties\serviceDependencies.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+    <None Include="Properties\serviceDependencies.RagDemoAPI20241118085132 - Web Deploy.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+    <None Include="Properties\ServiceDependencies\RagDemoAPI20241118085132 - Web Deploy\apis1.arm.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+    <None Include="Properties\ServiceDependencies\RagDemoAPI20241118085132 - Web Deploy\profile.arm.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\agent-demo-backend\AgentDemoAPI\AgentDemoAPI.csproj" />
+    <ProjectReference Include="..\..\shared\Shared\Shared.csproj" />
+    <ProjectReference Include="..\RagDemo\RagDemo.csproj" />
+  </ItemGroup>
+
+</Project>

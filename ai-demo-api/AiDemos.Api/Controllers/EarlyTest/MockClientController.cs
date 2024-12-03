@@ -5,7 +5,7 @@ using RagDemoAPI.Models;
 namespace RagDemoAPI.Controllers.EarlyTest;
 
 [ApiController]
-[Route("Mock")]
+[Route("mock")]
 public class MockClientController : ControllerBase
 {
     private readonly AzureOptions _azureOptions;
