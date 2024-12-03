@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using RagDemoAPI.Configuration;
-using RagDemoAPI.Models;
+using AiDemos.Api.Configuration;
+using AiDemos.Api.Models;
 
-namespace RagDemoAPI.Controllers.EarlyTest;
+namespace AiDemos.Api.Controllers.EarlyTest;
 
 [ApiController]
 [Route("mock")]

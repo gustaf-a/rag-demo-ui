@@ -1,6 +1,6 @@
-﻿using RagDemoAPI.Models;
+﻿using AiDemos.Api.Models;
 
-namespace RagDemoAPI.Ingestion
+namespace AiDemos.Api.Ingestion
 {
     public interface IIngestionHandler
     {

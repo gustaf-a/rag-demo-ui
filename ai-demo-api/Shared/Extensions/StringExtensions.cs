@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace RagDemoAPI.Extensions;
+namespace AiDemos.Api.Extensions;
 
 public static class StringExtensions
 {

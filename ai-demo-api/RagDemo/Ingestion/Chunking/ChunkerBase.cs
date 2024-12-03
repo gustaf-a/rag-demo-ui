@@ -1,9 +1,10 @@
-﻿using RagDemoAPI.Configuration;
-using RagDemoAPI.Extensions;
-using RagDemoAPI.Generation.LlmServices;
-using RagDemoAPI.Models;
+﻿using Microsoft.Extensions.Configuration;
+using AiDemos.Api.Configuration;
+using AiDemos.Api.Extensions;
+using AiDemos.Api.Generation.LlmServices;
+using AiDemos.Api.Models;
 
-namespace RagDemoAPI.Ingestion.Chunking;
+namespace AiDemos.Api.Ingestion.Chunking;
 
 public class ChunkerBase
 {

@@ -1,6 +1,6 @@
-﻿using RagDemoAPI.Models;
+﻿using AiDemos.Api.Models;
 
-namespace RagDemoAPI.Repositories;
+namespace AiDemos.Api.Repositories;
 
 public interface IPostgreSqlRepository
 {

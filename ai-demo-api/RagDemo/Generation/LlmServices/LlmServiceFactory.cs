@@ -1,7 +1,7 @@
-﻿using RagDemoAPI.Extensions;
-using RagDemoAPI.Models;
+﻿using AiDemos.Api.Extensions;
+using AiDemos.Api.Models;
 
-namespace RagDemoAPI.Generation.LlmServices;
+namespace AiDemos.Api.Generation.LlmServices;
 
 public class LlmServiceFactory(IEnumerable<ILlmService> _llmServices) : ILlmServiceFactory
 {

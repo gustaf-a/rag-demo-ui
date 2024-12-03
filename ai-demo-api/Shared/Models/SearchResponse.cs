@@ -1,6 +1,6 @@
-﻿using RagDemoAPI.Extensions;
+﻿using AiDemos.Api.Extensions;
 
-namespace RagDemoAPI.Models;
+namespace AiDemos.Api.Models;
 
 #pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 public class SearchResponse

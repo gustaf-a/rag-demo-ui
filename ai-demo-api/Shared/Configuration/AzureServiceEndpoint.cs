@@ -1,4 +1,4 @@
-﻿namespace RagDemoAPI.Configuration
+﻿namespace AiDemos.Api.Configuration
 {
     public class AzureServiceEndpoint
     {

@@ -1,11 +1,12 @@
-﻿using Npgsql;
-using RagDemoAPI.Configuration;
-using RagDemoAPI.Extensions;
-using RagDemoAPI.Models;
+﻿using Microsoft.Extensions.Configuration;
+using Npgsql;
+using AiDemos.Api.Configuration;
+using AiDemos.Api.Extensions;
+using AiDemos.Api.Models;
 using System.Text;
 using System.Text.Json;
 
-namespace RagDemoAPI.Repositories;
+namespace AiDemos.Api.Repositories;
 
 public class PostgreSqlRepository : IPostgreSqlRepository
 {

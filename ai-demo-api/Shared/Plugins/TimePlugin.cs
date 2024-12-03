@@ -1,7 +1,7 @@
 ﻿using Microsoft.SemanticKernel;
 using System.ComponentModel;
 
-namespace RagDemoAPI.Plugins;
+namespace AiDemos.Api.Plugins;
 
 /// <summary>
 /// A plugin that provides time-related features.

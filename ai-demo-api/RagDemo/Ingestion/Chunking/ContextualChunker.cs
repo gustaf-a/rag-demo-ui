@@ -1,7 +1,8 @@
-﻿using RagDemoAPI.Generation.LlmServices;
-using RagDemoAPI.Models;
+﻿using Microsoft.Extensions.Configuration;
+using AiDemos.Api.Generation.LlmServices;
+using AiDemos.Api.Models;
 
-namespace RagDemoAPI.Ingestion.Chunking;
+namespace AiDemos.Api.Ingestion.Chunking;
 
 public class ContextualChunker(IConfiguration configuration, ILlmServiceFactory llmServiceFactory) : ChunkerBase(configuration, llmServiceFactory), IChunker
 {

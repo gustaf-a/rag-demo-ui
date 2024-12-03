@@ -1,6 +1,6 @@
-﻿using RagDemoAPI.Models;
+﻿using AiDemos.Api.Models;
 
-namespace RagDemoAPI.Retrieval
+namespace AiDemos.Api.Retrieval
 {
     public interface IRetrievalHandler
     {

@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using RagDemoAPI.Extensions;
-using RagDemoAPI.Models;
-using RagDemoAPI.Retrieval;
+using AiDemos.Api.Extensions;
+using AiDemos.Api.Models;
+using AiDemos.Api.Retrieval;
 
-namespace RagDemoAPI.Controllers;
+namespace AiDemos.Api.Controllers;
 
 /// <summary>
 /// A controller which only handles retrieval, for example for semantic search

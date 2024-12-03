@@ -1,4 +1,4 @@
-﻿namespace RagDemoAPI.Ingestion.PreProcessing;
+﻿namespace AiDemos.Api.Ingestion.PreProcessing;
 
 public class PreProcessorFactory(IEnumerable<IPreProcessor> _contentPreProcessors) : IPreProcessorFactory
 {

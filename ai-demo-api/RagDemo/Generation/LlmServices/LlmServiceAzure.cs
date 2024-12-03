@@ -1,11 +1,12 @@
 ﻿using Azure.AI.OpenAI;
 using Azure.AI.OpenAI.Chat;
+using Microsoft.Extensions.Configuration;
 using OpenAI.Chat;
-using RagDemoAPI.Configuration;
-using RagDemoAPI.Extensions;
-using RagDemoAPI.Models;
+using AiDemos.Api.Configuration;
+using AiDemos.Api.Extensions;
+using AiDemos.Api.Models;
 
-namespace RagDemoAPI.Generation.LlmServices;
+namespace AiDemos.Api.Generation.LlmServices;
 
 #pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 public class LlmServiceAzure(IConfiguration configuration) : ILlmService

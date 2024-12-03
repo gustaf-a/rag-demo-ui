@@ -1,10 +1,17 @@
 
 using Microsoft.OpenApi.Models;
 using Microsoft.SemanticKernel;
-using RagDemoAPI.Configuration;
-using RagDemoAPI.Plugins;
-using RagDemoAPI.Repositories;
-using RagDemoAPI.Services;
+using AiDemos.Api.Configuration;
+using AiDemos.Api.Generation;
+using AiDemos.Api.Generation.LlmServices;
+using AiDemos.Api.Ingestion;
+using AiDemos.Api.Ingestion.Chunking;
+using AiDemos.Api.Ingestion.PreProcessing;
+using AiDemos.Api.Plugins;
+using AiDemos.Api.Repositories;
+using AiDemos.Api.Retrieval;
+using AiDemos.Api.Retrieval.Search;
+using AiDemos.Api.Services;
 using System.Reflection;
 
 namespace AiDemos.Api;

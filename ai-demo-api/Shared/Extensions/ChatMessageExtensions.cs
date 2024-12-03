@@ -1,7 +1,7 @@
 ﻿using Microsoft.SemanticKernel.ChatCompletion;
-using RagDemoAPI.Models;
+using AiDemos.Api.Models;
 
-namespace RagDemoAPI.Extensions;
+namespace AiDemos.Api.Extensions;
 
 public static class ChatMessageExtensions
 {

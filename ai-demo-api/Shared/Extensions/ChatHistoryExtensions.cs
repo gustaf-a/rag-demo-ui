@@ -1,6 +1,6 @@
 ﻿using Microsoft.SemanticKernel.ChatCompletion;
 
-namespace RagDemoAPI.Extensions;
+namespace AiDemos.Api.Extensions;
 
 public static class ChatHistoryExtensions
 {

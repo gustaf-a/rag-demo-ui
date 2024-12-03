@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using RagDemoAPI.Configuration;
-using RagDemoAPI.Ingestion;
-using RagDemoAPI.Models;
+using AiDemos.Api.Configuration;
+using AiDemos.Api.Ingestion;
+using AiDemos.Api.Models;
 
-namespace RagDemoAPI.Controllers;
+namespace AiDemos.Api.Controllers;
 
 [ApiController]
 [Route("Ingestion")]

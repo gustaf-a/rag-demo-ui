@@ -1,5 +1,5 @@
 ﻿
-namespace RagDemoAPI.Models
+namespace AiDemos.Api.Models
 {
     public class EmbeddingMetaData
     {

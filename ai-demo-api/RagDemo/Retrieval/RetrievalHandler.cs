@@ -1,7 +1,7 @@
-﻿using RagDemoAPI.Generation.LlmServices;
-using RagDemoAPI.Models;
+﻿using AiDemos.Api.Generation.LlmServices;
+using AiDemos.Api.Models;
 
-namespace RagDemoAPI.Retrieval;
+namespace AiDemos.Api.Retrieval;
 
 public class RetrievalHandler(ISearchServiceFactory _searchServiceFactory) : IRetrievalHandler
 {

@@ -1,9 +1,9 @@
-﻿using RagDemoAPI.Extensions;
-using RagDemoAPI.Generation.LlmServices;
-using RagDemoAPI.Models;
+﻿using AiDemos.Api.Extensions;
+using AiDemos.Api.Generation.LlmServices;
+using AiDemos.Api.Models;
 using System.Text;
 
-namespace RagDemoAPI.Retrieval.Search;
+namespace AiDemos.Api.Retrieval.Search;
 
 public abstract class SearchServiceBase(ILlmServiceFactory _llmServiceFactory)
 {

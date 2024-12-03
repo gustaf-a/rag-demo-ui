@@ -1,6 +1,6 @@
-﻿using RagDemoAPI.Models;
+﻿using AiDemos.Api.Models;
 
-namespace RagDemoAPI.Ingestion.Chunking;
+namespace AiDemos.Api.Ingestion.Chunking;
 
 public interface IChunker
 {

@@ -1,7 +1,7 @@
-﻿using RagDemoAPI.Extensions;
-using RagDemoAPI.Models;
+﻿using AiDemos.Api.Extensions;
+using AiDemos.Api.Models;
 
-namespace RagDemoAPI.Ingestion.Chunking
+namespace AiDemos.Api.Ingestion.Chunking
 {
     public class ChunkerFactory(IEnumerable<IChunker> _chunkers) : IChunkerFactory
     {

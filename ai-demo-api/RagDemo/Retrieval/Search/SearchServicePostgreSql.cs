@@ -1,11 +1,13 @@
-﻿using RagDemoAPI.Configuration;
-using RagDemoAPI.Extensions;
-using RagDemoAPI.Generation.LlmServices;
-using RagDemoAPI.Models;
-using RagDemoAPI.Repositories;
-using RagDemoAPI.Services;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using AiDemos.Api.Configuration;
+using AiDemos.Api.Extensions;
+using AiDemos.Api.Generation.LlmServices;
+using AiDemos.Api.Models;
+using AiDemos.Api.Repositories;
+using AiDemos.Api.Services;
 
-namespace RagDemoAPI.Retrieval.Search;
+namespace AiDemos.Api.Retrieval.Search;
 
 public class SearchServicePostgreSql(ILogger<SearchServicePostgreSql> _logger,
                                      IConfiguration configuration,

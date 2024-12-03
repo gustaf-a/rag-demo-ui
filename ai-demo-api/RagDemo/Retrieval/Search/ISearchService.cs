@@ -1,6 +1,6 @@
-﻿using RagDemoAPI.Models;
+﻿using AiDemos.Api.Models;
 
-namespace RagDemoAPI.Retrieval.Search
+namespace AiDemos.Api.Retrieval.Search
 {
     public interface ISearchService
     {

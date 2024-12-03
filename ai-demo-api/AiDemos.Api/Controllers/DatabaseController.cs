@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using RagDemoAPI.Configuration;
-using RagDemoAPI.Models;
-using RagDemoAPI.Repositories;
+using AiDemos.Api.Configuration;
+using AiDemos.Api.Models;
+using AiDemos.Api.Repositories;
 
-namespace RagDemoAPI.Controllers;
+namespace AiDemos.Api.Controllers;
 
 [ApiController]
 [Route("Database")]

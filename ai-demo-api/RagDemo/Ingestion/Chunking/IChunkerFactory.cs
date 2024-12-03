@@ -1,4 +1,4 @@
-﻿namespace RagDemoAPI.Ingestion.Chunking;
+﻿namespace AiDemos.Api.Ingestion.Chunking;
 
 public interface IChunkerFactory
 {

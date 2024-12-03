@@ -1,6 +1,6 @@
-﻿using RagDemoAPI.Models;
+﻿using AiDemos.Api.Models;
 
-namespace RagDemoAPI.Ingestion.FileReaders;
+namespace AiDemos.Api.Ingestion.FileReaders;
 
 public class LocalFileReader(IngestDataRequest request) : FileReaderBase(request.MetaDataTags), IFileReader
 {

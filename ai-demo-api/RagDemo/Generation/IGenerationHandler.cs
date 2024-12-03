@@ -1,6 +1,6 @@
-﻿using RagDemoAPI.Models;
+﻿using AiDemos.Api.Models;
 
-namespace RagDemoAPI.Generation
+namespace AiDemos.Api.Generation
 {
     public interface IGenerationHandler
     {

@@ -1,11 +1,12 @@
-﻿using RagDemoAPI.Ingestion.Chunking;
-using RagDemoAPI.Ingestion.FileReaders;
-using RagDemoAPI.Ingestion.PreProcessing;
-using RagDemoAPI.Models;
-using RagDemoAPI.Repositories;
-using RagDemoAPI.Services;
+﻿using Microsoft.Extensions.Logging;
+using AiDemos.Api.Ingestion.Chunking;
+using AiDemos.Api.Ingestion.FileReaders;
+using AiDemos.Api.Ingestion.PreProcessing;
+using AiDemos.Api.Models;
+using AiDemos.Api.Repositories;
+using AiDemos.Api.Services;
 
-namespace RagDemoAPI.Ingestion;
+namespace AiDemos.Api.Ingestion;
 
 public class IngestionHandler(ILogger<IngestionHandler> _logger, IPostgreSqlRepository _postgreSqlService, IPreProcessorFactory _contentPreProcessorFactory, IChunkerFactory _chunkerFactory, IEmbeddingService _embeddingService) : IIngestionHandler
 {

@@ -1,13 +1,14 @@
 ﻿using Azure.Search.Documents;
 using Azure.Search.Documents.Models;
-using RagDemoAPI.Configuration;
-using RagDemoAPI.Extensions;
-using RagDemoAPI.Generation.LlmServices;
-using RagDemoAPI.Models;
-using RagDemoAPI.Services;
-using SearchOptions = RagDemoAPI.Models.SearchOptions;
+using Microsoft.Extensions.Configuration;
+using AiDemos.Api.Configuration;
+using AiDemos.Api.Extensions;
+using AiDemos.Api.Generation.LlmServices;
+using AiDemos.Api.Models;
+using AiDemos.Api.Services;
+using SearchOptions = AiDemos.Api.Models.SearchOptions;
 
-namespace RagDemoAPI.Retrieval.Search;
+namespace AiDemos.Api.Retrieval.Search;
 
 public class SearchServiceAzure(IConfiguration configuration,
                                 ILlmServiceFactory _llmServiceFactory,

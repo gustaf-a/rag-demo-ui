@@ -1,7 +1,7 @@
-﻿using RagDemoAPI.Models;
+﻿using AiDemos.Api.Models;
 using System.Text;
 
-namespace RagDemoAPI.Extensions;
+namespace AiDemos.Api.Extensions;
 
 public static class RetrievedDocumentExtensions
 {

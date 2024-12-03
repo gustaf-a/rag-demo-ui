@@ -1,7 +1,7 @@
-﻿using RagDemoAPI.Extensions;
-using RagDemoAPI.Models;
+﻿using AiDemos.Api.Extensions;
+using AiDemos.Api.Models;
 
-namespace RagDemoAPI.Ingestion.FileReaders;
+namespace AiDemos.Api.Ingestion.FileReaders;
 
 public abstract class FileReaderBase(Dictionary<string, string> _metaDataTags)
 {

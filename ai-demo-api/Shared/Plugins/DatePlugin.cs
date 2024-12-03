@@ -1,7 +1,7 @@
 ﻿using Microsoft.SemanticKernel;
 using System.ComponentModel;
 
-namespace RagDemoAPI.Plugins;
+namespace AiDemos.Api.Plugins;
 
 //TODO Register in program and test this plugin
 

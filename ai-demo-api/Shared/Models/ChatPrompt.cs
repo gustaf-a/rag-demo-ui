@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace RagDemoAPI.Models;
+namespace AiDemos.Api.Models;
 
 public class ChatPrompt
 {

@@ -1,4 +1,4 @@
-﻿namespace RagDemoAPI.Services;
+﻿namespace AiDemos.Api.Services;
 
 public interface IEmbeddingService
 {

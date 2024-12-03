@@ -1,9 +1,10 @@
-﻿using RagDemoAPI.Extensions;
-using RagDemoAPI.Generation.LlmServices;
-using RagDemoAPI.Models;
-using RagDemoAPI.Retrieval;
+﻿using Microsoft.Extensions.Logging;
+using AiDemos.Api.Extensions;
+using AiDemos.Api.Generation.LlmServices;
+using AiDemos.Api.Models;
+using AiDemos.Api.Retrieval;
 
-namespace RagDemoAPI.Generation;
+namespace AiDemos.Api.Generation;
 
 public class GenerationHandler(ILogger<GenerationHandler> _logger, ILlmServiceFactory _llmServiceFactory, IRetrievalHandler _retrievalHandler) : IGenerationHandler
 {

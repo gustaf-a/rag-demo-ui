@@ -1,4 +1,4 @@
-﻿namespace RagDemoAPI.Extensions;
+﻿namespace AiDemos.Api.Extensions;
 
 public static class BoolExtensions
 {

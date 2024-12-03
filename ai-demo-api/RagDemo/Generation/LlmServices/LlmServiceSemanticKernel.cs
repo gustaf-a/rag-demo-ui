@@ -1,15 +1,15 @@
-﻿using Microsoft.SemanticKernel;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using RagDemoAPI.Extensions;
-using RagDemoAPI.Models;
-using RagDemoAPI.Plugins;
-using System.Text;
+using AiDemos.Api.Extensions;
+using AiDemos.Api.Models;
+using AiDemos.Api.Plugins;
 using System.Text.Json;
-using ChatMessage = RagDemoAPI.Models.ChatMessage;
-using ChatOptions = RagDemoAPI.Models.ChatOptions;
+using ChatMessage = AiDemos.Api.Models.ChatMessage;
+using ChatOptions = AiDemos.Api.Models.ChatOptions;
 
-namespace RagDemoAPI.Generation.LlmServices;
+namespace AiDemos.Api.Generation.LlmServices;
 
 #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 public class LlmServiceSemanticKernel(IConfiguration configuration, Kernel _kernel, IPluginHandler _pluginHandler) : ILlmService

@@ -1,4 +1,4 @@
-﻿namespace RagDemoAPI.Ingestion.PreProcessing
+﻿namespace AiDemos.Api.Ingestion.PreProcessing
 {
     /// <summary>
     /// When building a Retrieval Augmented Generation (RAG) application, preprocessing your data effectively is crucial for accurate indexing and retrieval. Different file types often require specialized preprocessing to extract meaningful information. Here's a breakdown of preprocessing steps you could apply for various file types:

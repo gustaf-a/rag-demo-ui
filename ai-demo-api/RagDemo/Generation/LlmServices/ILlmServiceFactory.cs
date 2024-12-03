@@ -1,6 +1,6 @@
-﻿using RagDemoAPI.Models;
+﻿using AiDemos.Api.Models;
 
-namespace RagDemoAPI.Generation.LlmServices;
+namespace AiDemos.Api.Generation.LlmServices;
 
 public interface ILlmServiceFactory
 {

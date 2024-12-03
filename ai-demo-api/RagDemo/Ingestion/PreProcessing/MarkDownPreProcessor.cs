@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace RagDemoAPI.Ingestion.PreProcessing;
+namespace AiDemos.Api.Ingestion.PreProcessing;
 
 public class MarkDownPreProcessor : IPreProcessor
 {

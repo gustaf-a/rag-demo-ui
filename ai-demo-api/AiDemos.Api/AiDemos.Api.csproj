@@ -9,17 +9,17 @@
 
   <ItemGroup>
     <Content Remove="Properties\serviceDependencies.json" />
-    <Content Remove="Properties\serviceDependencies.RagDemoAPI20241118085132 - Web Deploy.json" />
-    <Content Remove="Properties\ServiceDependencies\RagDemoAPI20241118085132 - Web Deploy\apis1.arm.json" />
-    <Content Remove="Properties\ServiceDependencies\RagDemoAPI20241118085132 - Web Deploy\profile.arm.json" />
+    <Content Remove="Properties\serviceDependencies.AiDemos.Api.20241118085132 - Web Deploy.json" />
+    <Content Remove="Properties\ServiceDependencies\AiDemos.Api.20241118085132 - Web Deploy\apis1.arm.json" />
+    <Content Remove="Properties\ServiceDependencies\AiDemos.Api.20241118085132 - Web Deploy\profile.arm.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <_WebToolingArtifacts Remove="Properties\PublishProfiles\RagDemoAPI20241118085132 - Web Deploy.pubxml" />
+    <_WebToolingArtifacts Remove="Properties\PublishProfiles\AiDemos.Api.20241118085132 - Web Deploy.pubxml" />
     <_WebToolingArtifacts Remove="Properties\serviceDependencies.json" />
-    <_WebToolingArtifacts Remove="Properties\serviceDependencies.RagDemoAPI20241118085132 - Web Deploy.json" />
-    <_WebToolingArtifacts Remove="Properties\ServiceDependencies\RagDemoAPI20241118085132 - Web Deploy\apis1.arm.json" />
-    <_WebToolingArtifacts Remove="Properties\ServiceDependencies\RagDemoAPI20241118085132 - Web Deploy\profile.arm.json" />
+    <_WebToolingArtifacts Remove="Properties\serviceDependencies.AiDemos.Api.20241118085132 - Web Deploy.json" />
+    <_WebToolingArtifacts Remove="Properties\ServiceDependencies\AiDemos.Api.20241118085132 - Web Deploy\apis1.arm.json" />
+    <_WebToolingArtifacts Remove="Properties\ServiceDependencies\AiDemos.Api.20241118085132 - Web Deploy\profile.arm.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,17 +28,17 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
-    <None Include="Properties\serviceDependencies.RagDemoAPI20241118085132 - Web Deploy.json">
+    <None Include="Properties\serviceDependencies.AiDemos.Api.20241118085132 - Web Deploy.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
-    <None Include="Properties\ServiceDependencies\RagDemoAPI20241118085132 - Web Deploy\apis1.arm.json">
+    <None Include="Properties\ServiceDependencies\AiDemos.Api.20241118085132 - Web Deploy\apis1.arm.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
-    <None Include="Properties\ServiceDependencies\RagDemoAPI20241118085132 - Web Deploy\profile.arm.json">
+    <None Include="Properties\ServiceDependencies\AiDemos.Api.20241118085132 - Web Deploy\profile.arm.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
@@ -46,6 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 

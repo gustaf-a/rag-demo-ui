@@ -1,7 +1,7 @@
-﻿using RagDemoAPI.Models;
-using RagDemoAPI.Retrieval.Search;
+﻿using AiDemos.Api.Models;
+using AiDemos.Api.Retrieval.Search;
 
-namespace RagDemoAPI.Generation.LlmServices;
+namespace AiDemos.Api.Generation.LlmServices;
 
 public interface ISearchServiceFactory
 {
