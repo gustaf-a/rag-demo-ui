@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using AiDemos.Api.Generation;
 using AiDemos.Api.Models;
 
-namespace AiDemos.Api.Controllers;
+namespace AiDemos.Api.Controllers.RagDemo;
 
 /// <summary>
 /// A controller which handles chat requests, for example a simple chat request or a data driven RAG chat request

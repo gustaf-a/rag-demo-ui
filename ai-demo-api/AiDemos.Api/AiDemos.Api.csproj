@@ -56,4 +56,8 @@
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\ProcessDemo\" />
+  </ItemGroup>
+
 </Project>

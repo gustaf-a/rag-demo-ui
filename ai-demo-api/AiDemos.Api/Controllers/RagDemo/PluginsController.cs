@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using AiDemos.Api.Plugins;
 
-namespace AiDemos.Api.Controllers;
+namespace AiDemos.Api.Controllers.RagDemo;
 
 /// <summary>
 /// A controller for the available plugins

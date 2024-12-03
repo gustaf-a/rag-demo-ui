@@ -3,7 +3,7 @@ using AiDemos.Api.Configuration;
 using AiDemos.Api.Models;
 using AiDemos.Api.Repositories;
 
-namespace AiDemos.Api.Controllers;
+namespace AiDemos.Api.Controllers.RagDemo;
 
 [ApiController]
 [Route("Database")]
@@ -87,7 +87,7 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
     }
 
     [HttpPost("get-unique-tag-values/{tag}")]
-    public async Task<IActionResult> GetUniqueMetaDataTagValues(string tag, [FromBody]DatabaseOptions databaseOptions)
+    public async Task<IActionResult> GetUniqueMetaDataTagValues(string tag, [FromBody] DatabaseOptions databaseOptions)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(tag);
 
@@ -105,9 +105,9 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
             return StatusCode(500, $"Error getting {tag} values: {ex.Message}");
         }
     }
-    
+
     [HttpPost("get-unique-tag-keys")]
-    public async Task<IActionResult> GetUniqueMetaDataTagKeys([FromBody]DatabaseOptions databaseOptions)
+    public async Task<IActionResult> GetUniqueMetaDataTagKeys([FromBody] DatabaseOptions databaseOptions)
     {
         await CheckTableExists(databaseOptions);
 

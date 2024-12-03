@@ -3,7 +3,7 @@ using AiDemos.Api.Extensions;
 using AiDemos.Api.Models;
 using AiDemos.Api.Retrieval;
 
-namespace AiDemos.Api.Controllers;
+namespace AiDemos.Api.Controllers.RagDemo;
 
 /// <summary>
 /// A controller which only handles retrieval, for example for semantic search

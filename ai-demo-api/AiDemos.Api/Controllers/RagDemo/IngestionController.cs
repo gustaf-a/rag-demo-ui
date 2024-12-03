@@ -3,7 +3,7 @@ using AiDemos.Api.Configuration;
 using AiDemos.Api.Ingestion;
 using AiDemos.Api.Models;
 
-namespace AiDemos.Api.Controllers;
+namespace AiDemos.Api.Controllers.RagDemo;
 
 [ApiController]
 [Route("Ingestion")]
