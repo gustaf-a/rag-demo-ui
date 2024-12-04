@@ -21,6 +21,39 @@ export class Client {
     /**
      * @return Success
      */
+    getNames(): Promise<void> {
+        let url_ = this.baseUrl + "/agents/get-names";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetNames(_response);
+        });
+    }
+
+    protected processGetNames(response: Response): Promise<void> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            return;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * @return Success
+     */
     getTables(): Promise<void> {
         let url_ = this.baseUrl + "/Database/get-tables";
         url_ = url_.replace(/[?&]$/, "");
@@ -287,7 +320,9 @@ export class Client {
 
     /**
      * Continues a chat using the chat history object.
-    Work in progress.
+    This is a bit experimental, but should allow human in the loop and/or step-by-step animations of what the model is doing in the background.
+    When model is finished it will return an Assistant-message with content.
+    If this chathistory is returned in another reply then code will see metaData:FinishReason:Stop and will return an empty chathistory object as a reply.
      * @param body (optional) 
      * @return Success
      */
@@ -401,7 +436,7 @@ export class Client {
      * @return Success
      */
     chatCompletion(body: ChatMessage[] | undefined): Promise<ChatResponse> {
-        let url_ = this.baseUrl + "/Mock/chatCompletion";
+        let url_ = this.baseUrl + "/mock/chatCompletion";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -441,7 +476,7 @@ export class Client {
     /**
      * @return Success
      */
-    getNames(): Promise<void> {
+    getNames2(): Promise<void> {
         let url_ = this.baseUrl + "/plugins/get-names";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -452,44 +487,11 @@ export class Client {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processGetNames(_response);
+            return this.processGetNames2(_response);
         });
     }
 
-    protected processGetNames(response: Response): Promise<void> {
-        const status = response.status;
-        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200) {
-            return response.text().then((_responseText) => {
-            return;
-            });
-        } else if (status !== 200 && status !== 204) {
-            return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Promise.resolve<void>(null as any);
-    }
-
-    /**
-     * @return Success
-     */
-    processes(): Promise<void> {
-        let url_ = this.baseUrl + "/processes";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: RequestInit = {
-            method: "GET",
-            headers: {
-            }
-        };
-
-        return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processProcesses(_response);
-        });
-    }
-
-    protected processProcesses(response: Response): Promise<void> {
+    protected processGetNames2(response: Response): Promise<void> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
@@ -545,9 +547,7 @@ export class Client {
 }
 
 export class ChatMessage implements IChatMessage {
-    /** The role of the message sender, e.g., "system", "user", "assistant". */
     role?: string | undefined;
-    /** The content of the message. */
     content?: string | undefined;
 
     constructor(data?: IChatMessage) {
@@ -582,9 +582,7 @@ export class ChatMessage implements IChatMessage {
 }
 
 export interface IChatMessage {
-    /** The role of the message sender, e.g., "system", "user", "assistant". */
     role?: string | undefined;
-    /** The content of the message. */
     content?: string | undefined;
 }
 
@@ -715,8 +713,6 @@ export interface IChatRequest {
 export class ChatResponse implements IChatResponse {
     chatMessages?: ChatMessage[] | undefined;
     citations?: RetrievedDocument[] | undefined;
-    intent?: string | undefined;
-    /** Contains the original question and tool calls */
     chatHistoryJson?: string | undefined;
 
     constructor(data?: IChatResponse) {
@@ -740,7 +736,6 @@ export class ChatResponse implements IChatResponse {
                 for (let item of _data["citations"])
                     this.citations!.push(RetrievedDocument.fromJS(item));
             }
-            this.intent = _data["intent"];
             this.chatHistoryJson = _data["chatHistoryJson"];
         }
     }
@@ -764,7 +759,6 @@ export class ChatResponse implements IChatResponse {
             for (let item of this.citations)
                 data["citations"].push(item.toJSON());
         }
-        data["intent"] = this.intent;
         data["chatHistoryJson"] = this.chatHistoryJson;
         return data;
     }
@@ -773,8 +767,6 @@ export class ChatResponse implements IChatResponse {
 export interface IChatResponse {
     chatMessages?: ChatMessage[] | undefined;
     citations?: RetrievedDocument[] | undefined;
-    intent?: string | undefined;
-    /** Contains the original question and tool calls */
     chatHistoryJson?: string | undefined;
 }
 
@@ -920,7 +912,6 @@ export interface IEmbeddingMetaData {
 
 export class IngestDataOptions implements IIngestDataOptions {
     mergeLineIfFewerWordsThan?: number;
-    /** An ordered list of the chunking strategies to apply. */
     selectedChunkers?: string[] | undefined;
 
     constructor(data?: IIngestDataOptions) {
@@ -964,7 +955,6 @@ export class IngestDataOptions implements IIngestDataOptions {
 
 export interface IIngestDataOptions {
     mergeLineIfFewerWordsThan?: number;
-    /** An ordered list of the chunking strategies to apply. */
     selectedChunkers?: string[] | undefined;
 }
 
