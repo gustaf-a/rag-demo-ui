@@ -23,7 +23,8 @@ public class LlmServiceSemanticKernel(IConfiguration configuration, Kernel _kern
     {
         var chatResponse = await GetChatResponseInternal(chatMessages.ToSemanticKernelChatMessages(retrievedContextSources), chatOptions);
 
-        chatResponse.Citations = retrievedContextSources.ToList();
+        if(!retrievedContextSources.IsNullOrEmpty())
+            chatResponse.Citations = retrievedContextSources.ToList();
 
         return chatResponse;
     }

@@ -20,7 +20,8 @@ public class ChatResponse
 
     public ChatResponse(string text)
     {
-        ChatMessages.Add(new ChatMessage(ChatMessageRoles.Assistant, text));
+        if(!string.IsNullOrWhiteSpace(text))
+            ChatMessages.Add(new ChatMessage(ChatMessageRoles.Assistant, text));
     }
 
     public ChatResponse(string text, List<RetrievedDocument> sourcesUsed) : this(text)
