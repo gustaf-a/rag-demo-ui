@@ -109,7 +109,7 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     ///    "chatMessages": [
     ///    {  
     ///        "role": "user",  
-    ///        "content": "How long until Jane's next meeting? Search in the database."  
+    ///        "content": "Who has the first follow up meeting, Jane or John? Search in the database."  
     ///    }  
     ///    ],  
     ///    "chatOptions": {  
@@ -121,6 +121,10 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     ///    }  
     /// }
     /// ```
+    /// There's a big risk here that the bot doesn't understand that it needs to search multiple times for different things.
+    /// For example the search phrase could become: "follow-up meeting Jane John"
+    /// Which probably will not get anything useful.
+    /// Using a system message can help here, but this is a multi stage question more suited for an agent assistant.
     /// 
     /// ## RAG chat request with 1 plugin without auto invoking of plugins. For human-in-the-loop or animating message progress
     /// ```
