@@ -11,7 +11,7 @@ namespace AiDemos.Api.Controllers.RagDemo;
 public class PluginsController(ILogger<PluginsController> _logger, IEnumerable<IPlugin> _plugins) : ControllerBase
 {
     [HttpGet("get-names")]
-    public async Task<IActionResult> GetPluginNames()
+    public async Task<ActionResult<IEnumerable<string>>> GetPluginNames()
     {
         var pluginNames = _plugins.Select(plugin => plugin.GetType().Name).ToList();
 

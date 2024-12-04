@@ -10,7 +10,7 @@ namespace AiDemos.Api.Controllers.AgentDemo;
 public class AgentsController(ILogger<AgentsController> _logger) : ControllerBase
 {
     [HttpGet("get-names")]
-    public async Task<IActionResult> GetNames()
+    public async Task<ActionResult<IEnumerable<string>>> GetNames()
     {
         //TODO Handler gets names of agents available
 

@@ -153,7 +153,7 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     /// <param name="chatRequest"></param>
     /// <returns></returns>
     [HttpPost("get-chat-response")]
-    public async Task<IActionResult> GetChatResponse([FromBody] ChatRequest chatRequest)
+    public async Task<ActionResult<ChatResponse>> GetChatResponse([FromBody] ChatRequest chatRequest)
     {
         var response = await _chatHandler.GetChatResponse(chatRequest);
 
@@ -258,7 +258,7 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     /// <param name="continueChatRequest"></param>
     /// <returns></returns>
     [HttpPost("continue-chat")]
-    public async Task<IActionResult> ContinueChatResponse([FromBody] ContinueChatRequest continueChatRequest)
+    public async Task<ActionResult<ChatResponse>> ContinueChatResponse([FromBody] ContinueChatRequest continueChatRequest)
     {
         var response = await _chatHandler.ContinueChatResponse(continueChatRequest);
 

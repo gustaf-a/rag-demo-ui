@@ -12,7 +12,7 @@ public class IngestionController(ILogger<IngestionController> _logger, IConfigur
     private readonly AzureOptions _azureOptions = configuration.GetSection(AzureOptions.Azure).Get<AzureOptions>() ?? throw new ArgumentNullException(nameof(AzureOptions));
 
     [HttpGet("get-chunkers")]
-    public async Task<IActionResult> GetChunkers()
+    public async Task<ActionResult<IEnumerable<string>>> GetChunkers()
     {
         var chunkerNames = _ingestionHandler.GetChunkerNames();
 
@@ -20,7 +20,7 @@ public class IngestionController(ILogger<IngestionController> _logger, IConfigur
     }
 
     [HttpPost("ingest-data")]
-    public async Task<IActionResult> IngestData([FromBody] IngestDataRequest request)
+    public async Task<ActionResult<string>> IngestData([FromBody] IngestDataRequest request)
     {
         ArgumentNullException.ThrowIfNull(nameof(request));
 

@@ -12,7 +12,7 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
     private readonly AzureOptions _azureOptions = configuration.GetSection(AzureOptions.Azure).Get<AzureOptions>() ?? throw new ArgumentNullException(nameof(AzureOptions));
 
     [HttpGet("get-tables")]
-    public async Task<IActionResult> GetDatabaseTables()
+    public async Task<ActionResult<IEnumerable<string>>> GetDatabaseTables()
     {
         try
         {
@@ -28,7 +28,7 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
     }
 
     [HttpDelete("remove-table")]
-    public async Task<IActionResult> RemoveTable([FromBody] DatabaseOptions databaseOptions)
+    public async Task<ActionResult<string>> RemoveTable([FromBody] DatabaseOptions databaseOptions)
     {
         await CheckTableExists(databaseOptions);
 
@@ -46,7 +46,7 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
     }
 
     [HttpPost("reset-table")]
-    public async Task<IActionResult> ResetTable([FromBody] DatabaseOptions databaseOptions)
+    public async Task<ActionResult<string>> ResetTable([FromBody] DatabaseOptions databaseOptions)
     {
         await CheckTableExists(databaseOptions);
 
@@ -64,7 +64,7 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
     }
 
     [HttpPost("create-embeddings-table")]
-    public async Task<IActionResult> CreateEmbeddingsTable([FromBody] DatabaseOptions databaseOptions)
+    public async Task<ActionResult<string>> CreateEmbeddingsTable([FromBody] DatabaseOptions databaseOptions)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(databaseOptions.TableName);
 
@@ -87,7 +87,7 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
     }
 
     [HttpPost("get-unique-tag-values/{tag}")]
-    public async Task<IActionResult> GetUniqueMetaDataTagValues(string tag, [FromBody] DatabaseOptions databaseOptions)
+    public async Task<ActionResult<IEnumerable<string>>> GetUniqueMetaDataTagValues(string tag, [FromBody] DatabaseOptions databaseOptions)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(tag);
 
@@ -107,7 +107,7 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
     }
 
     [HttpPost("get-unique-tag-keys")]
-    public async Task<IActionResult> GetUniqueMetaDataTagKeys([FromBody] DatabaseOptions databaseOptions)
+    public async Task<ActionResult<IEnumerable<string>>> GetUniqueMetaDataTagKeys([FromBody] DatabaseOptions databaseOptions)
     {
         await CheckTableExists(databaseOptions);
 

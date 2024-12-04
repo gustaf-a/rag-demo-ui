@@ -48,7 +48,7 @@ public class RetrievalController(ILogger<RetrievalController> _logger, IConfigur
     /// <param name="searchRequest"></param>
     /// <returns></returns>
     [HttpPost("search")]
-    public async Task<IActionResult> PerformSearch([FromBody] SearchRequest searchRequest)
+    public async Task<ActionResult<IEnumerable<RetrievedDocument>>> PerformSearch([FromBody] SearchRequest searchRequest)
     {
         var searchResults = await _retrievalHandler.DoSearch(searchRequest);
         if (searchResults.IsNullOrEmpty())
