@@ -404,3 +404,4 @@ rag-demo-backend/RagDemoAPI/Properties/launchSettings.json
 ai-demo-api/AiDemos.Api/Properties/launchSettings.json
 ai-demo-api/AiDemos.Api/Properties/ServiceDependencies/RagDemoAPI20241118085132 - Web Deploy/profile.arm.json
 ai-demo-api/AiDemos.Api/Properties/ServiceDependencies/RagDemoAPI20241118085132 - Web Deploy/apis1.arm.json
+ai-demo-api/AiDemos.Api/Properties/ServiceDependencies/RagDemoAPI20241118085132 - Web Deploy1/profile.arm.json
