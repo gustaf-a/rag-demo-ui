@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Npgsql;
-using AiDemos.Api.Configuration;
 using AiDemos.Api.Extensions;
 using AiDemos.Api.Models;
 using System.Text;
@@ -8,15 +7,10 @@ using System.Text.Json;
 
 namespace AiDemos.Api.Repositories;
 
-public class PostgreSqlRepository : IPostgreSqlRepository
+public class RagRepository : RepositoryBase, IRagRepository
 {
-    private readonly PostgreSqlOptions _options;
-    private readonly NpgsqlConnection _connection;
-
-    public PostgreSqlRepository(IConfiguration configuration)
+    public RagRepository(IConfiguration configuration) : base(configuration)
     {
-        _options = configuration.GetSection(PostgreSqlOptions.PostgreSql).Get<PostgreSqlOptions>() ?? throw new ArgumentNullException(nameof(PostgreSqlOptions));
-        _connection = new NpgsqlConnection(_options.ConnectionString);
     }
 
     public async Task<IEnumerable<string>> GetTableNames()
@@ -28,12 +22,9 @@ public class PostgreSqlRepository : IPostgreSqlRepository
               AND table_type = 'BASE TABLE';
         ";
 
-        var parameters = new Dictionary<string, object>();
-
-        return await ExecuteQueryAsync(
+        return await ExecuteQueryAsync<string>(
             query,
-            parameters,
-            reader => reader.GetString(reader.GetOrdinal("table_name"))
+            []
         );
     }
 
@@ -44,10 +35,9 @@ public class PostgreSqlRepository : IPostgreSqlRepository
             FROM {databaseOptions.TableName};
         ";
 
-        return await ExecuteQueryAsync(
+        return await ExecuteQueryAsync<string>(
             query,
-            [],
-            reader => reader.GetString(reader.GetOrdinal("unique_keys"))
+            []
         );
     }
 
@@ -59,32 +49,17 @@ public class PostgreSqlRepository : IPostgreSqlRepository
             WHERE metadata->'Tags' ? '{tag}';
         ";
 
-        return await ExecuteQueryAsync(
+        return await ExecuteQueryAsync<string>(
             query,
-            [],
-            reader => reader.GetString(reader.GetOrdinal("tag_value"))
+            []
         );
     }
-
-    public async Task<bool> DoesTableExist(DatabaseOptions databaseOptions)
-    {
-        var tableNames = await GetTableNames();
-
-        return tableNames.Contains(databaseOptions.TableName);
-    }
-
+    
     public async Task ResetTable(DatabaseOptions databaseOptions)
     {
         await DeleteTable(databaseOptions);
 
         await CreateEmbeddingsTable(databaseOptions);
-    }
-
-    public async Task DeleteTable(DatabaseOptions databaseOptions)
-    {
-        string dropTableQuery = $"DROP TABLE IF EXISTS {databaseOptions.TableName};";
-
-        await ExecuteQuery(dropTableQuery);
     }
 
     public async Task CreateEmbeddingsTable(DatabaseOptions databaseOptions)
@@ -188,7 +163,7 @@ public class PostgreSqlRepository : IPostgreSqlRepository
         }
 
         var retrieveDataQuery = sqlBuilder.ToString();
-
+        
         var queryResult = await ExecuteQueryAsync(
             retrieveDataQuery,
             parameters,
@@ -220,43 +195,5 @@ public class PostgreSqlRepository : IPostgreSqlRepository
             Content = reader.GetString(reader.GetOrdinal("content")),
             EmbeddingVector = null //Not relevant during retrieval
         };
-    }
-
-    private async Task ExecuteQuery(string query)
-    {
-        await _connection.OpenAsync();
-        try
-        {
-            using var command = new NpgsqlCommand(query, _connection);
-            var affected = await command.ExecuteNonQueryAsync();
-        }
-        finally
-        {
-            await _connection.CloseAsync();
-        }
-    }
-
-    private async Task<IEnumerable<T>> ExecuteQueryAsync<T>(string query, Dictionary<string, object> parameters, Func<NpgsqlDataReader, T> mapFunction)
-    {
-        var results = new List<T>();
-        await _connection.OpenAsync();
-        try
-        {
-            using var command = new NpgsqlCommand(query, _connection);
-
-            foreach (var parameter in parameters)
-                command.Parameters.AddWithValue(parameter.Key, parameter.Value ?? DBNull.Value);
-
-            using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                results.Add(mapFunction(reader));
-            }
-        }
-        finally
-        {
-            await _connection.CloseAsync();
-        }
-        return results;
     }
 }

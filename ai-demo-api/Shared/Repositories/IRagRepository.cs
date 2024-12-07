@@ -2,7 +2,7 @@
 
 namespace AiDemos.Api.Repositories;
 
-public interface IPostgreSqlRepository
+public interface IRagRepository
 {
     Task<IEnumerable<string>> GetTableNames();
     Task<bool> DoesTableExist(DatabaseOptions databaseOptions);

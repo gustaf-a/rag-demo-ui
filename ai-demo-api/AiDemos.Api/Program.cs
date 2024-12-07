@@ -13,6 +13,7 @@ using AiDemos.Api.Retrieval;
 using AiDemos.Api.Services;
 using System.Reflection;
 using Shared.Search;
+using Shared.Repositories;
 
 namespace AiDemos.Api;
 
@@ -129,6 +130,8 @@ public class Program
         builder.Services.AddScoped<ISearchService, SearchServicePostgreSql>();
 
         builder.Services.AddScoped<IEmbeddingService, EmbeddingService>();
-        builder.Services.AddSingleton<IPostgreSqlRepository, PostgreSqlRepository>();
+
+        builder.Services.AddSingleton<IRagRepository, RagRepository>();
+        builder.Services.AddSingleton<IWorkflowRepository, WorkflowRepository>();
     }
 }

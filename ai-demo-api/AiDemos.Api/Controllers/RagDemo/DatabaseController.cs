@@ -7,7 +7,7 @@ namespace AiDemos.Api.Controllers.RagDemo;
 
 [ApiController]
 [Route("Database")]
-public class DatabaseController(ILogger<IngestionController> _logger, IConfiguration configuration, IPostgreSqlRepository _postgreSqlService) : ControllerBase
+public class DatabaseController(ILogger<IngestionController> _logger, IConfiguration configuration, IRagRepository _postgreSqlService) : ControllerBase
 {
     private readonly AzureOptions _azureOptions = configuration.GetSection(AzureOptions.Azure).Get<AzureOptions>() ?? throw new ArgumentNullException(nameof(AzureOptions));
 

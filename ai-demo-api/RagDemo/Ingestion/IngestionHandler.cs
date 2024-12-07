@@ -8,7 +8,7 @@ using AiDemos.Api.Services;
 
 namespace AiDemos.Api.Ingestion;
 
-public class IngestionHandler(ILogger<IngestionHandler> _logger, IPostgreSqlRepository _postgreSqlService, IPreProcessorFactory _contentPreProcessorFactory, IChunkerFactory _chunkerFactory, IEmbeddingService _embeddingService) : IIngestionHandler
+public class IngestionHandler(ILogger<IngestionHandler> _logger, IRagRepository _postgreSqlService, IPreProcessorFactory _contentPreProcessorFactory, IChunkerFactory _chunkerFactory, IEmbeddingService _embeddingService) : IIngestionHandler
 {
     public IEnumerable<string> GetChunkerNames()
     {

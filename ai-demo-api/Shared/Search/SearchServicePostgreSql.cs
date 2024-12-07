@@ -11,7 +11,7 @@ namespace Shared.Search;
 
 public class SearchServicePostgreSql(ILogger<SearchServicePostgreSql> _logger,
                                      IConfiguration configuration,
-                                     IPostgreSqlRepository _postgreSqlService,
+                                     IRagRepository _postgreSqlService,
                                      IEmbeddingService _embeddingService,
                                      ILlmServiceFactory llmServiceFactory)
             : SearchServiceBase(llmServiceFactory), ISearchService
