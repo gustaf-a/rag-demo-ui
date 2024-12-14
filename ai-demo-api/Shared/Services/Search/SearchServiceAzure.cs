@@ -8,7 +8,7 @@ using AiDemos.Api.Models;
 using AiDemos.Api.Services;
 using SearchOptions = AiDemos.Api.Models.SearchOptions;
 
-namespace Shared.Search;
+namespace Shared.Services.Search;
 
 public class SearchServiceAzure(IConfiguration configuration,
                                 ILlmServiceFactory _llmServiceFactory,

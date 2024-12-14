@@ -1,6 +1,6 @@
 ﻿using AiDemos.Api.Models;
 
-namespace Shared.Search;
+namespace Shared.Services.Search;
 
 public interface ISearchServiceFactory
 {

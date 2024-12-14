@@ -3,7 +3,7 @@ using AiDemos.Api.Generation.LlmServices;
 using AiDemos.Api.Models;
 using System.Text;
 
-namespace Shared.Search;
+namespace Shared.Services.Search;
 
 public abstract class SearchServiceBase(ILlmServiceFactory _llmServiceFactory)
 {
