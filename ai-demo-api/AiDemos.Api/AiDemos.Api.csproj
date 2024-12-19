@@ -52,12 +52,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ProcessDemo\ProcessDemo.csproj" />
     <ProjectReference Include="..\RagDemo\RagDemo.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\ProcessDemo\" />
   </ItemGroup>
 
 </Project>

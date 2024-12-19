@@ -8,8 +8,10 @@
 
   <ItemGroup>
     <Folder Include="Functions\" />
-    <Folder Include="Workflows\" />
-    <Folder Include="Steps\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
 
 </Project>

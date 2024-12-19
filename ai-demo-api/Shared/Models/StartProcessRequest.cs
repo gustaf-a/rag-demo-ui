@@ -1,6 +1,6 @@
 ﻿using Shared.Models;
 
-namespace ProcessDemo.Processs;
+namespace ProcessDemo.Processes;
 
 public class StartProcessRequest
 {

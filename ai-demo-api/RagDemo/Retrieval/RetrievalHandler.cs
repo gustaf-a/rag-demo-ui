@@ -1,5 +1,5 @@
 ﻿using AiDemos.Api.Models;
-using Shared.Search;
+using Shared.Services.Search;
 
 namespace AiDemos.Api.Retrieval;
 

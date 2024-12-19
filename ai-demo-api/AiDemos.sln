@@ -11,9 +11,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RagDemo", "RagDemo\RagDemo.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{18B451AA-4181-42A9-8CDA-3B379E87C957}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessDemo", "ProcessDemo\ProcessDemo.csproj", "{4CDBEDE9-28C7-4696-B10A-4DC057E0AFA3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessDemo", "ProcessDemo\ProcessDemo.csproj", "{4CDBEDE9-28C7-4696-B10A-4DC057E0AFA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AgentDemo", "AgentDemo\AgentDemo.csproj", "{CC447C80-D7F8-44FD-BFE7-6E5CC3568434}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AgentDemo", "AgentDemo\AgentDemo.csproj", "{CC447C80-D7F8-44FD-BFE7-6E5CC3568434}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D9DEB280-5926-4A1B-92FE-7AD0FDB04464}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "database", "database", "{CF6F7DDD-E9F0-4057-9FD2-DD881F26FB82}"
+	ProjectSection(SolutionItems) = preProject
+		Database\setup\001_create_process_table.sql = Database\setup\001_create_process_table.sql
+		Database\setup\002_create_process_steps_table.sql = Database\setup\002_create_process_steps_table.sql
+		Database\setup\003_create_process_instances_table.sql = Database\setup\003_create_process_instances_table.sql
+		Database\setup\004_create_process_step_instances_table.sql = Database\setup\004_create_process_step_instances_table.sql
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +54,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CF6F7DDD-E9F0-4057-9FD2-DD881F26FB82} = {D9DEB280-5926-4A1B-92FE-7AD0FDB04464}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {39F5C913-F736-4BE4-B4DF-DF2DC75DDFB4}

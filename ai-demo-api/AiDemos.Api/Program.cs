@@ -12,8 +12,12 @@ using AiDemos.Api.Repositories;
 using AiDemos.Api.Retrieval;
 using AiDemos.Api.Services;
 using System.Reflection;
-using Shared.Search;
 using Shared.Repositories;
+using Shared.Services.Search;
+using ProcessDemo.Processes;
+using Shared.Search;
+using ProcessDemo.Steps;
+using ProcessDemo.Steps.StepServices;
 
 namespace AiDemos.Api;
 
@@ -103,6 +107,7 @@ public class Program
 
     private static void SetupServices(WebApplicationBuilder builder)
     {
+        //RAG
         builder.Services.AddScoped<IIngestionHandler, IngestionHandler>();
 
         builder.Services.AddScoped<IPreProcessorFactory, PreProcessorFactory>();
@@ -132,6 +137,15 @@ public class Program
         builder.Services.AddScoped<IEmbeddingService, EmbeddingService>();
 
         builder.Services.AddSingleton<IRagRepository, RagRepository>();
-        builder.Services.AddSingleton<IWorkflowRepository, WorkflowRepository>();
+        //End RAG
+
+        //Processes
+        builder.Services.AddScoped<IProcessHandler, ProcessHandler>();
+        builder.Services.AddScoped<IProcessExecutor, ProcessExecutor>();
+        builder.Services.AddScoped<IProcessRepository, ProcessRepository>();
+
+        builder.Services.AddScoped<IStepClassFactory, StepClassFactory>();
+
+        builder.Services.AddScoped<IFileService, FileService>();
     }
 }

@@ -10,12 +10,10 @@ namespace AiDemos.Api.Repositories;
 public abstract class RepositoryBase
 {
     protected readonly PostgreSqlOptions _options;
-    protected readonly NpgsqlConnection _connection;
 
     public RepositoryBase(IConfiguration configuration)
     {
         _options = configuration.GetSection(PostgreSqlOptions.PostgreSql).Get<PostgreSqlOptions>() ?? throw new ArgumentNullException(nameof(PostgreSqlOptions));
-        _connection = new NpgsqlConnection(_options.ConnectionString);
     }
 
     public async Task<bool> DoesTableExist(DatabaseOptions databaseOptions)
@@ -48,36 +46,47 @@ public abstract class RepositoryBase
 
     protected async Task ExecuteQuery(string query)
     {
-        await _connection.OpenAsync();
-        try
-        {
-            using var command = new NpgsqlCommand(query, _connection);
-            var affected = await command.ExecuteNonQueryAsync();
-        }
-        finally
-        {
-            await _connection.CloseAsync();
-        }
+        using var connection = new NpgsqlConnection(_options.ConnectionString);
+        await connection.OpenAsync();
+
+        using var command = new NpgsqlCommand(query, connection);
+        var affected = await command.ExecuteNonQueryAsync();
     }
 
     #region Helper Methods
 
     protected async Task ExecuteQueryAsync(string query, Dictionary<string, object> parameters)
     {
-        await _connection.OpenAsync();
+        using var connection = new NpgsqlConnection(_options.ConnectionString);
+        await connection.OpenAsync();
 
-        using var command = new NpgsqlCommand(query, _connection);
+        using var command = new NpgsqlCommand(query, connection);
 
         AddParameters(command, parameters);
 
         await command.ExecuteNonQueryAsync();
     }
 
+    protected async Task ExecuteQueryAsync(string query, Dictionary<string, object> parameters, Dictionary<string, string> jsonBParameters)
+    {
+        using var connection = new NpgsqlConnection(_options.ConnectionString);
+        await connection.OpenAsync();
+
+        using var command = new NpgsqlCommand(query, connection);
+
+        AddParameters(command, parameters);
+
+        AddJsonBParameters(command, jsonBParameters);
+
+        await command.ExecuteNonQueryAsync();
+    }
+
     protected async Task<T> ExecuteQuerySingleAsync<T>(string query, Dictionary<string, object> parameters) where T : new()
     {
-        await _connection.OpenAsync();
+        using var connection = new NpgsqlConnection(_options.ConnectionString);
+        await connection.OpenAsync();
 
-        using var command = new NpgsqlCommand(query, _connection);
+        using var command = new NpgsqlCommand(query, connection);
 
         AddParameters(command, parameters);
 
@@ -96,11 +105,37 @@ public abstract class RepositoryBase
     {
         var results = new List<T>();
 
-        await _connection.OpenAsync();
+        using var connection = new NpgsqlConnection(_options.ConnectionString);
+        await connection.OpenAsync();
 
-        using var command = new NpgsqlCommand(query, _connection);
+        using var command = new NpgsqlCommand(query, connection);
 
         AddParameters(command, parameters);
+
+        using (var reader = await command.ExecuteReaderAsync())
+        {
+            while (await reader.ReadAsync())
+            {
+                T entity = MapReaderToEntity<T>(reader);
+                results.Add(entity);
+            }
+        }
+
+        return results;
+    }
+
+    protected async Task<List<T>> ExecuteQueryAsync<T>(string query, Dictionary<string, object> parameters, Dictionary<string, string> jsonBParameters)
+    {
+        var results = new List<T>();
+
+        using var connection = new NpgsqlConnection(_options.ConnectionString);
+        await connection.OpenAsync();
+
+        using var command = new NpgsqlCommand(query, connection);
+
+        AddParameters(command, parameters);
+
+        AddJsonBParameters(command, jsonBParameters);
 
         using (var reader = await command.ExecuteReaderAsync())
         {
@@ -117,33 +152,39 @@ public abstract class RepositoryBase
     protected async Task<IEnumerable<T>> ExecuteQueryAsync<T>(string query, Dictionary<string, object> parameters, Func<NpgsqlDataReader, T> mapFunction)
     {
         var results = new List<T>();
-        await _connection.OpenAsync();
-        try
-        {
-            using var command = new NpgsqlCommand(query, _connection);
 
-            foreach (var parameter in parameters)
-                command.Parameters.AddWithValue(parameter.Key, parameter.Value ?? DBNull.Value);
+        using var connection = new NpgsqlConnection(_options.ConnectionString);
+        await connection.OpenAsync();
 
-            using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                results.Add(mapFunction(reader));
-            }
-        }
-        finally
+        using var command = new NpgsqlCommand(query, connection);
+
+        foreach (var parameter in parameters)
+            command.Parameters.AddWithValue(parameter.Key, parameter.Value ?? DBNull.Value);
+
+        using var reader = await command.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
         {
-            await _connection.CloseAsync();
+            results.Add(mapFunction(reader));
         }
+
         return results;
     }
 
-    private void AddParameters(NpgsqlCommand command, Dictionary<string, object> parameters)
+    private static void AddParameters(NpgsqlCommand command, Dictionary<string, object> parameters)
     {
         foreach (var param in parameters)
         {
             var value = param.Value ?? DBNull.Value;
             command.Parameters.AddWithValue(param.Key, value);
+        }
+    }
+
+    private static void AddJsonBParameters(NpgsqlCommand command, Dictionary<string, string> parameters)
+    {
+        foreach (var param in parameters)
+        {
+            command.Parameters.Add(param.Key, NpgsqlTypes.NpgsqlDbType.Jsonb)
+                .Value = param.Value;
         }
     }
 

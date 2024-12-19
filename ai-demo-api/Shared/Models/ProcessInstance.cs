@@ -9,6 +9,7 @@ public class ProcessInstance
     public string StartedBy { get; set; }
     public DateTime StartedAt { get; set; }
     public DateTime? CompletedAt { get; set; }
+    public DateTime UpdatedAt { get;  set; }
 
     public List<ProcessStepInstance> StepInstances { get; set; }
     public ProcessPayload Payload { get; set; }

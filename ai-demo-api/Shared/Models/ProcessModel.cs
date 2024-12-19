@@ -1,14 +1,15 @@
 ﻿namespace Shared.Models;
 
 /// <summary>
-/// Simplified Process class used for sending to frontend
+/// Process class that directly maps to database
 /// </summary>
-public class ProcessInfo
+public class ProcessModel
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
     public ProcessPayload Payload { get; set; } = new ProcessPayload();
 
-    public List<ProcessStepInfo>? Steps { get; set; } = [];
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
 }

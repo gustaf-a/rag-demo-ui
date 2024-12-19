@@ -1,7 +1,7 @@
 ﻿using AiDemos.Api.Extensions;
 using AiDemos.Api.Models;
 using Microsoft.SemanticKernel;
-using Shared.Search;
+using Shared.Services.Search;
 using System.ComponentModel;
 
 namespace Shared.Plugins;
