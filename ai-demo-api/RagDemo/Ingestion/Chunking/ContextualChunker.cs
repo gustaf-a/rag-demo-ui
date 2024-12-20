@@ -6,7 +6,6 @@ namespace AiDemos.Api.Ingestion.Chunking;
 
 public class ContextualChunker(IConfiguration configuration, ILlmServiceFactory llmServiceFactory) : ChunkerBase(configuration, llmServiceFactory), IChunker
 {
-
     public string Name => nameof(ContextualChunker);
 
     public bool IsSuitable(IngestDataRequest request, string content)
@@ -17,24 +16,23 @@ public class ContextualChunker(IConfiguration configuration, ILlmServiceFactory 
         return true;
     }
 
-    public async Task<IEnumerable<string>> Execute(IngestDataRequest request, string content)
+    public async Task<IEnumerable<ContentChunk>> Execute(IngestDataRequest request, string content)
     {
         var contentChunks = GetChunks(request.IngestDataOptions, content, _ingestionOptions.ContextualRetrievalWordsPerChunk, 0);
 
-        var chunksWithContext = new List<string>();
+        var chunksWithContext = new List<ContentChunk>();
 
-        //TODO Use caching
         var llmService = _llmServiceFactory.Create(request);
 
         foreach (var contentChunk in contentChunks)
         {
-            var chunkContext = await GetChunkContext(llmService, request, content, contentChunk);
+            var chunkContext = await GetChunkContext(llmService, request, content, contentChunk.Content);
             if (string.IsNullOrWhiteSpace(chunkContext))
             {
                 throw new Exception($"Failed to generate context for chunk: {contentChunk} using LlmService {llmService.GetType()}.");
             }
 
-            var contextEnrichedChunk =
+            contentChunk.EmbeddingContent =
 $"""
 Context:
 {chunkContext}
@@ -43,7 +41,7 @@ Information:
 {contentChunk}
 """;
 
-            chunksWithContext.Add(contextEnrichedChunk);
+            chunksWithContext.Add(contentChunk);
         }
 
         return chunksWithContext;

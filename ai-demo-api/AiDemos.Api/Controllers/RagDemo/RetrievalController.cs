@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using AiDemos.Api.Extensions;
 using AiDemos.Api.Models;
 using AiDemos.Api.Retrieval;
+using Shared.Models;
+using AiDemos.Api.Ingestion.Chunking;
 
 namespace AiDemos.Api.Controllers.RagDemo;
 
@@ -57,5 +59,17 @@ public class RetrievalController(ILogger<RetrievalController> _logger, IConfigur
         }
 
         return Ok(searchResults);
+    }
+    
+    [HttpPost("get-chunks")]
+    public async Task<ActionResult<IEnumerable<ContentChunk>>> PerformSearch([FromBody] ContentChunkRequest contentChunkRequest)
+    {
+        var contentChunks = await _retrievalHandler.GetContentChunks(contentChunkRequest);
+        if (contentChunks.IsNullOrEmpty())
+        {
+            return NoContent();
+        }
+
+        return Ok(contentChunks);
     }
 }

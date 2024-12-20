@@ -56,9 +56,15 @@ public class IngestionHandler(ILogger<IngestionHandler> _logger, IRagRepository 
             
             var chunks = await DoChunking(request, ingestionSource.Name, preprocessedContent);
 
-            foreach (var chunk in chunks)
+            ingestionSource.MetaData.SourceTotalChunkNumbers = chunks.Count - 1;
+
+            for (int j = 0; j < chunks.Count; j++)
             {
-                var embedding = await _embeddingService.GetEmbeddings(chunk);
+                var chunk = chunks[j];
+
+                var embedding = await _embeddingService.GetEmbeddings(chunk.EmbeddingContent);
+
+                ingestionSource.MetaData.SourceChunkNumber = j;
 
                 await _postgreSqlService.InsertData(request.DatabaseOptions!, chunk, embedding, ingestionSource.MetaData);
             }
@@ -75,13 +81,14 @@ public class IngestionHandler(ILogger<IngestionHandler> _logger, IRagRepository 
         return preprocessedContent;
     }
 
-    private async Task<IEnumerable<string>> DoChunking(IngestDataRequest request, string file, string preprocessedContent)
+    private async Task<List<ContentChunk>> DoChunking(IngestDataRequest request, string file, string preprocessedContent)
     {
         var chunker = _chunkerFactory.Create(request, file, preprocessedContent);
 
         _logger.LogInformation($"Chunking {file}: Using {chunker.Name}.");
 
         var chunks = await chunker.Execute(request, preprocessedContent);
-        return chunks;
+
+        return chunks.ToList();
     }
 }

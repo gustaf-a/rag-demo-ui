@@ -7,6 +7,8 @@ public class EmbeddingsRowModel
     public EmbeddingMetaData Metadata { get; set; }
 
     public string Content { get; set; }
-
+    public string EmbeddingContent { get; set; }
     public double[] EmbeddingVector { get; set; }
+    public long StartIndex { get; set; }
+    public long EndIndex { get; set; }
 }

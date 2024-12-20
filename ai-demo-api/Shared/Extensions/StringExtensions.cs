@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using Shared.Models;
 
 namespace AiDemos.Api.Extensions;
 
@@ -20,36 +21,101 @@ public static class StringExtensions
         if (string.IsNullOrWhiteSpace(text))
             return 0;
 
-        return SplitIntoWords(text).Length;
+        return SplitIntoWords(text, 0).Count();
     }
 
-    private static readonly string[] _paragraphSeparators = ["\r\n\r\n", "\n\n"];
+    private static readonly IEnumerable<string> _paragraphSeparators = ["\r\n\r\n", "\n\n"];
 
-    public static IEnumerable<string> SplitIntoParagraphs(this string content)
+    public static IEnumerable<SplitText> SplitIntoParagraphs(this string content, int startingIndex)
     {
-        return content.Split(_paragraphSeparators, StringSplitOptions.None);
+        return SplitIntoTextBySeparator(content, _paragraphSeparators, startingIndex);
     }
 
-    private static readonly string[] _newLineSeparators = ["\r\n", "\n"];
-
-    public static IEnumerable<string> SplitIntoLines(this string paragraph)
+    private static IEnumerable<SplitText> SplitIntoTextBySeparator(string content, IEnumerable<string> paragraphSeparators, int startingIndex)
     {
-        return paragraph.Split(_newLineSeparators, StringSplitOptions.None);
+        var result = new List<SplitText>();
+        int currentIndex = 0;
+
+        while (currentIndex < content.Length)
+        {
+            // Find the next occurrence of any known paragraph separator.
+            int nextSeparatorIndex = FindNextSeparator(paragraphSeparators, content, currentIndex, out string foundSeparator);
+
+            if (nextSeparatorIndex == -1)
+            {
+                // No more separators, so the remaining text is the last paragraph.
+                string lastText = content.Substring(currentIndex);
+                result.Add(new SplitText
+                {
+                    Text = lastText,
+                    StartIndex = startingIndex + currentIndex,
+                    EndIndex = startingIndex + currentIndex + lastText.Length - 1
+                });
+                break;
+            }
+            else
+            {
+                // Extract the text between currentIndex and the separator start.
+                int textLength = nextSeparatorIndex - currentIndex;
+                string text = content.Substring(currentIndex, textLength);
+
+                result.Add(new SplitText
+                {
+                    Text = text,
+                    StartIndex = startingIndex + currentIndex,
+                    EndIndex = startingIndex + currentIndex + textLength
+                });
+
+                // Move currentIndex to the character after the separator.
+                currentIndex = nextSeparatorIndex + foundSeparator.Length;
+            }
+        }
+
+        return result;
     }
 
-    private static readonly string _regexPunctiationWithWhiteSpace = @"(?<=[.!?])\s+";
-
-    public static IEnumerable<string> SplitIntoSentences(this string text)
+    /// <summary>
+    /// Finds the earliest next occurrence of any separator starting from startIndex.
+    /// Returns the index of the separator in the content, or -1 if none is found.
+    /// Also returns which separator was found via the out parameter.
+    /// </summary>
+    private static int FindNextSeparator(IEnumerable<string> separators, string content, int startIndex, out string foundSeparator)
     {
-        return Regex.Split(text, _regexPunctiationWithWhiteSpace)
-                    .Where(sentence => !string.IsNullOrWhiteSpace(sentence));
+        int earliestIndex = -1;
+        foundSeparator = null;
+
+        foreach (var sep in separators)
+        {
+            int index = content.IndexOf(sep, startIndex, StringComparison.Ordinal);
+            if (index != -1 && (earliestIndex == -1 || index < earliestIndex))
+            {
+                earliestIndex = index;
+                foundSeparator = sep;
+            }
+        }
+
+        return earliestIndex;
     }
 
-    private static readonly char[] _betweenWordsSeparator = [' '];
+    private static readonly IEnumerable<string> _newLineSeparators = ["\r\n", "\n"];
 
-    public static string[] SplitIntoWords(this string cleanedParagraph)
+    public static IEnumerable<SplitText> SplitIntoLines(this string content, int startingIndex)
     {
-        return cleanedParagraph.Split(_betweenWordsSeparator, StringSplitOptions.RemoveEmptyEntries);
+        return SplitIntoTextBySeparator(content, _newLineSeparators, startingIndex);
+    }
+
+    private static readonly IEnumerable<string> _sentenceSeparators = ["?", "!", "."];
+
+    public static IEnumerable<SplitText> SplitIntoSentences(this string content, int startingIndex)
+    {
+        return SplitIntoTextBySeparator(content, _sentenceSeparators, startingIndex);
+    }
+
+    private static readonly IEnumerable<string> _betweenWordsSeparator = [" "];
+
+    public static IEnumerable<SplitText> SplitIntoWords(this string content, int startingIndex)
+    {
+        return SplitIntoTextBySeparator(content, _betweenWordsSeparator, startingIndex);
     }
 
     public static IEnumerable<string> PostgreSqlEscapeSqlIdentifier(this IEnumerable<string> identifier)
@@ -67,7 +133,7 @@ public static class StringExtensions
 
     public static IEnumerable<string> PostgreSqlEscapeSqlLiteral(this IEnumerable<string> literals)
     {
-        if(literals.IsNullOrEmpty()) 
+        if (literals.IsNullOrEmpty())
             return Enumerable.Empty<string>();
 
         return literals.Select(l => l.PostgreSqlEscapeSqlIdentifier());

@@ -15,6 +15,9 @@
 
         public string? SemanticSearchContent { get; set; } = null;
 
+        public int IncludeContentChunksAfter { get; set; } = 0;
+        public int IncludeContentChunksBefore { get; set; } = 0;
+
         public bool UseSemanticReRanker { get; set; } = false;
         public int SemanticRankerCandidatesToRetrieve { get; set; } = 30;
         public bool UseSemanticCaptions { get; set; } = false;

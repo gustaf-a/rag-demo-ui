@@ -4,7 +4,6 @@ using AiDemos.Api.Models;
 
 namespace AiDemos.Api.Ingestion.Chunking;
 
-
 public class SlidingWindowChunker(IConfiguration configuration, ILlmServiceFactory llmServiceFactory) : ChunkerBase(configuration, llmServiceFactory), IChunker
 {
     public string Name => nameof(SlidingWindowChunker);
@@ -14,7 +13,7 @@ public class SlidingWindowChunker(IConfiguration configuration, ILlmServiceFacto
         return true;
     }
 
-    public async Task<IEnumerable<string>> Execute(IngestDataRequest request, string content)
+    public async Task<IEnumerable<ContentChunk>> Execute(IngestDataRequest request, string content)
     {
         var contentChunks = GetChunks(request.IngestDataOptions, content, _ingestionOptions.SlidingWindowWordsPerChunk, _ingestionOptions.SlidingWindowOverlapWords);
 
