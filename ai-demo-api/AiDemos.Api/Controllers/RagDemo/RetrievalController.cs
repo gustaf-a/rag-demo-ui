@@ -31,6 +31,19 @@ public class RetrievalController(ILogger<RetrievalController> _logger, IConfigur
     /// }
     /// ```
     /// 
+    /// ## Simple semantic search request with contentBefore and contentAfter:
+    /// ```   
+    /// {
+    ///     "searchOptions": {
+    ///         "embeddingsTableName": "embeddings1",
+    ///         "itemsToRetrieve": 3,
+    ///         "semanticSearchContent": "John's medicines",
+    ///         "IncludeContentChunksAfter": 2,
+    ///         "IncludeContentChunksBefore": 2
+    ///     }
+    /// }
+    /// ```
+    /// 
     /// ## Semantic search request with metadata filter (uses Tags):
     /// ```   
     /// {
