@@ -1,6 +1,6 @@
-﻿using AiDemos.Api.Extensions;
-using AiDemos.Api.Ingestion.Chunking;
+﻿using Shared.Extensions;
 using Shared.Extensions;
+using Shared.Models;
 
 namespace Shared.Extensions;
 

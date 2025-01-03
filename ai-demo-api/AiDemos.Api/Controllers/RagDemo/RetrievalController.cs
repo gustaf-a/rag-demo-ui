@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using AiDemos.Api.Extensions;
-using AiDemos.Api.Models;
+using Shared.Models;
 using AiDemos.Api.Retrieval;
 using Shared.Models;
-using AiDemos.Api.Ingestion.Chunking;
+using Shared.Extensions;
 
 namespace AiDemos.Api.Controllers.RagDemo;
 

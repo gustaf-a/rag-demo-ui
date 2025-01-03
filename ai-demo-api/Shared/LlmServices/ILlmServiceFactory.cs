@@ -1,6 +1,7 @@
-﻿using AiDemos.Api.Models;
+﻿using Shared.Models;
+using Shared.Models;
 
-namespace AiDemos.Api.Generation.LlmServices;
+namespace Shared.Generation.LlmServices;
 
 public interface ILlmServiceFactory
 {

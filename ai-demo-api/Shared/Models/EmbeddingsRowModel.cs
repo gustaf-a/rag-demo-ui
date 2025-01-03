@@ -1,4 +1,4 @@
-﻿namespace AiDemos.Api.Models;
+﻿namespace Shared.Models;
 
 public class EmbeddingsRowModel
 {

@@ -2,9 +2,9 @@
 using AiDemos.Api.Ingestion.Chunking;
 using AiDemos.Api.Ingestion.FileReaders;
 using AiDemos.Api.Ingestion.PreProcessing;
-using AiDemos.Api.Models;
-using AiDemos.Api.Repositories;
-using AiDemos.Api.Services;
+using Shared.Models;
+using Shared.Repositories;
+using Shared.Services;
 
 namespace AiDemos.Api.Ingestion;
 

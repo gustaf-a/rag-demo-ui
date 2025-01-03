@@ -1,4 +1,4 @@
-﻿using AiDemos.Api.Models;
+﻿using Shared.Models;
 
 namespace Shared.Services.Search;
 

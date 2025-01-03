@@ -1,9 +1,9 @@
 ﻿
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Embeddings;
-using AiDemos.Api.Extensions;
+using Shared.Extensions;
 
-namespace AiDemos.Api.Services;
+namespace Shared.Services;
 
 #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 public class EmbeddingService(Kernel _kernel) : IEmbeddingService

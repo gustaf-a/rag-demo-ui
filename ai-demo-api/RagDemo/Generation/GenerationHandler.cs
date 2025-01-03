@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-using AiDemos.Api.Extensions;
-using AiDemos.Api.Generation.LlmServices;
-using AiDemos.Api.Models;
+using Shared.Models;
 using AiDemos.Api.Retrieval;
+using Shared.Extensions;
+using Shared.Generation.LlmServices;
 
 namespace AiDemos.Api.Generation;
 

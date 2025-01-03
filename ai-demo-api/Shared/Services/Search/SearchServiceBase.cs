@@ -1,6 +1,6 @@
-﻿using AiDemos.Api.Extensions;
-using AiDemos.Api.Generation.LlmServices;
-using AiDemos.Api.Models;
+﻿using Shared.Generation.LlmServices;
+using Shared.Extensions;
+using Shared.Models;
 using System.Text;
 
 namespace Shared.Services.Search;

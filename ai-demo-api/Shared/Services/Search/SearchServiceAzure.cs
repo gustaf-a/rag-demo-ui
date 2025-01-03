@@ -1,12 +1,14 @@
 ﻿using Azure.Search.Documents;
 using Azure.Search.Documents.Models;
 using Microsoft.Extensions.Configuration;
-using AiDemos.Api.Configuration;
-using AiDemos.Api.Extensions;
-using AiDemos.Api.Generation.LlmServices;
-using AiDemos.Api.Models;
-using AiDemos.Api.Services;
-using SearchOptions = AiDemos.Api.Models.SearchOptions;
+using Shared.Configuration;
+using Shared.Extensions;
+using Shared.Generation.LlmServices;
+using Shared.Models;
+using Shared.Services;
+using SearchOptions = Shared.Models.SearchOptions;
+using Shared.Extensions;
+using Shared.Models;
 
 namespace Shared.Services.Search;
 

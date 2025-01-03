@@ -2,24 +2,26 @@
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
-using AiDemos.Api.Extensions;
-using AiDemos.Api.Models;
+using Shared.Extensions;
+using Shared.Models;
 using Shared.Plugins;
 using System.Text.Json;
-using ChatMessage = AiDemos.Api.Models.ChatMessage;
-using ChatOptions = AiDemos.Api.Models.ChatOptions;
+using ChatMessage = Shared.Models.ChatMessage;
+using ChatOptions = Shared.Models.ChatOptions;
+using Shared.Extensions;
+using Shared.Models;
 
-namespace AiDemos.Api.Generation.LlmServices;
+namespace Shared.Generation.LlmServices;
 
 #pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 public class LlmServiceSemanticKernel(IConfiguration configuration, Kernel _kernel, IPluginHandler _pluginHandler) : ILlmService
 {
-    public async Task<ChatResponse> GetChatResponse(IEnumerable<Models.ChatMessage> chatMessages, ChatOptions chatOptions)
+    public async Task<ChatResponse> GetChatResponse(IEnumerable<ChatMessage> chatMessages, ChatOptions chatOptions)
     {
         return await GetChatResponseInternal(chatMessages.ToSemanticKernelChatMessages(), chatOptions);
     }
 
-    public async Task<ChatResponse> GetChatResponse(IEnumerable<Models.ChatMessage> chatMessages, IEnumerable<RetrievedDocument> retrievedContextSources, ChatOptions chatOptions)
+    public async Task<ChatResponse> GetChatResponse(IEnumerable<ChatMessage> chatMessages, IEnumerable<RetrievedDocument> retrievedContextSources, ChatOptions chatOptions)
     {
         var chatResponse = await GetChatResponseInternal(chatMessages.ToSemanticKernelChatMessages(retrievedContextSources), chatOptions);
 

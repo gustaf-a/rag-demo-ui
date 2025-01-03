@@ -1,4 +1,4 @@
-﻿namespace AiDemos.Api.Services;
+﻿namespace Shared.Services;
 
 public interface IEmbeddingService
 {

@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text.Json;
-using AiDemos.Api.Repositories;
+﻿using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Shared.Models;
 

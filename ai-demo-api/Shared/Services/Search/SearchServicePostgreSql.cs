@@ -1,11 +1,13 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using AiDemos.Api.Configuration;
-using AiDemos.Api.Extensions;
-using AiDemos.Api.Generation.LlmServices;
-using AiDemos.Api.Models;
-using AiDemos.Api.Repositories;
-using AiDemos.Api.Services;
+using Shared.Configuration;
+using Shared.Extensions;
+using Shared.Generation.LlmServices;
+using Shared.Models;
+using Shared.Repositories;
+using Shared.Services;
+using Shared.Extensions;
+using Shared.Models;
 
 namespace Shared.Services.Search;
 

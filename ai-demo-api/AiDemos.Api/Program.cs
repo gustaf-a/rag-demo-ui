@@ -1,16 +1,12 @@
 
 using Microsoft.OpenApi.Models;
 using Microsoft.SemanticKernel;
-using AiDemos.Api.Configuration;
 using AiDemos.Api.Generation;
-using AiDemos.Api.Generation.LlmServices;
 using AiDemos.Api.Ingestion;
 using AiDemos.Api.Ingestion.Chunking;
 using AiDemos.Api.Ingestion.PreProcessing;
 using Shared.Plugins;
-using AiDemos.Api.Repositories;
 using AiDemos.Api.Retrieval;
-using AiDemos.Api.Services;
 using System.Reflection;
 using Shared.Repositories;
 using Shared.Services.Search;
@@ -18,6 +14,10 @@ using ProcessDemo.Processes;
 using Shared.Search;
 using ProcessDemo.Steps;
 using ProcessDemo.Steps.StepServices;
+using Shared.Configuration;
+using Shared.Generation.LlmServices;
+using Shared.Services;
+using AgentDemo;
 
 namespace AiDemos.Api;
 

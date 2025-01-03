@@ -1,7 +1,8 @@
-﻿using AiDemos.Api.Models;
+﻿using Shared.Extensions;
+using Shared.Models;
 using System.Text;
 
-namespace AiDemos.Api.Extensions;
+namespace Shared.Extensions;
 
 public static class RetrievedDocumentExtensions
 {

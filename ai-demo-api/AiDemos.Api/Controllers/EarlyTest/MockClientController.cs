@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using AiDemos.Api.Configuration;
-using AiDemos.Api.Models;
+using Shared.Configuration;
+using Shared.Models;
 
 namespace AiDemos.Api.Controllers.EarlyTest;
 

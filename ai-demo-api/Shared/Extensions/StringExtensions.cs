@@ -1,7 +1,8 @@
 ﻿using System.Text.RegularExpressions;
+using Shared.Extensions;
 using Shared.Models;
 
-namespace AiDemos.Api.Extensions;
+namespace Shared.Extensions;
 
 public static class StringExtensions
 {

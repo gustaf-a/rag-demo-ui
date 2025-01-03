@@ -1,4 +1,6 @@
-﻿namespace AiDemos.Api.Models
+﻿using Shared.Models;
+
+namespace Shared.Models
 {
     public class SearchRequest
     {

@@ -1,4 +1,4 @@
-﻿namespace AiDemos.Api.Extensions;
+﻿namespace Shared.Extensions;
 
 public static class BoolExtensions
 {

@@ -1,8 +1,7 @@
-﻿using AiDemos.Api.Generation.LlmServices;
-using AiDemos.Api.Models;
+﻿using Shared.Models;
 using Microsoft.Extensions.Logging;
-using Shared.Models;
 using Shared.Repositories;
+using Shared.Generation.LlmServices;
 
 namespace ProcessDemo.Steps.StepImplementations;
 

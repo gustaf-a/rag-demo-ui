@@ -1,7 +1,9 @@
 ﻿using Microsoft.SemanticKernel.ChatCompletion;
-using AiDemos.Api.Models;
+using Shared.Models;
+using Shared.Extensions;
+using Shared.Models;
 
-namespace AiDemos.Api.Extensions;
+namespace Shared.Extensions;
 
 public static class ChatMessageExtensions
 {

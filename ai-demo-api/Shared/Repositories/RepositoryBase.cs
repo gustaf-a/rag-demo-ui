@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Npgsql;
-using AiDemos.Api.Configuration;
-using AiDemos.Api.Models;
+using Shared.Configuration;
 using Shared.Extensions;
 using System.Text.Json;
+using Shared.Models;
 
-namespace AiDemos.Api.Repositories;
+namespace Shared.Repositories;
 
 public abstract class RepositoryBase
 {

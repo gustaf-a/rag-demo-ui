@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
-using AiDemos.Api.Generation.LlmServices;
-using AiDemos.Api.Models;
+using Shared.Models;
+using Shared.Generation.LlmServices;
 
 namespace AiDemos.Api.Ingestion.Chunking;
 

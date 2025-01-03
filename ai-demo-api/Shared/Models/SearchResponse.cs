@@ -1,6 +1,7 @@
-﻿using AiDemos.Api.Extensions;
+﻿using Shared.Extensions;
+using Shared.Models;
 
-namespace AiDemos.Api.Models;
+namespace Shared.Models;
 
 #pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 public class SearchResponse

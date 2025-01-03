@@ -1,4 +1,4 @@
-﻿namespace AiDemos.Api.Configuration;
+﻿namespace Shared.Configuration;
 
 public class PostgreSqlOptions
 {

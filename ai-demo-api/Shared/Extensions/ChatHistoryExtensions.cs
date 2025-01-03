@@ -1,10 +1,12 @@
 ﻿using Microsoft.SemanticKernel.ChatCompletion;
+using Shared.Extensions;
+using Shared.Models;
 
-namespace AiDemos.Api.Extensions;
+namespace Shared.Extensions;
 
 public static class ChatHistoryExtensions
 {
-    public static Microsoft.SemanticKernel.ChatCompletion.ChatHistory AddToChatHistory(this Microsoft.SemanticKernel.ChatCompletion.ChatHistory chatHistory, IEnumerable<Models.ChatMessage> chatMessages)
+    public static Microsoft.SemanticKernel.ChatCompletion.ChatHistory AddToChatHistory(this Microsoft.SemanticKernel.ChatCompletion.ChatHistory chatHistory, IEnumerable<ChatMessage> chatMessages)
     {
         if (chatMessages.IsNullOrEmpty())
             return chatHistory;

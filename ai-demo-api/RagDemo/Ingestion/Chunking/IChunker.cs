@@ -1,4 +1,5 @@
-﻿using AiDemos.Api.Models;
+﻿using Shared.Models;
+using Shared.Models;
 
 namespace AiDemos.Api.Ingestion.Chunking;
 

@@ -1,5 +1,5 @@
-﻿using AiDemos.Api.Extensions;
-using AiDemos.Api.Models;
+﻿using Shared.Extensions;
+using Shared.Models;
 
 namespace AiDemos.Api.Ingestion.FileReaders;
 

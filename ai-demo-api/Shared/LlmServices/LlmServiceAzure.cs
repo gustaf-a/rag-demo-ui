@@ -2,28 +2,29 @@
 using Azure.AI.OpenAI.Chat;
 using Microsoft.Extensions.Configuration;
 using OpenAI.Chat;
-using AiDemos.Api.Configuration;
-using AiDemos.Api.Extensions;
-using AiDemos.Api.Models;
+using Shared.Configuration;
+using Shared.Models;
+using Shared.Extensions;
+using Shared.Models;
 
-namespace AiDemos.Api.Generation.LlmServices;
+namespace Shared.Generation.LlmServices;
 
 #pragma warning disable AOAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 public class LlmServiceAzure(IConfiguration configuration) : ILlmService
 {
     private readonly AzureOptions _azureOptions = configuration.GetSection(AzureOptions.Azure).Get<AzureOptions>() ?? throw new ArgumentNullException(nameof(AzureOptions));
 
-    public Task<ChatResponse> ContinueChatResponse(string previousChatHistoryJson, IEnumerable<Models.ChatMessage> chatMessages, IEnumerable<RetrievedDocument> retrievedContextSources, ChatOptions chatRequestOptions)
+    public Task<ChatResponse> ContinueChatResponse(string previousChatHistoryJson, IEnumerable<Shared.Models.ChatMessage> chatMessages, IEnumerable<RetrievedDocument> retrievedContextSources, ChatOptions chatRequestOptions)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<ChatResponse> GetChatResponse(IEnumerable<Models.ChatMessage> chatMessages, ChatOptions chatRequestOptions)
+    public async Task<ChatResponse> GetChatResponse(IEnumerable<Shared.Models.ChatMessage> chatMessages, ChatOptions chatRequestOptions)
     {
         return await GetChatResponse(chatMessages, [], chatRequestOptions);
     }
 
-    public async Task<ChatResponse> GetChatResponse(IEnumerable<Models.ChatMessage> chatMessages, IEnumerable<RetrievedDocument> retrievedContextSources, ChatOptions chatRequestOptions)
+    public async Task<ChatResponse> GetChatResponse(IEnumerable<Shared.Models.ChatMessage> chatMessages, IEnumerable<RetrievedDocument> retrievedContextSources, ChatOptions chatRequestOptions)
     {
         var chatHistory = chatMessages.ToOpenAiChatMessages(retrievedContextSources);
 

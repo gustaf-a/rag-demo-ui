@@ -1,6 +1,7 @@
-﻿using System.Text;
+﻿using Shared.Models;
+using System.Text;
 
-namespace AiDemos.Api.Models;
+namespace Shared.Models;
 
 public class ChatPrompt
 {

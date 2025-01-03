@@ -1,4 +1,4 @@
-﻿using AiDemos.Api.Models;
+﻿using Shared.Models;
 
 namespace AiDemos.Api.Ingestion.FileReaders
 {

@@ -1,6 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using AiDemos.Api.Models;
+using Shared.Models;
 
 namespace AiDemos.Api.Ingestion.FileReaders;
 

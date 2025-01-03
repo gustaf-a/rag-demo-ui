@@ -1,9 +1,7 @@
-﻿using AiDemos.Api.Ingestion.Chunking;
-using AiDemos.Api.Models;
-using AiDemos.Api.Repositories;
-using Shared.Models;
+﻿using Shared.Models;
 using Shared.Services.Search;
 using Shared.Extensions;
+using Shared.Repositories;
 
 namespace AiDemos.Api.Retrieval;
 

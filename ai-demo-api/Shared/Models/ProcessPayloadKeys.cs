@@ -17,4 +17,6 @@ public static class ProcessPayloadKeys
     public const string OutputText = nameof(InputText);
     public const string OutputLanguage = nameof(OutputLanguage);
     public const string OutputFileUri = nameof(OutputFileUri);
+
+    public const string ApprovedBy = nameof(ApprovedBy);
 }

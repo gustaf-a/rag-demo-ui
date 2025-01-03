@@ -1,11 +1,11 @@
-﻿namespace AiDemos.Api.Models;
+﻿namespace Shared.Models;
 
 public class RetrievedDocument
 {
     public RetrievedDocument()
     {
     }
-    
+
     public RetrievedDocument(string tableName, EmbeddingsRowModel embeddingsRowModel)
     {
         TableName = tableName;

@@ -20,17 +20,17 @@ public class ProcessesController(ILogger<ProcessesController> _logger, IProcessH
     [HttpGet("templates/{role}/{guid}")]
     public async Task<ActionResult<ProcessInfo>> GetProcess(string role, Guid guid)
     {
-        var processs = await _processHandler.GetProcess(role, guid);
+        var process = await _processHandler.GetProcess(role, guid);
 
-        return Ok(processs);
+        return Ok(process);
     }
 
     [HttpGet("templates/{role}")]
     public async Task<ActionResult<IEnumerable<ProcessInfo>>> GetProcesses(string role)
     {
-        var processs = await _processHandler.GetProcesses(role);
+        var processes = await _processHandler.GetProcesses(role);
 
-        return Ok(processs);
+        return Ok(processes);
     }
 
     [HttpPost("templates")]
@@ -77,9 +77,9 @@ public class ProcessesController(ILogger<ProcessesController> _logger, IProcessH
     [HttpPost("start")]
     public async Task<ActionResult<ProcessInstance>> StartProcess([FromBody] StartProcessRequest startProcessRequest)
     {
-        var processs = await _processHandler.StartProcessExecution(startProcessRequest);
+        var process = await _processHandler.StartProcessExecution(startProcessRequest);
 
-        return Ok(processs);
+        return Ok(process);
     }
 
     #endregion Process
@@ -100,9 +100,9 @@ public class ProcessesController(ILogger<ProcessesController> _logger, IProcessH
     [HttpPost("templates/steps")]
     public async Task<ActionResult<ProcessStepInfo>> CreateProcessStep([FromBody] ProcessStepInfo processStepInfo)
     {
-        var processs = await _processHandler.CreateProcessStepAsync(processStepInfo);
+        var process = await _processHandler.CreateProcessStepAsync(processStepInfo);
 
-        return Ok(processs);
+        return Ok(process);
     }
 
     [HttpPut("templates/steps/{stepId}")]

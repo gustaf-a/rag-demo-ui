@@ -1,13 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Npgsql;
-using AiDemos.Api.Extensions;
-using AiDemos.Api.Models;
+using Shared.Models;
 using System.Text;
 using System.Text.Json;
-using AiDemos.Api.Ingestion.Chunking;
 using Shared.Models;
+using Shared.Extensions;
 
-namespace AiDemos.Api.Repositories;
+namespace Shared.Repositories;
 
 public class RagRepository : RepositoryBase, IRagRepository
 {

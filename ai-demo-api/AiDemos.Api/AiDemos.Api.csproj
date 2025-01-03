@@ -52,6 +52,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AgentDemo\AgentDemo.csproj" />
     <ProjectReference Include="..\ProcessDemo\ProcessDemo.csproj" />
     <ProjectReference Include="..\RagDemo\RagDemo.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
