@@ -16,11 +16,11 @@ public abstract class RepositoryBase
         _options = configuration.GetSection(PostgreSqlOptions.PostgreSql).Get<PostgreSqlOptions>() ?? throw new ArgumentNullException(nameof(PostgreSqlOptions));
     }
 
-    public async Task<bool> DoesTableExist(DatabaseOptions databaseOptions)
+    public async Task<bool> DoesTableExist(string tableName)
     {
         var tableNames = await GetTableNames();
 
-        return tableNames.Contains(databaseOptions.TableName);
+        return tableNames.Contains(tableName);
     }
 
     public async Task<IEnumerable<string>> GetTableNames()
@@ -37,9 +37,9 @@ public abstract class RepositoryBase
         return await ExecuteQueryAsync<string>(query, parameters);
     }
 
-    public async Task DeleteTable(DatabaseOptions databaseOptions)
+    public async Task DeleteTable(string tableName)
     {
-        string dropTableQuery = $"DROP TABLE IF EXISTS {databaseOptions.TableName};";
+        string dropTableQuery = $"DROP TABLE IF EXISTS {tableName};";
 
         await ExecuteQuery(dropTableQuery);
     }

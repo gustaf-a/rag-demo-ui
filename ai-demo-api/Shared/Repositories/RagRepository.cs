@@ -3,7 +3,6 @@ using Npgsql;
 using Shared.Models;
 using System.Text;
 using System.Text.Json;
-using Shared.Models;
 using Shared.Extensions;
 
 namespace Shared.Repositories;
@@ -29,11 +28,11 @@ public class RagRepository : RepositoryBase, IRagRepository
         );
     }
 
-    public async Task<IEnumerable<string>> GetUniqueMetaDataTagKeys(DatabaseOptions databaseOptions)
+    public async Task<IEnumerable<string>> GetUniqueMetaDataTagKeys(string tableName)
     {
         string query = $@"
             SELECT DISTINCT jsonb_object_keys(metadata->'Tags') AS unique_keys
-            FROM {databaseOptions.TableName};
+            FROM {tableName};
         ";
 
         return await ExecuteQueryAsync<string>(
@@ -42,11 +41,11 @@ public class RagRepository : RepositoryBase, IRagRepository
         );
     }
 
-    public async Task<IEnumerable<string>> GetUniqueMetaDataTagValues(DatabaseOptions databaseOptions, string tag)
+    public async Task<IEnumerable<string>> GetUniqueMetaDataTagValues(string tableName, string tag)
     {
         string query = $@"
             SELECT DISTINCT metadata->'Tags'->>'{tag}' AS tag_value
-            FROM {databaseOptions.TableName}
+            FROM {tableName}
             WHERE metadata->'Tags' ? '{tag}';
         ";
 
@@ -58,7 +57,7 @@ public class RagRepository : RepositoryBase, IRagRepository
 
     public async Task ResetTable(DatabaseOptions databaseOptions)
     {
-        await DeleteTable(databaseOptions);
+        await DeleteTable(databaseOptions.TableName);
 
         await CreateEmbeddingsTable(databaseOptions);
     }
@@ -91,10 +90,10 @@ public class RagRepository : RepositoryBase, IRagRepository
         //        await ExecuteQuery(createDiskAnnQuery);
     }
 
-    public async Task InsertData(DatabaseOptions databaseOptions, ContentChunk contentChunk, float[] embedding, EmbeddingMetaData metaData)
+    public async Task InsertData(string tableName, ContentChunk contentChunk, float[] embedding, EmbeddingMetaData metaData)
     {
         string insertQuery = $@"
-            INSERT INTO {databaseOptions.TableName} (content, embedding, embeddingContent, startIndex, endIndex, metadata)
+            INSERT INTO {tableName} (content, embedding, embeddingContent, startIndex, endIndex, metadata)
             VALUES (@content, @embedding, @embeddingContent, @startIndex, @endIndex, @metadata);";
 
         var metadataJson = JsonSerializer.Serialize(metaData);
