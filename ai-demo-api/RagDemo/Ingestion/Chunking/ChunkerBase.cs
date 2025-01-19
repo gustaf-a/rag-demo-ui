@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Shared.Extensions;
 using Shared.Models;
-using Shared.Extensions;
 using Shared.Configuration;
 using Shared.Generation.LlmServices;
 
@@ -39,6 +38,13 @@ public class ChunkerBase
                     StartIndex = paragraph.StartIndex,
                     EndIndex = paragraph.EndIndex
                 });
+
+                if (smallLineBuffer.Sum(c => c.EmbeddingContent.GetWordCount()) > ingestDataOptions.MergeLineIfFewerWordsThan)
+                {
+                    AddChunks(ingestDataOptions, resultChunks, wordsPerChunk, slidingOverLap, smallLineBuffer);
+                    smallLineBuffer = [];
+                }
+
                 continue;
             }
 
@@ -78,7 +84,7 @@ public class ChunkerBase
                 smallLineBuffer.Add(new ContentChunk
                 {
                     Content = cleanedLine,
-                    EmbeddingContent= cleanedLine,
+                    EmbeddingContent = cleanedLine,
                     StartIndex = line.StartIndex,
                     EndIndex = line.EndIndex
                 });
@@ -95,7 +101,16 @@ public class ChunkerBase
             }
         }
 
+        foreach (var chunk in resultChunks)
+            CleanChunk(chunk);
+
         return resultChunks;
+    }
+
+    private static void CleanChunk(ContentChunk chunk)
+    {
+        chunk.Content = chunk.Content.Trim("\\n");
+        chunk.EmbeddingContent = chunk.EmbeddingContent.Trim("\\n");
     }
 
     private static void AppendToLastChunk(List<string> chunks, List<string> smallLineBuffer)
@@ -125,24 +140,66 @@ public class ChunkerBase
 
         var currentSentences = mergedChunk.Content.SplitIntoSentences(mergedChunk.StartIndex);
 
+        List<ContentChunk> smallSentencesBuffer = [];
+
         foreach (var sentence in currentSentences)
         {
             var cleanedSentence = sentence.Text.CleanText();
 
-            if (cleanedSentence.GetWordCount() <= wordsPerChunk)
+            if (cleanedSentence.GetWordCount() < ingestDataOptions.MergeLineIfFewerWordsThan)
             {
-                resultChunks.Add(new ContentChunk
+                smallSentencesBuffer.Add(new ContentChunk
                 {
                     Content = cleanedSentence,
+                    EmbeddingContent = cleanedSentence,
                     StartIndex = sentence.StartIndex,
                     EndIndex = sentence.EndIndex
                 });
+
+                if (smallSentencesBuffer.Sum(c => c.EmbeddingContent.GetWordCount()) > ingestDataOptions.MergeLineIfFewerWordsThan)
+                {
+                    var mergedSentenceChunk1 = MergeChunks(smallSentencesBuffer);
+
+                    resultChunks.Add(mergedSentenceChunk1);
+
+                    smallSentencesBuffer = [];
+                }
+
                 continue;
             }
 
-            var wordChunks = SplitIntoWordChunks(cleanedSentence, wordsPerChunk, slidingOverLap, sentence.StartIndex);
+            if (cleanedSentence.GetWordCount() <= wordsPerChunk)
+            {
+                smallSentencesBuffer.Add(new ContentChunk
+                {
+                    Content = cleanedSentence,
+                    EmbeddingContent = cleanedSentence,
+                    StartIndex = sentence.StartIndex,
+                    EndIndex = sentence.EndIndex
+                });
+
+                var mergedSentenceChunk2 = MergeChunks(smallSentencesBuffer);
+
+                resultChunks.Add(mergedSentenceChunk2);
+                smallSentencesBuffer = [];
+                continue;
+            }
+
+            smallSentencesBuffer.Add(new ContentChunk
+            {
+                Content = cleanedSentence,
+                EmbeddingContent = cleanedSentence,
+                StartIndex = sentence.StartIndex,
+                EndIndex = sentence.EndIndex
+            });
+
+            var mergedSentenceChunk3 = MergeChunks(smallSentencesBuffer);
+
+            var wordChunks = SplitIntoWordChunks(mergedSentenceChunk3.Content, wordsPerChunk, slidingOverLap, mergedSentenceChunk3.StartIndex);
 
             resultChunks.AddRange(wordChunks);
+
+            smallSentencesBuffer = [];
         }
     }
 
@@ -205,12 +262,15 @@ public class ChunkerBase
         if (contentChunks.IsNullOrEmpty())
             return null;
 
-        if(contentChunks.Count == 1)
+        if (contentChunks.Count == 1)
             return contentChunks[0];
+
+        var content = string.Join(' ', contentChunks.Select(cc => cc.Content));
 
         return new ContentChunk
         {
-            Content = string.Join(' ', contentChunks.Select(cc => cc.Content)),
+            Content = content,
+            EmbeddingContent = content,
             StartIndex = contentChunks.First().StartIndex,
             EndIndex = contentChunks.Last().EndIndex
         };
