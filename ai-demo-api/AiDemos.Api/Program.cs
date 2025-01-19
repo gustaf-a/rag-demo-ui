@@ -134,7 +134,7 @@ public class Program
 
         builder.Services.AddScoped<IRetrievalHandler, RetrievalHandler>();
         builder.Services.AddScoped<ISearchServiceFactory, SearchServiceFactory>();
-        builder.Services.AddScoped<ISearchService, SearchServiceAzure>();
+        //builder.Services.AddScoped<ISearchService, SearchServiceAzure>(); //Not up to date
         builder.Services.AddScoped<ISearchService, SearchServicePostgreSql>();
 
         builder.Services.AddScoped<IEmbeddingService, EmbeddingService>();
