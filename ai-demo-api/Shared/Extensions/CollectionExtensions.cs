@@ -45,8 +45,8 @@ public static class CollectionExtensions
         if (count == 0)
             yield break;
 
-        int start = Math.Max(collection.Count() - count, 0);
-        for (int i = start; i < collection.Count(); i++)
+        int start = Math.Max(collection.Count - count, 0);
+        for (int i = start; i < collection.Count; i++)
         {
             yield return collection[i];
         }

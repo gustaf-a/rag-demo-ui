@@ -36,7 +36,10 @@ public static class RetrievedDocumentExtensions
         var sb = new StringBuilder();
 
         foreach (var document in retrievedDocuments)
+        {
             sb.AppendLine(document.ToString());
+            sb.AppendLine();
+        }
 
         return
 $"""

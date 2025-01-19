@@ -6,6 +6,24 @@ namespace Shared.Extensions;
 
 public static class StringExtensions
 {
+    public static string Trim(this string input, string trimStr)
+    {
+        if (string.IsNullOrEmpty(input) || string.IsNullOrEmpty(trimStr))
+            return input;
+
+        while (input.StartsWith(trimStr))
+        {
+            input = input.Substring(trimStr.Length);
+        }
+
+        while (input.EndsWith(trimStr))
+        {
+            input = input.Substring(0, input.Length - trimStr.Length);
+        }
+
+        return input;
+    }
+
     public static string RemoveNewLines(this string value)
         => value.Replace('\r', ' ').Replace('\n', ' ');
 
@@ -105,11 +123,22 @@ public static class StringExtensions
         return SplitIntoTextBySeparator(content, _newLineSeparators, startingIndex);
     }
 
-    private static readonly IEnumerable<string> _sentenceSeparators = ["?", "!", "."];
+    private static readonly IEnumerable<string> _sentenceSeparators = ["? ", "! ", ". "];
 
     public static IEnumerable<SplitText> SplitIntoSentences(this string content, int startingIndex)
     {
-        return SplitIntoTextBySeparator(content, _sentenceSeparators, startingIndex);
+        // Replace dots with a number right before with a temp value, to avoid numbered lists and chapter titles.
+        content = Regex.Replace(content, @"(?<=\d)\.(?=\s)", "[TEMP_DOT]");
+
+        // Split into sentences using separators
+        var sentences = SplitIntoTextBySeparator(content, _sentenceSeparators, startingIndex);
+
+        // Restore temp value back to dots
+        foreach (var sentence in sentences)
+        {
+            sentence.Text = sentence.Text.Replace("[TEMP_DOT]", ".");
+            yield return sentence;
+        }
     }
 
     private static readonly IEnumerable<string> _betweenWordsSeparator = [" "];

@@ -1,7 +1,6 @@
 ﻿using Microsoft.SemanticKernel.ChatCompletion;
 using Shared.Models;
-using Shared.Extensions;
-using Shared.Models;
+using Microsoft.SemanticKernel;
 
 namespace Shared.Extensions;
 
@@ -42,9 +41,10 @@ public static class ChatMessageExtensions
 
         chatHistory.Insert(0, new OpenAI.Chat.UserChatMessage(
 $"""
-<sources>
+Please use the following sources when answering the question.
+If you use a source, please refer to it in the answer.
+
 {sourcesString}
-</sources>
 """));
 
         return chatHistory;
@@ -82,5 +82,46 @@ $"""
         }
 
         return chatHistory;
+    }
+
+#pragma warning disable SKEXP0001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+    public static ChatMessageContent ToSemanticKernelChatMessageContent(this ChatMessage message)
+    {
+        AuthorRole role;
+
+        if (string.Equals(message.Role, ChatMessageRoles.User, StringComparison.InvariantCultureIgnoreCase))
+            role = AuthorRole.User;
+        else if (string.Equals(message.Role, ChatMessageRoles.System, StringComparison.InvariantCultureIgnoreCase))
+            role = AuthorRole.System;
+        else if (string.Equals(message.Role, ChatMessageRoles.Assistant, StringComparison.InvariantCultureIgnoreCase))
+            role = AuthorRole.Assistant;
+        else if (string.Equals(message.Role, ChatMessageRoles.Tool, StringComparison.InvariantCultureIgnoreCase))
+            role = AuthorRole.Tool;
+        else
+            throw new NotSupportedException($"Unsupported chat message role encountered: {message.Role}");
+
+        var chatMessage = new ChatMessageContent(role, message.Content);
+
+        return chatMessage;
+    }
+
+    public static ChatMessage ToChatMessage(this ChatMessageContent content)
+    {
+        string role;
+
+        if (content.Role == AuthorRole.User)
+            role = ChatMessageRoles.User;
+        else if (content.Role == AuthorRole.System)
+            role = ChatMessageRoles.System;
+        else if (content.Role == AuthorRole.Assistant)
+            role = ChatMessageRoles.Assistant;
+        else if (content.Role == AuthorRole.Tool)
+            role = ChatMessageRoles.Tool;
+        else
+            throw new NotSupportedException($"Unsupported chat message role encountered: {content.Role}");
+
+        var chatMessage = new ChatMessage(role, content.Content);
+
+        return chatMessage;
     }
 }
