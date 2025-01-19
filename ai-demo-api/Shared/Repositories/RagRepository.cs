@@ -187,11 +187,17 @@ public class RagRepository : RepositoryBase, IRagRepository
                 AddColumnFilter(whereClauses, parameters, "content", isInclude: false, paramName: $"@TextQueryExcl{i}", queryParameters.ContentMustNotIncludeWords.ElementAt(i));
         }
 
-        if (!queryParameters.MetaDataFilterInclude.IsNullOrEmpty())
-            whereClauses.AddRange(queryParameters.MetaDataFilterInclude);
+        if (!queryParameters.MetaDataFilterIncludeAll.IsNullOrEmpty())
+            whereClauses.AddRange(queryParameters.MetaDataFilterIncludeAll);
 
-        if (!queryParameters.MetaDataFilterExclude.IsNullOrEmpty())
-            whereClauses.Add($"NOT ({string.Join(" OR ", queryParameters.MetaDataFilterExclude)})");
+        if (!queryParameters.MetaDataFilterIncludeAny.IsNullOrEmpty())
+            whereClauses.AddRange(queryParameters.MetaDataFilterIncludeAny);
+
+        if (!queryParameters.MetaDataFilterExcludeAll.IsNullOrEmpty())
+            whereClauses.Add($"NOT ({string.Join(" OR ", queryParameters.MetaDataFilterExcludeAll)})");
+
+        if (!queryParameters.MetaDataFilterExcludeAny.IsNullOrEmpty())
+            whereClauses.Add($"NOT ({string.Join(" OR ", queryParameters.MetaDataFilterExcludeAny)})");
 
         if (whereClauses.Any())
             sqlBuilder.AppendLine("WHERE " + string.Join(" AND ", whereClauses));

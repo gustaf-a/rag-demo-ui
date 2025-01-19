@@ -5,10 +5,7 @@ using Shared.Configuration;
 using Shared.Extensions;
 using Shared.Generation.LlmServices;
 using Shared.Models;
-using Shared.Services;
 using SearchOptions = Shared.Models.SearchOptions;
-using Shared.Extensions;
-using Shared.Models;
 
 namespace Shared.Services.Search;
 
@@ -181,15 +178,22 @@ Generate a search query for this content:
 
     private static string CreateMetaDataFilters(SearchOptions searchOptions)
     {
-        if (searchOptions.MetaDataExclude.IsNullOrEmpty()
-            && searchOptions.MetaDataInclude.IsNullOrEmpty())
+        if (!searchOptions.MetaDataExcludeWhenContainsAny.IsNullOrEmpty()
+            || !searchOptions.MetaDataIncludeWhenContainsAny.IsNullOrEmpty())
+            throw new Exception($"Azure Search Service does not support {nameof(searchOptions.MetaDataExcludeWhenContainsAny)} and {nameof(searchOptions.MetaDataIncludeWhenContainsAny)}");
+
+        if (searchOptions.MetaDataExcludeWhenContainsAll.IsNullOrEmpty()
+            && searchOptions.MetaDataExcludeWhenContainsAny.IsNullOrEmpty()
+            && searchOptions.MetaDataIncludeWhenContainsAll.IsNullOrEmpty()
+            && searchOptions.MetaDataIncludeWhenContainsAny.IsNullOrEmpty())
             return string.Empty;
+
 
         var filterParts = new List<string>();
 
-        if (!searchOptions.MetaDataExclude.IsNullOrEmpty())
+        if (!searchOptions.MetaDataExcludeWhenContainsAll.IsNullOrEmpty())
         {
-            foreach (var filterKeyValuePair in searchOptions.MetaDataExclude)
+            foreach (var filterKeyValuePair in searchOptions.MetaDataExcludeWhenContainsAll)
             {
                 switch (filterKeyValuePair.Key.ToLower())
                 {
@@ -208,9 +212,9 @@ Generate a search query for this content:
             }
         }
 
-        if (!searchOptions.MetaDataInclude.IsNullOrEmpty())
+        if (!searchOptions.MetaDataIncludeWhenContainsAll.IsNullOrEmpty())
         {
-            foreach (var filterKeyValuePair in searchOptions.MetaDataExclude)
+            foreach (var filterKeyValuePair in searchOptions.MetaDataExcludeWhenContainsAll)
             {
                 switch (filterKeyValuePair.Key.ToLower())
                 {

@@ -23,9 +23,9 @@ public class RetrievalController(ILogger<RetrievalController> _logger, IConfigur
     /// ```   
     /// {
     ///     "searchOptions": {
-    ///         "embeddingsTableName": "embeddings1",
+    ///         "embeddingsTableName": "embeddings2",
     ///         "itemsToRetrieve": 3,
-    ///         "semanticSearchContent": "John's medicines"
+    ///         "semanticSearchContent": "Nimbus installation"
     ///     }
     /// }
     /// ```
@@ -34,9 +34,9 @@ public class RetrievalController(ILogger<RetrievalController> _logger, IConfigur
     /// ```   
     /// {
     ///     "searchOptions": {
-    ///         "embeddingsTableName": "embeddings1",
-    ///         "itemsToRetrieve": 3,
-    ///         "semanticSearchContent": "John's medicines",
+    ///         "embeddingsTableName": "embeddings2",
+    ///         "itemsToRetrieve": 2,
+    ///         "semanticSearchContent": "how to talk to other departments",
     ///         "IncludeContentChunksAfter": 2,
     ///         "IncludeContentChunksBefore": 2
     ///     }
@@ -44,17 +44,22 @@ public class RetrievalController(ILogger<RetrievalController> _logger, IConfigur
     /// ```
     /// 
     /// ## Semantic search request with metadata filter (uses Tags):
+    /// The metaDataIncludeWhenContainsAll filter indicates that the mix of the tag values must be present.
+    /// The metaDataIncludeWhenContainsAny filter requires that any value provided is enough to include. However, all different tags must get a match for at least one value.
+    /// 
+    /// Remove any of the accessLevels in this response to see how it affects the results.
+    /// 
     /// ```   
     /// {
     ///   "searchOptions": {
-    ///     "embeddingsTableName": "embeddings1",
+    ///     "embeddingsTableName": "embeddings2",
     ///     "itemsToRetrieve": 5,
-    ///     "semanticSearchContent": "John's medicines",
-    ///     "metaDataInclude": {
-    ///       "project": [
-    ///         "Health Care 10x"
-    ///       ]
-    ///     }
+    ///     "semanticSearchContent": "What happened at the summer party?",
+    ///     "metaDataIncludeWhenContainsAny": {
+    ///       "accessLevel": ["2","3"]
+    ///     },
+    ///    "IncludeContentChunksAfter": 2,
+    ///    "IncludeContentChunksBefore": 2
     ///   }
     /// }
     /// ```
@@ -74,7 +79,7 @@ public class RetrievalController(ILogger<RetrievalController> _logger, IConfigur
     }
     
     [HttpPost("get-chunks")]
-    public async Task<ActionResult<IEnumerable<ContentChunk>>> PerformSearch([FromBody] ContentChunkRequest contentChunkRequest)
+    public async Task<ActionResult<IEnumerable<ContentChunk>>> GetChunks([FromBody] ContentChunkRequest contentChunkRequest)
     {
         var contentChunks = await _retrievalHandler.GetContentChunks(contentChunkRequest);
         if (contentChunks.IsNullOrEmpty())

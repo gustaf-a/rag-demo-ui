@@ -10,8 +10,10 @@ public class SearchOptions
     public IEnumerable<string>? ContentMustIncludeWords { get; set; } = null;
     public IEnumerable<string>? ContentMustNotIncludeWords { get; set; } = null;
 
-    public Dictionary<string, IEnumerable<string>> MetaDataInclude { get; set; } = [];
-    public Dictionary<string, IEnumerable<string>> MetaDataExclude { get; set; } = [];
+    public Dictionary<string, IEnumerable<string>> MetaDataIncludeWhenContainsAll { get; set; } = [];
+    public Dictionary<string, IEnumerable<string>> MetaDataIncludeWhenContainsAny { get; set; } = [];
+    public Dictionary<string, IEnumerable<string>> MetaDataExcludeWhenContainsAll { get; set; } = [];
+    public Dictionary<string, IEnumerable<string>> MetaDataExcludeWhenContainsAny { get; set; } = [];
 
     public string? SemanticSearchContent { get; set; } = null;
 

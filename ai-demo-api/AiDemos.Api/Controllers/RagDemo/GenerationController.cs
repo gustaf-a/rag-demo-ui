@@ -19,18 +19,6 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     /// <remarks>
     /// #  Examples
     /// 
-    /// ## Simple chat request:
-    /// ```   
-    /// {  
-    ///    "chatMessages": [
-    ///    {  
-    ///        "role": "user",  
-    ///        "content": "What do you think about RAG systems for LLMs? Keep it short."  
-    ///    }  
-    ///    ]
-    /// }  
-    /// ```
-    /// 
     /// ## Simple chat request with chat options high temperature for more creative answers:
     /// ```   
     /// {  
@@ -41,7 +29,7 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     ///    }  
     ///    ],
     ///    "chatOptions": {  
-    ///        "temperature": 0.9
+    ///        "temperature": 1
     ///    }
     /// }  
     /// ```
@@ -52,27 +40,11 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     ///    "chatMessages": [
     ///    {  
     ///        "role": "user",  
-    ///        "content": "How long until Jane's next meeting?"  
+    ///        "content": "How do I pair to my Nimbus headphones?"  
     ///    }  
     ///    ],
     ///    "searchOptions": {
-    ///        "embeddingsTableName": "embeddings1",
-    ///        "itemsToRetrieve": 3
-    ///    }  
-    /// }  
-    /// ```
-    /// 
-    /// ## RAG chat request with search filters:
-    /// ```   
-    /// {  
-    ///    "chatMessages": [
-    ///    {  
-    ///        "role": "user",  
-    ///        "content": "How long until Jane's next meeting?"  
-    ///    }  
-    ///    ],
-    ///    "searchOptions": {
-    ///        "embeddingsTableName": "embeddings1",
+    ///        "embeddingsTableName": "embeddings2",
     ///        "itemsToRetrieve": 3
     ///    }  
     /// }  
@@ -109,7 +81,7 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     ///    "chatMessages": [
     ///    {  
     ///        "role": "user",  
-    ///        "content": "Who has the first follow up meeting, Jane or John? Search in the database."  
+    ///        "content": "What's the difference between our current Q1 sales and the Q3 targets? Search in the database."  
     ///    }  
     ///    ],  
     ///    "chatOptions": {  
@@ -122,7 +94,7 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     /// }
     /// ```
     /// There's a big risk here that the bot doesn't understand that it needs to search multiple times for different things.
-    /// For example the search phrase could become: "follow-up meeting Jane John"
+    /// For example the search phrase could become "difference between sales" which will not do much.
     /// Which probably will not get anything useful.
     /// Using a system message can help here, but this is a multi stage question more suited for an agent assistant.
     /// 

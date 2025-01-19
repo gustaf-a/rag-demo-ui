@@ -29,12 +29,15 @@ public class IngestionController(ILogger<IngestionController> _logger, IConfigur
     /// ```
     ///{
     ///  "databaseOptions": {
-    ///    "tableName": "embeddings1"
+    ///    "tableName": "embeddings2"
     ///  },
     ///	"metaDataTags": {
     ///    "version": "1.0",
-    ///    "access-level": "3",
-    ///    "project": "Health Care 10x"
+    ///    "accessLevel": "2",
+    ///    "department": "Sales",
+    ///    "role": "Customer Service",
+    ///    "documentType": "Lessons Learned",
+    ///    "topicsKeywords": "Customer Service;Best Practices"
     ///  },
     ///  "ingestFromAzureContainerOptions": {
     ///    "connectionString": "DefaultEndpointsProtocol=https;AccountName=[storage-account];AccountKey=[storage-account-key];EndpointSuffix=core.windows.net",

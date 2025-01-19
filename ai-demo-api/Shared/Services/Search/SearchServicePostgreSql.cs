@@ -8,6 +8,7 @@ using Shared.Repositories;
 using Shared.Services;
 using Shared.Extensions;
 using Shared.Models;
+using System.IO;
 
 namespace Shared.Services.Search;
 
@@ -53,8 +54,10 @@ public class SearchServicePostgreSql(ILogger<SearchServicePostgreSql> _logger,
             ContentMustIncludeWords = searchOptions.ContentMustIncludeWords.PostgreSqlEscapeSqlLiteral(),
             ContentMustNotIncludeWords = searchOptions.ContentMustNotIncludeWords.PostgreSqlEscapeSqlLiteral(),
             EmbeddingQuery = embeddingQuery,
-            MetaDataFilterInclude = CreateMetaDataFilter(searchOptions.MetaDataInclude),
-            MetaDataFilterExclude = CreateMetaDataFilter(searchOptions.MetaDataExclude),
+            MetaDataFilterIncludeAll = CreateMetaDataFilter(searchOptions.MetaDataIncludeWhenContainsAll, mustMatchAll: true),
+            MetaDataFilterIncludeAny = CreateMetaDataFilter(searchOptions.MetaDataIncludeWhenContainsAny, mustMatchAll: false),
+            MetaDataFilterExcludeAll = CreateMetaDataFilter(searchOptions.MetaDataExcludeWhenContainsAll, mustMatchAll: true),
+            MetaDataFilterExcludeAny = CreateMetaDataFilter(searchOptions.MetaDataExcludeWhenContainsAny, mustMatchAll: false),
             ItemsToRetrieve = searchOptions.ItemsToRetrieve,
             ItemsToSkip = searchOptions.ItemsToSkip,
             SemanticRankerCandidatesToRetrieve = searchOptions.SemanticRankerCandidatesToRetrieve
@@ -79,7 +82,7 @@ public class SearchServicePostgreSql(ILogger<SearchServicePostgreSql> _logger,
     /// </summary>
     private const string PostgreSqlJsonBContainsOperator = "@>";
 
-    private static IEnumerable<string> CreateMetaDataFilter(Dictionary<string, IEnumerable<string>> metaDataFilters)
+    private static IEnumerable<string> CreateMetaDataFilter(Dictionary<string, IEnumerable<string>> metaDataFilters, bool mustMatchAll)
     {
         if (metaDataFilters.IsNullOrEmpty())
             return [];
@@ -95,6 +98,8 @@ public class SearchServicePostgreSql(ILogger<SearchServicePostgreSql> _logger,
 
             string key = filter.Key.PostgreSqlEscapeSqlIdentifier();
 
+            var conditionsForThisKey = new List<string>();
+
             foreach (var filterValue in filter.Value)
             {
                 if (string.IsNullOrWhiteSpace(filterValue))
@@ -102,9 +107,19 @@ public class SearchServicePostgreSql(ILogger<SearchServicePostgreSql> _logger,
 
                 string value = filterValue.PostgreSqlEscapeSqlLiteral();
 
-                string postgreSqlFilter = $"metadata {PostgreSqlJsonBContainsOperator} '{{\"{nameof(EmbeddingMetaData.Tags)}\": {{\"{key}\": \"{value}\"}}}}'";
-                postgreSqlFilters.Add(postgreSqlFilter);
+                string condition = $"metadata {PostgreSqlJsonBContainsOperator} '{{\"{nameof(EmbeddingMetaData.Tags)}\":{{\"{key}\":\"{value}\"}}}}'";
+
+                conditionsForThisKey.Add(condition);
             }
+
+            if (!conditionsForThisKey.Any())
+                continue;
+
+            //Typically "ContainsAny" => OR, "ContainsAll" => AND
+            var combinationOperator = mustMatchAll ? " AND " : " OR ";
+            var combinedForThisKey = "(" + string.Join(combinationOperator, conditionsForThisKey) + ")";
+
+            postgreSqlFilters.Add(combinedForThisKey);
         }
 
         return postgreSqlFilters;
