@@ -20,10 +20,10 @@ public class IngestionHandler(ILogger<IngestionHandler> _logger, IRagRepository 
         ArgumentNullException.ThrowIfNull(nameof(request));
         ArgumentNullException.ThrowIfNull(nameof(request.DatabaseOptions));
 
-        if (!await _postgreSqlService.DoesTableExist(request.DatabaseOptions!))
+        if (!await _postgreSqlService.DoesTableExist(request.DatabaseOptions.TableName!))
             throw new Exception($"Invalid table name: Table does not exist.");
 
-        if(request.FolderPath != null)
+        if (request.FolderPath != null)
         {
             _logger.LogInformation($"Starting to ingest data from local folder: {request.FolderPath}.");
 
@@ -32,9 +32,9 @@ public class IngestionHandler(ILogger<IngestionHandler> _logger, IRagRepository 
             await IngestFiles(fileReader, request);
         }
 
-        if(request.IngestFromAzureContainerOptions != null)
+        if (request.IngestFromAzureContainerOptions != null)
         {
-            _logger.LogInformation($"Starting to ingest data from Azure container: {request.IngestFromAzureContainerOptions.ContainerName}.");
+            _logger.LogInformation($"Starting to ingest data from Azure container: {request.IngestFromAzureContainerOptions.RootContainerName}.");
 
             IFileReader fileReader = new AzureBlobFileReader(request);
 
@@ -52,8 +52,8 @@ public class IngestionHandler(ILogger<IngestionHandler> _logger, IRagRepository 
         {
             var ingestionSource = await fileReader.GetNextFileContent();
 
-            var preprocessedContent = DoPreProcessing(ingestionSource.Name, ingestionSource.Content);
-            
+            var preprocessedContent = DoPreProcessing(request, ingestionSource.Name, ingestionSource.Content);
+
             var chunks = await DoChunking(request, ingestionSource.Name, preprocessedContent);
 
             ingestionSource.MetaData.SourceTotalChunkNumbers = chunks.Count - 1;
@@ -66,13 +66,18 @@ public class IngestionHandler(ILogger<IngestionHandler> _logger, IRagRepository 
 
                 ingestionSource.MetaData.SourceChunkNumber = j;
 
-                await _postgreSqlService.InsertData(request.DatabaseOptions!, chunk, embedding, ingestionSource.MetaData);
+                await _postgreSqlService.InsertData(request.DatabaseOptions!.TableName, chunk, embedding, ingestionSource.MetaData);
             }
         }
     }
 
-    private string DoPreProcessing(string file, string content)
+    private string DoPreProcessing(IngestDataRequest request, string file, string content)
     {
+        if (!request.IngestDataOptions.DoPreProcessing)
+        {
+            return content;
+        }
+
         var preProcessor = _contentPreProcessorFactory.Create(file);
 
         _logger.LogInformation($"Preprocessing {file}: Using {preProcessor.Name}.");
