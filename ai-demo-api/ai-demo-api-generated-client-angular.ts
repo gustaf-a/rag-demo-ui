@@ -17,18 +17,29 @@ export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
 export interface IClient {
     /**
+     * Creates an agent
+     * @param body (optional) 
      * @return Success
      */
-    getNames(): Observable<string[]>;
+    agents(body: Agent | undefined): Observable<ProcessInfo>;
+    /**
+     * @return Success
+     */
+    agentsAll(): Observable<Agent[]>;
+    /**
+     * Creates and starts an agent task
+     * @param body (optional) 
+     * @return Success
+     */
+    task(body: StartAgentTaskRequest | undefined): Observable<AgentTask>;
     /**
      * @return Success
      */
     getTables(): Observable<string[]>;
     /**
-     * @param body (optional) 
      * @return Success
      */
-    removeTable(body: DatabaseOptions | undefined): Observable<string>;
+    removeTable(tableName: string): Observable<string>;
     /**
      * @param body (optional) 
      * @return Success
@@ -40,15 +51,13 @@ export interface IClient {
      */
     createEmbeddingsTable(body: DatabaseOptions | undefined): Observable<string>;
     /**
-     * @param body (optional) 
      * @return Success
      */
-    getUniqueTagValues(tag: string, body: DatabaseOptions | undefined): Observable<string[]>;
+    getUniqueTagValues(tableName: string, tag: string): Observable<string[]>;
     /**
-     * @param body (optional) 
      * @return Success
      */
-    getUniqueTagKeys(body: DatabaseOptions | undefined): Observable<string[]>;
+    getUniqueTagKeys(tableName: string): Observable<string[]>;
     /**
      * Gets a chat response.
     If SearchOptions are included, search results will be included for the model to use for generation.
@@ -71,6 +80,7 @@ export interface IClient {
      */
     getChunkers(): Observable<string[]>;
     /**
+     * Imports and ingests data
      * @param body (optional) 
      * @return Success
      */
@@ -83,7 +93,7 @@ export interface IClient {
     /**
      * @return Success
      */
-    getNames2(): Observable<string[]>;
+    getNames(): Observable<string[]>;
     /**
      * @return Success
      */
@@ -194,10 +204,67 @@ export class Client implements IClient {
     }
 
     /**
+     * Creates an agent
+     * @param body (optional) 
      * @return Success
      */
-    getNames(): Observable<string[]> {
-        let url_ = this.baseUrl + "/agents/get-names";
+    agents(body: Agent | undefined): Observable<ProcessInfo> {
+        let url_ = this.baseUrl + "/agents";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processAgents(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processAgents(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProcessInfo>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProcessInfo>;
+        }));
+    }
+
+    protected processAgents(response: HttpResponseBase): Observable<ProcessInfo> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProcessInfo.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return Success
+     */
+    agentsAll(): Observable<Agent[]> {
+        let url_ = this.baseUrl + "/agents";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -209,20 +276,20 @@ export class Client implements IClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetNames(response_);
+            return this.processAgentsAll(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetNames(response_ as any);
+                    return this.processAgentsAll(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<string[]>;
+                    return _observableThrow(e) as any as Observable<Agent[]>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<string[]>;
+                return _observableThrow(response_) as any as Observable<Agent[]>;
         }));
     }
 
-    protected processGetNames(response: HttpResponseBase): Observable<string[]> {
+    protected processAgentsAll(response: HttpResponseBase): Observable<Agent[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -236,11 +303,68 @@ export class Client implements IClient {
             if (Array.isArray(resultData200)) {
                 result200 = [] as any;
                 for (let item of resultData200)
-                    result200!.push(item);
+                    result200!.push(Agent.fromJS(item));
             }
             else {
                 result200 = <any>null;
             }
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * Creates and starts an agent task
+     * @param body (optional) 
+     * @return Success
+     */
+    task(body: StartAgentTaskRequest | undefined): Observable<AgentTask> {
+        let url_ = this.baseUrl + "/agents/task";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processTask(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processTask(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AgentTask>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AgentTask>;
+        }));
+    }
+
+    protected processTask(response: HttpResponseBase): Observable<AgentTask> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AgentTask.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -310,21 +434,19 @@ export class Client implements IClient {
     }
 
     /**
-     * @param body (optional) 
      * @return Success
      */
-    removeTable(body: DatabaseOptions | undefined): Observable<string> {
-        let url_ = this.baseUrl + "/Database/remove-table";
+    removeTable(tableName: string): Observable<string> {
+        let url_ = this.baseUrl + "/Database/remove-table/{tableName}";
+        if (tableName === undefined || tableName === null)
+            throw new Error("The parameter 'tableName' must be defined.");
+        url_ = url_.replace("{tableName}", encodeURIComponent("" + tableName));
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(body);
-
         let options_ : any = {
-            body: content_,
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
-                "Content-Type": "application/json",
                 "Accept": "text/plain"
             })
         };
@@ -481,29 +603,27 @@ export class Client implements IClient {
     }
 
     /**
-     * @param body (optional) 
      * @return Success
      */
-    getUniqueTagValues(tag: string, body: DatabaseOptions | undefined): Observable<string[]> {
-        let url_ = this.baseUrl + "/Database/get-unique-tag-values/{tag}";
+    getUniqueTagValues(tableName: string, tag: string): Observable<string[]> {
+        let url_ = this.baseUrl + "/Database/get-unique-tag-values/{tableName}/{tag}";
+        if (tableName === undefined || tableName === null)
+            throw new Error("The parameter 'tableName' must be defined.");
+        url_ = url_.replace("{tableName}", encodeURIComponent("" + tableName));
         if (tag === undefined || tag === null)
             throw new Error("The parameter 'tag' must be defined.");
         url_ = url_.replace("{tag}", encodeURIComponent("" + tag));
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(body);
-
         let options_ : any = {
-            body: content_,
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
-                "Content-Type": "application/json",
                 "Accept": "text/plain"
             })
         };
 
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
             return this.processGetUniqueTagValues(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
@@ -547,26 +667,24 @@ export class Client implements IClient {
     }
 
     /**
-     * @param body (optional) 
      * @return Success
      */
-    getUniqueTagKeys(body: DatabaseOptions | undefined): Observable<string[]> {
-        let url_ = this.baseUrl + "/Database/get-unique-tag-keys";
+    getUniqueTagKeys(tableName: string): Observable<string[]> {
+        let url_ = this.baseUrl + "/Database/get-unique-tag-keys/{tableName}";
+        if (tableName === undefined || tableName === null)
+            throw new Error("The parameter 'tableName' must be defined.");
+        url_ = url_.replace("{tableName}", encodeURIComponent("" + tableName));
         url_ = url_.replace(/[?&]$/, "");
 
-        const content_ = JSON.stringify(body);
-
         let options_ : any = {
-            body: content_,
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
-                "Content-Type": "application/json",
                 "Accept": "text/plain"
             })
         };
 
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
             return this.processGetUniqueTagKeys(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
@@ -787,6 +905,7 @@ export class Client implements IClient {
     }
 
     /**
+     * Imports and ingests data
      * @param body (optional) 
      * @return Success
      */
@@ -902,7 +1021,7 @@ export class Client implements IClient {
     /**
      * @return Success
      */
-    getNames2(): Observable<string[]> {
+    getNames(): Observable<string[]> {
         let url_ = this.baseUrl + "/plugins/get-names";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -915,11 +1034,11 @@ export class Client implements IClient {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetNames2(response_);
+            return this.processGetNames(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetNames2(response_ as any);
+                    return this.processGetNames(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<string[]>;
                 }
@@ -928,7 +1047,7 @@ export class Client implements IClient {
         }));
     }
 
-    protected processGetNames2(response: HttpResponseBase): Observable<string[]> {
+    protected processGetNames(response: HttpResponseBase): Observable<string[]> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2148,6 +2267,202 @@ export class Client implements IClient {
     }
 }
 
+export class Agent implements IAgent {
+    id?: string;
+    name?: string | undefined;
+    description?: string | undefined;
+    options?: { [key: string]: string; } | undefined;
+
+    constructor(data?: IAgent) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            if (_data["options"]) {
+                this.options = {} as any;
+                for (let key in _data["options"]) {
+                    if (_data["options"].hasOwnProperty(key))
+                        (<any>this.options)![key] = _data["options"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): Agent {
+        data = typeof data === 'object' ? data : {};
+        let result = new Agent();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        if (this.options) {
+            data["options"] = {};
+            for (let key in this.options) {
+                if (this.options.hasOwnProperty(key))
+                    (<any>data["options"])[key] = (<any>this.options)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IAgent {
+    id?: string;
+    name?: string | undefined;
+    description?: string | undefined;
+    options?: { [key: string]: string; } | undefined;
+}
+
+export class AgentTask implements IAgentTask {
+    id?: string;
+    name?: string | undefined;
+    taskPrompt?: string | undefined;
+    status?: string | undefined;
+    payload?: AgentTaskPayload;
+    completedAt?: Date | undefined;
+    startedAt?: Date | undefined;
+    updatedAt?: Date;
+
+    constructor(data?: IAgentTask) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.taskPrompt = _data["taskPrompt"];
+            this.status = _data["status"];
+            this.payload = _data["payload"] ? AgentTaskPayload.fromJS(_data["payload"]) : <any>undefined;
+            this.completedAt = _data["completedAt"] ? new Date(_data["completedAt"].toString()) : <any>undefined;
+            this.startedAt = _data["startedAt"] ? new Date(_data["startedAt"].toString()) : <any>undefined;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): AgentTask {
+        data = typeof data === 'object' ? data : {};
+        let result = new AgentTask();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["taskPrompt"] = this.taskPrompt;
+        data["status"] = this.status;
+        data["payload"] = this.payload ? this.payload.toJSON() : <any>undefined;
+        data["completedAt"] = this.completedAt ? this.completedAt.toISOString() : <any>undefined;
+        data["startedAt"] = this.startedAt ? this.startedAt.toISOString() : <any>undefined;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IAgentTask {
+    id?: string;
+    name?: string | undefined;
+    taskPrompt?: string | undefined;
+    status?: string | undefined;
+    payload?: AgentTaskPayload;
+    completedAt?: Date | undefined;
+    startedAt?: Date | undefined;
+    updatedAt?: Date;
+}
+
+export class AgentTaskPayload implements IAgentTaskPayload {
+    state?: { [key: string]: any; } | undefined;
+    agents?: string[] | undefined;
+    chatHistory?: ChatMessage[] | undefined;
+
+    constructor(data?: IAgentTaskPayload) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (_data["state"]) {
+                this.state = {} as any;
+                for (let key in _data["state"]) {
+                    if (_data["state"].hasOwnProperty(key))
+                        (<any>this.state)![key] = _data["state"][key];
+                }
+            }
+            if (Array.isArray(_data["agents"])) {
+                this.agents = [] as any;
+                for (let item of _data["agents"])
+                    this.agents!.push(item);
+            }
+            if (Array.isArray(_data["chatHistory"])) {
+                this.chatHistory = [] as any;
+                for (let item of _data["chatHistory"])
+                    this.chatHistory!.push(ChatMessage.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): AgentTaskPayload {
+        data = typeof data === 'object' ? data : {};
+        let result = new AgentTaskPayload();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (this.state) {
+            data["state"] = {};
+            for (let key in this.state) {
+                if (this.state.hasOwnProperty(key))
+                    (<any>data["state"])[key] = (<any>this.state)[key];
+            }
+        }
+        if (Array.isArray(this.agents)) {
+            data["agents"] = [];
+            for (let item of this.agents)
+                data["agents"].push(item);
+        }
+        if (Array.isArray(this.chatHistory)) {
+            data["chatHistory"] = [];
+            for (let item of this.chatHistory)
+                data["chatHistory"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IAgentTaskPayload {
+    state?: { [key: string]: any; } | undefined;
+    agents?: string[] | undefined;
+    chatHistory?: ChatMessage[] | undefined;
+}
+
 export class ChatMessage implements IChatMessage {
     role?: string | undefined;
     content?: string | undefined;
@@ -2619,6 +2934,7 @@ export interface IEmbeddingMetaData {
 export class IngestDataOptions implements IIngestDataOptions {
     mergeLineIfFewerWordsThan?: number;
     selectedChunkers?: string[] | undefined;
+    doPreProcessing?: boolean;
 
     constructor(data?: IIngestDataOptions) {
         if (data) {
@@ -2637,6 +2953,7 @@ export class IngestDataOptions implements IIngestDataOptions {
                 for (let item of _data["selectedChunkers"])
                     this.selectedChunkers!.push(item);
             }
+            this.doPreProcessing = _data["doPreProcessing"];
         }
     }
 
@@ -2655,6 +2972,7 @@ export class IngestDataOptions implements IIngestDataOptions {
             for (let item of this.selectedChunkers)
                 data["selectedChunkers"].push(item);
         }
+        data["doPreProcessing"] = this.doPreProcessing;
         return data;
     }
 }
@@ -2662,6 +2980,7 @@ export class IngestDataOptions implements IIngestDataOptions {
 export interface IIngestDataOptions {
     mergeLineIfFewerWordsThan?: number;
     selectedChunkers?: string[] | undefined;
+    doPreProcessing?: boolean;
 }
 
 export class IngestDataRequest implements IIngestDataRequest {
@@ -2730,7 +3049,9 @@ export interface IIngestDataRequest {
 
 export class IngestFromAzureContainerOptions implements IIngestFromAzureContainerOptions {
     connectionString?: string | undefined;
-    containerName?: string | undefined;
+    rootContainerName?: string | undefined;
+    subFolderPrefix?: string | undefined;
+    includeSubfolders?: boolean;
 
     constructor(data?: IIngestFromAzureContainerOptions) {
         if (data) {
@@ -2744,7 +3065,9 @@ export class IngestFromAzureContainerOptions implements IIngestFromAzureContaine
     init(_data?: any) {
         if (_data) {
             this.connectionString = _data["connectionString"];
-            this.containerName = _data["containerName"];
+            this.rootContainerName = _data["rootContainerName"];
+            this.subFolderPrefix = _data["subFolderPrefix"];
+            this.includeSubfolders = _data["includeSubfolders"];
         }
     }
 
@@ -2758,14 +3081,18 @@ export class IngestFromAzureContainerOptions implements IIngestFromAzureContaine
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["connectionString"] = this.connectionString;
-        data["containerName"] = this.containerName;
+        data["rootContainerName"] = this.rootContainerName;
+        data["subFolderPrefix"] = this.subFolderPrefix;
+        data["includeSubfolders"] = this.includeSubfolders;
         return data;
     }
 }
 
 export interface IIngestFromAzureContainerOptions {
     connectionString?: string | undefined;
-    containerName?: string | undefined;
+    rootContainerName?: string | undefined;
+    subFolderPrefix?: string | undefined;
+    includeSubfolders?: boolean;
 }
 
 export class ProcessInfo implements IProcessInfo {
@@ -3234,8 +3561,10 @@ export class SearchOptions implements ISearchOptions {
     itemsToSkip?: number;
     contentMustIncludeWords?: string[] | undefined;
     contentMustNotIncludeWords?: string[] | undefined;
-    metaDataInclude?: { [key: string]: string[]; } | undefined;
-    metaDataExclude?: { [key: string]: string[]; } | undefined;
+    metaDataIncludeWhenContainsAll?: { [key: string]: string[]; } | undefined;
+    metaDataIncludeWhenContainsAny?: { [key: string]: string[]; } | undefined;
+    metaDataExcludeWhenContainsAll?: { [key: string]: string[]; } | undefined;
+    metaDataExcludeWhenContainsAny?: { [key: string]: string[]; } | undefined;
     semanticSearchContent?: string | undefined;
     includeContentChunksAfter?: number;
     includeContentChunksBefore?: number;
@@ -3268,18 +3597,32 @@ export class SearchOptions implements ISearchOptions {
                 for (let item of _data["contentMustNotIncludeWords"])
                     this.contentMustNotIncludeWords!.push(item);
             }
-            if (_data["metaDataInclude"]) {
-                this.metaDataInclude = {} as any;
-                for (let key in _data["metaDataInclude"]) {
-                    if (_data["metaDataInclude"].hasOwnProperty(key))
-                        (<any>this.metaDataInclude)![key] = _data["metaDataInclude"][key] !== undefined ? _data["metaDataInclude"][key] : [];
+            if (_data["metaDataIncludeWhenContainsAll"]) {
+                this.metaDataIncludeWhenContainsAll = {} as any;
+                for (let key in _data["metaDataIncludeWhenContainsAll"]) {
+                    if (_data["metaDataIncludeWhenContainsAll"].hasOwnProperty(key))
+                        (<any>this.metaDataIncludeWhenContainsAll)![key] = _data["metaDataIncludeWhenContainsAll"][key] !== undefined ? _data["metaDataIncludeWhenContainsAll"][key] : [];
                 }
             }
-            if (_data["metaDataExclude"]) {
-                this.metaDataExclude = {} as any;
-                for (let key in _data["metaDataExclude"]) {
-                    if (_data["metaDataExclude"].hasOwnProperty(key))
-                        (<any>this.metaDataExclude)![key] = _data["metaDataExclude"][key] !== undefined ? _data["metaDataExclude"][key] : [];
+            if (_data["metaDataIncludeWhenContainsAny"]) {
+                this.metaDataIncludeWhenContainsAny = {} as any;
+                for (let key in _data["metaDataIncludeWhenContainsAny"]) {
+                    if (_data["metaDataIncludeWhenContainsAny"].hasOwnProperty(key))
+                        (<any>this.metaDataIncludeWhenContainsAny)![key] = _data["metaDataIncludeWhenContainsAny"][key] !== undefined ? _data["metaDataIncludeWhenContainsAny"][key] : [];
+                }
+            }
+            if (_data["metaDataExcludeWhenContainsAll"]) {
+                this.metaDataExcludeWhenContainsAll = {} as any;
+                for (let key in _data["metaDataExcludeWhenContainsAll"]) {
+                    if (_data["metaDataExcludeWhenContainsAll"].hasOwnProperty(key))
+                        (<any>this.metaDataExcludeWhenContainsAll)![key] = _data["metaDataExcludeWhenContainsAll"][key] !== undefined ? _data["metaDataExcludeWhenContainsAll"][key] : [];
+                }
+            }
+            if (_data["metaDataExcludeWhenContainsAny"]) {
+                this.metaDataExcludeWhenContainsAny = {} as any;
+                for (let key in _data["metaDataExcludeWhenContainsAny"]) {
+                    if (_data["metaDataExcludeWhenContainsAny"].hasOwnProperty(key))
+                        (<any>this.metaDataExcludeWhenContainsAny)![key] = _data["metaDataExcludeWhenContainsAny"][key] !== undefined ? _data["metaDataExcludeWhenContainsAny"][key] : [];
                 }
             }
             this.semanticSearchContent = _data["semanticSearchContent"];
@@ -3314,18 +3657,32 @@ export class SearchOptions implements ISearchOptions {
             for (let item of this.contentMustNotIncludeWords)
                 data["contentMustNotIncludeWords"].push(item);
         }
-        if (this.metaDataInclude) {
-            data["metaDataInclude"] = {};
-            for (let key in this.metaDataInclude) {
-                if (this.metaDataInclude.hasOwnProperty(key))
-                    (<any>data["metaDataInclude"])[key] = (<any>this.metaDataInclude)[key];
+        if (this.metaDataIncludeWhenContainsAll) {
+            data["metaDataIncludeWhenContainsAll"] = {};
+            for (let key in this.metaDataIncludeWhenContainsAll) {
+                if (this.metaDataIncludeWhenContainsAll.hasOwnProperty(key))
+                    (<any>data["metaDataIncludeWhenContainsAll"])[key] = (<any>this.metaDataIncludeWhenContainsAll)[key];
             }
         }
-        if (this.metaDataExclude) {
-            data["metaDataExclude"] = {};
-            for (let key in this.metaDataExclude) {
-                if (this.metaDataExclude.hasOwnProperty(key))
-                    (<any>data["metaDataExclude"])[key] = (<any>this.metaDataExclude)[key];
+        if (this.metaDataIncludeWhenContainsAny) {
+            data["metaDataIncludeWhenContainsAny"] = {};
+            for (let key in this.metaDataIncludeWhenContainsAny) {
+                if (this.metaDataIncludeWhenContainsAny.hasOwnProperty(key))
+                    (<any>data["metaDataIncludeWhenContainsAny"])[key] = (<any>this.metaDataIncludeWhenContainsAny)[key];
+            }
+        }
+        if (this.metaDataExcludeWhenContainsAll) {
+            data["metaDataExcludeWhenContainsAll"] = {};
+            for (let key in this.metaDataExcludeWhenContainsAll) {
+                if (this.metaDataExcludeWhenContainsAll.hasOwnProperty(key))
+                    (<any>data["metaDataExcludeWhenContainsAll"])[key] = (<any>this.metaDataExcludeWhenContainsAll)[key];
+            }
+        }
+        if (this.metaDataExcludeWhenContainsAny) {
+            data["metaDataExcludeWhenContainsAny"] = {};
+            for (let key in this.metaDataExcludeWhenContainsAny) {
+                if (this.metaDataExcludeWhenContainsAny.hasOwnProperty(key))
+                    (<any>data["metaDataExcludeWhenContainsAny"])[key] = (<any>this.metaDataExcludeWhenContainsAny)[key];
             }
         }
         data["semanticSearchContent"] = this.semanticSearchContent;
@@ -3345,8 +3702,10 @@ export interface ISearchOptions {
     itemsToSkip?: number;
     contentMustIncludeWords?: string[] | undefined;
     contentMustNotIncludeWords?: string[] | undefined;
-    metaDataInclude?: { [key: string]: string[]; } | undefined;
-    metaDataExclude?: { [key: string]: string[]; } | undefined;
+    metaDataIncludeWhenContainsAll?: { [key: string]: string[]; } | undefined;
+    metaDataIncludeWhenContainsAny?: { [key: string]: string[]; } | undefined;
+    metaDataExcludeWhenContainsAll?: { [key: string]: string[]; } | undefined;
+    metaDataExcludeWhenContainsAny?: { [key: string]: string[]; } | undefined;
     semanticSearchContent?: string | undefined;
     includeContentChunksAfter?: number;
     includeContentChunksBefore?: number;
@@ -3390,6 +3749,78 @@ export class SearchRequest implements ISearchRequest {
 
 export interface ISearchRequest {
     searchOptions?: SearchOptions;
+}
+
+export class StartAgentTaskRequest implements IStartAgentTaskRequest {
+    taskPrompt?: string | undefined;
+    name?: string | undefined;
+    agents?: string[] | undefined;
+    terminationStrategyInfo?: TerminationStrategyInfo;
+    options?: { [key: string]: string; } | undefined;
+
+    constructor(data?: IStartAgentTaskRequest) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.taskPrompt = _data["taskPrompt"];
+            this.name = _data["name"];
+            if (Array.isArray(_data["agents"])) {
+                this.agents = [] as any;
+                for (let item of _data["agents"])
+                    this.agents!.push(item);
+            }
+            this.terminationStrategyInfo = _data["terminationStrategyInfo"] ? TerminationStrategyInfo.fromJS(_data["terminationStrategyInfo"]) : <any>undefined;
+            if (_data["options"]) {
+                this.options = {} as any;
+                for (let key in _data["options"]) {
+                    if (_data["options"].hasOwnProperty(key))
+                        (<any>this.options)![key] = _data["options"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): StartAgentTaskRequest {
+        data = typeof data === 'object' ? data : {};
+        let result = new StartAgentTaskRequest();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["taskPrompt"] = this.taskPrompt;
+        data["name"] = this.name;
+        if (Array.isArray(this.agents)) {
+            data["agents"] = [];
+            for (let item of this.agents)
+                data["agents"].push(item);
+        }
+        data["terminationStrategyInfo"] = this.terminationStrategyInfo ? this.terminationStrategyInfo.toJSON() : <any>undefined;
+        if (this.options) {
+            data["options"] = {};
+            for (let key in this.options) {
+                if (this.options.hasOwnProperty(key))
+                    (<any>data["options"])[key] = (<any>this.options)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IStartAgentTaskRequest {
+    taskPrompt?: string | undefined;
+    name?: string | undefined;
+    agents?: string[] | undefined;
+    terminationStrategyInfo?: TerminationStrategyInfo;
+    options?: { [key: string]: string; } | undefined;
 }
 
 export class StartProcessRequest implements IStartProcessRequest {
@@ -3454,6 +3885,58 @@ export interface IStartProcessRequest {
     processId?: string;
     payload?: ProcessPayload;
     stepIdsWithPayload?: { [key: string]: ProcessPayload; } | undefined;
+}
+
+export class TerminationStrategyInfo implements ITerminationStrategyInfo {
+    type?: string | undefined;
+    payload?: { [key: string]: any; } | undefined;
+
+    constructor(data?: ITerminationStrategyInfo) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.type = _data["type"];
+            if (_data["payload"]) {
+                this.payload = {} as any;
+                for (let key in _data["payload"]) {
+                    if (_data["payload"].hasOwnProperty(key))
+                        (<any>this.payload)![key] = _data["payload"][key];
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): TerminationStrategyInfo {
+        data = typeof data === 'object' ? data : {};
+        let result = new TerminationStrategyInfo();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["type"] = this.type;
+        if (this.payload) {
+            data["payload"] = {};
+            for (let key in this.payload) {
+                if (this.payload.hasOwnProperty(key))
+                    (<any>data["payload"])[key] = (<any>this.payload)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface ITerminationStrategyInfo {
+    type?: string | undefined;
+    payload?: { [key: string]: any; } | undefined;
 }
 
 export class ApiClientException extends Error {
