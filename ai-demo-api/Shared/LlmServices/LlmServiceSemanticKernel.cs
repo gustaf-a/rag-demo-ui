@@ -8,8 +8,6 @@ using Shared.Plugins;
 using System.Text.Json;
 using ChatMessage = Shared.Models.ChatMessage;
 using ChatOptions = Shared.Models.ChatOptions;
-using Shared.Extensions;
-using Shared.Models;
 
 namespace Shared.Generation.LlmServices;
 

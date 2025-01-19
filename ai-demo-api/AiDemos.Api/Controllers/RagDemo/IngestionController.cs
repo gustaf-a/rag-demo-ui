@@ -19,6 +19,31 @@ public class IngestionController(ILogger<IngestionController> _logger, IConfigur
         return Ok(chunkerNames);
     }
 
+    /// <summary>
+    /// Imports and ingests data
+    /// </summary>
+    /// <remarks>
+    /// # Examples
+    /// ## Ingestion from Azure Container using default chunking and options
+    /// 
+    /// ```
+    ///{
+    ///  "databaseOptions": {
+    ///    "tableName": "embeddings1"
+    ///  },
+    ///	"metaDataTags": {
+    ///    "version": "1.0",
+    ///    "access-level": "3",
+    ///    "project": "Health Care 10x"
+    ///  },
+    ///  "ingestFromAzureContainerOptions": {
+    ///    "connectionString": "DefaultEndpointsProtocol=https;AccountName=[storage-account];AccountKey=[storage-account-key];EndpointSuffix=core.windows.net",
+    ///    "containerName": "[container-folder-name]"
+    ///  }
+    ///}
+    /// ```
+    /// </remarks>
+    /// <exception cref="Exception"></exception>
     [HttpPost("ingest-data")]
     public async Task<ActionResult<string>> IngestData([FromBody] IngestDataRequest request)
     {

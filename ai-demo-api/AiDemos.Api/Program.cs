@@ -18,6 +18,9 @@ using Shared.Configuration;
 using Shared.Generation.LlmServices;
 using Shared.Services;
 using AgentDemo;
+using AgentDemo.Agents;
+using AgentDemo.TerminationStrategies;
+using Shared.LlmServices;
 
 namespace AiDemos.Api;
 
@@ -107,7 +110,7 @@ public class Program
 
     private static void SetupServices(WebApplicationBuilder builder)
     {
-        //RAG
+        #region RAG
         builder.Services.AddScoped<IIngestionHandler, IngestionHandler>();
 
         builder.Services.AddScoped<IPreProcessorFactory, PreProcessorFactory>();
@@ -137,14 +140,28 @@ public class Program
         builder.Services.AddScoped<IEmbeddingService, EmbeddingService>();
 
         builder.Services.AddSingleton<IRagRepository, RagRepository>();
-        //End RAG
+        #endregion
 
-        //Processes
+
+        #region Processes
+
         builder.Services.AddScoped<IProcessHandler, ProcessHandler>();
         builder.Services.AddScoped<IProcessExecutor, ProcessExecutor>();
         builder.Services.AddScoped<IProcessRepository, ProcessRepository>();
 
         builder.Services.AddScoped<IStepClassFactory, StepClassFactory>();
+        #endregion
+
+        #region Agents
+        builder.Services.AddScoped<IAgentFactory, AgentFactory>();
+        builder.Services.AddScoped<ITerminationStrategyFactory, TerminationStrategyFactory>();
+        builder.Services.AddScoped<IAgentHandler, AgentHandler>();
+        builder.Services.AddScoped<IAgentRepository, AgentRepository>();
+        builder.Services.AddScoped<IAgentTaskExecutor, AgentTaskExecutor>();
+        builder.Services.AddScoped<IKernelCreator, KernelCreator>();
+
+        #endregion
+
 
         builder.Services.AddScoped<IFileService, FileService>();
     }

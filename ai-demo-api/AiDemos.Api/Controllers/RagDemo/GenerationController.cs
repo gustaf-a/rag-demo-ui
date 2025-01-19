@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using AiDemos.Api.Generation;
 using Shared.Models;
-using Shared.Models;
 
 namespace AiDemos.Api.Controllers.RagDemo;
 

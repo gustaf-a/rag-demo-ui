@@ -27,28 +27,28 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
         }
     }
 
-    [HttpDelete("remove-table")]
-    public async Task<ActionResult<string>> RemoveTable([FromBody] DatabaseOptions databaseOptions)
+    [HttpDelete("remove-table/{tableName}")]
+    public async Task<ActionResult<string>> RemoveTable(string tableName)
     {
-        await CheckTableExists(databaseOptions);
+        await CheckTableExists(tableName);
 
         try
         {
-            await _postgreSqlService.DeleteTable(databaseOptions);
+            await _postgreSqlService.DeleteTable(tableName);
             return Ok("Table removed successfully.");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Failed to remove table: {databaseOptions.TableName}");
+            _logger.LogError(ex, $"Failed to remove table: {tableName}");
 
-            return StatusCode(500, $"Failed to remove table {databaseOptions.TableName}: {ex.Message}");
+            return StatusCode(500, $"Failed to remove table {tableName}: {ex.Message}");
         }
     }
 
     [HttpPost("reset-table")]
     public async Task<ActionResult<string>> ResetTable([FromBody] DatabaseOptions databaseOptions)
     {
-        await CheckTableExists(databaseOptions);
+        await CheckTableExists(databaseOptions.TableName);
 
         try
         {
@@ -70,7 +70,7 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
 
         databaseOptions.TableName = databaseOptions.TableName.ToLower();
 
-        if (await _postgreSqlService.DoesTableExist(databaseOptions))
+        if (await _postgreSqlService.DoesTableExist(databaseOptions.TableName))
             throw new Exception($"Table {databaseOptions.TableName} already exists.");
 
         try
@@ -86,16 +86,16 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
         }
     }
 
-    [HttpPost("get-unique-tag-values/{tag}")]
-    public async Task<ActionResult<IEnumerable<string>>> GetUniqueMetaDataTagValues(string tag, [FromBody] DatabaseOptions databaseOptions)
+    [HttpGet("get-unique-tag-values/{tableName}/{tag}")]
+    public async Task<ActionResult<IEnumerable<string>>> GetUniqueMetaDataTagValues(string tableName, string tag)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(tag);
 
-        await CheckTableExists(databaseOptions);
+        await CheckTableExists(tableName);
 
         try
         {
-            var projectNames = await _postgreSqlService.GetUniqueMetaDataTagValues(databaseOptions, tag);
+            var projectNames = await _postgreSqlService.GetUniqueMetaDataTagValues(tableName, tag);
             return Ok(projectNames);
         }
         catch (Exception ex)
@@ -106,31 +106,31 @@ public class DatabaseController(ILogger<IngestionController> _logger, IConfigura
         }
     }
 
-    [HttpPost("get-unique-tag-keys")]
-    public async Task<ActionResult<IEnumerable<string>>> GetUniqueMetaDataTagKeys([FromBody] DatabaseOptions databaseOptions)
+    [HttpGet("get-unique-tag-keys/{tableName}")]
+    public async Task<ActionResult<IEnumerable<string>>> GetUniqueMetaDataTagKeys(string tableName)
     {
-        await CheckTableExists(databaseOptions);
+        await CheckTableExists(tableName);
 
         try
         {
-            var projectNames = await _postgreSqlService.GetUniqueMetaDataTagKeys(databaseOptions);
+            var projectNames = await _postgreSqlService.GetUniqueMetaDataTagKeys(tableName);
             return Ok(projectNames);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Failed to get tag keys {databaseOptions.TableName}.");
+            _logger.LogError(ex, $"Failed to get tag keys {tableName}.");
 
-            return StatusCode(500, $"Failed to get tag keys {databaseOptions.TableName}: {ex.Message}");
+            return StatusCode(500, $"Failed to get tag keys {tableName}: {ex.Message}");
         }
     }
 
-    private async Task CheckTableExists(DatabaseOptions databaseOptions)
+    private async Task CheckTableExists(string tableName)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(databaseOptions.TableName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(tableName);
 
-        databaseOptions.TableName = databaseOptions.TableName.ToLower();
+        tableName = tableName.ToLower();
 
-        if (!await _postgreSqlService.DoesTableExist(databaseOptions))
-            throw new Exception($"Table {databaseOptions.TableName} not found.");
+        if (!await _postgreSqlService.DoesTableExist(tableName))
+            throw new Exception($"Table {tableName} not found.");
     }
 }

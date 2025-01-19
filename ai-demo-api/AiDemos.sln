@@ -23,6 +23,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "database", "database", "{CF
 		Database\setup\002_create_process_steps_table.sql = Database\setup\002_create_process_steps_table.sql
 		Database\setup\003_create_process_instances_table.sql = Database\setup\003_create_process_instances_table.sql
 		Database\setup\004_create_process_step_instances_table.sql = Database\setup\004_create_process_step_instances_table.sql
+		005_create_agent_tasks_table.sql = 005_create_agent_tasks_table.sql
+		006_create_agent_table.sql = 006_create_agent_table.sql
 	EndProjectSection
 EndProject
 Global

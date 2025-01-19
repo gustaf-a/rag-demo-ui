@@ -5,7 +5,6 @@ using OpenAI.Chat;
 using Shared.Configuration;
 using Shared.Models;
 using Shared.Extensions;
-using Shared.Models;
 
 namespace Shared.Generation.LlmServices;
 
