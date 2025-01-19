@@ -17,10 +17,10 @@ public class AzureBlobFileReader : FileReaderBase, IFileReader
         if (string.IsNullOrWhiteSpace(azureContainerOptions.ConnectionString))
             throw new ArgumentException("Connection string cannot be null or empty.", nameof(azureContainerOptions.ConnectionString));
 
-        if (string.IsNullOrWhiteSpace(azureContainerOptions.ContainerName))
-            throw new ArgumentException("Container name cannot be null or empty.", nameof(azureContainerOptions.ContainerName));
+        if (string.IsNullOrWhiteSpace(azureContainerOptions.RootContainerName))
+            throw new ArgumentException("Container name cannot be null or empty.", nameof(azureContainerOptions.RootContainerName));
 
-        _containerClient = new BlobContainerClient(azureContainerOptions.ConnectionString, azureContainerOptions.ContainerName);
+        _containerClient = new BlobContainerClient(azureContainerOptions.ConnectionString, azureContainerOptions.RootContainerName);
         InitializeBlobsAsync(azureContainerOptions).GetAwaiter().GetResult();
     }
 
@@ -28,14 +28,21 @@ public class AzureBlobFileReader : FileReaderBase, IFileReader
     {
         try
         {
-            await _containerClient.CreateIfNotExistsAsync();
+            if(!string.IsNullOrWhiteSpace(azureContainerOptions.SubFolderPrefix))
+                azureContainerOptions.SubFolderPrefix = azureContainerOptions.SubFolderPrefix.TrimEnd('/') + "/";
 
-            await foreach (BlobItem blob in _containerClient.GetBlobsAsync())
+            await foreach (BlobItem blob in _containerClient.GetBlobsAsync(prefix: azureContainerOptions.SubFolderPrefix))
             {
-                if (!blob.Deleted)
+                if (!azureContainerOptions.IncludeSubfolders)
                 {
-                    _blobs.Add(blob.Name);
+                    var directory = Path.GetDirectoryName(blob.Name)?.Replace('\\', '/').TrimEnd('/') + "/";
+
+                    if (!string.Equals(directory, azureContainerOptions.SubFolderPrefix, StringComparison.OrdinalIgnoreCase))
+                        continue;
                 }
+
+                if (!blob.Deleted)
+                    _blobs.Add(blob.Name);
             }
         }
         catch (Exception ex)
