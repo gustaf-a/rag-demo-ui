@@ -1,4 +1,6 @@
-﻿namespace Shared.Models;
+﻿using System.Text;
+
+namespace Shared.Models;
 
 public class RetrievedDocument
 {
@@ -42,7 +44,17 @@ public class RetrievedDocument
 
     public override string ToString()
     {
-        return $"{Title}: {Content}";
+        var builder = new StringBuilder();
+
+        builder.Append('<')
+                .Append(Title)
+                .AppendLine(">")
+               .AppendLine(EmbeddingContent)
+               .Append("</")
+               .Append(Title)
+               .AppendLine(">");
+
+        return builder.ToString();
     }
 }
 
