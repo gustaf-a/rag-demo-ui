@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Shared.Generation.LlmServices;
 using Shared.Models;
+using System.Text;
 
 namespace AiDemos.Api.Ingestion.Chunking;
 
@@ -18,7 +19,7 @@ public class ContextualChunker(IConfiguration configuration, ILlmServiceFactory 
 
     public async Task<IEnumerable<ContentChunk>> Execute(IngestDataRequest request, string content)
     {
-        var contentChunks = GetChunks(request.IngestDataOptions, content, _ingestionOptions.ContextualRetrievalWordsPerChunk, 0);
+        var contentChunks = GetChunks(request.IngestDataOptions, content, _ingestionOptions.ContextualRetrievalWordsPerChunk, 2);
 
         var chunksWithContext = new List<ContentChunk>();
 
@@ -32,14 +33,16 @@ public class ContextualChunker(IConfiguration configuration, ILlmServiceFactory 
                 throw new Exception($"Failed to generate context for chunk: {contentChunk} using LlmService {llmService.GetType()}.");
             }
 
-            contentChunk.EmbeddingContent =
-$"""
-Context:
-{chunkContext}
+            var sb = new StringBuilder();
 
-Information:
-{contentChunk}
-""";
+            contentChunk.EmbeddingContent = sb
+                .AppendLine("<context>")
+                .AppendLine(chunkContext)
+                .AppendLine("</context>")
+                .AppendLine("<information>")
+                .AppendLine(contentChunk.Content)
+                .AppendLine("</information>")
+                .ToString();
 
             chunksWithContext.Add(contentChunk);
         }
