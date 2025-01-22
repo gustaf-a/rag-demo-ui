@@ -72,6 +72,53 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     /// }
     /// ```
     /// 
+    /// ## Chat request with file plugin  
+    /// The FilePlugin lets the model read or save to an Azure Storage Blob.
+    /// Here we ask it to look in the CustomerReviews folder and look through each file and then use that information.
+    /// This is a question that could easily be scheduled to run regularly with different results each time.
+    /// 
+    /// ```
+    /// {  
+    ///    "chatMessages": [
+    ///    {  
+    ///        "role": "user",  
+    ///        "content": "Read all files in the folder CustomerReviews and summarize what people say about the different products we have."  
+    ///    }  
+    ///    ],
+    ///     "chatOptions": {  
+    ///        "temperature": 0.2,  
+    ///        "pluginsToUse": [
+    ///             "FilePlugin"
+    ///        ]  
+    ///    } 
+    /// } 
+    /// ```
+    /// 
+    /// ## Chat request with search plugin and file plugin 
+    /// Here the model decides first what to search for so the search is smarter in some ways.
+    /// It's good to be extra clear that search needs to be done though.
+    /// The FilePlugin lets the model read or save to an Azure Storage Blob.
+    /// 
+    /// ```
+    /// {  
+    ///    "chatMessages": [
+    ///    {  
+    ///        "role": "user",  
+    ///        "content": "Write a small friendly note thanking customers for their purchase of their new Nimbus headphones. First search information about the headphones and then write the note in Swedish and save it to a file."
+    ///    }  
+    ///    ],
+    ///    "chatOptions": {  
+    ///        "temperature": 0.2,  
+    ///        "pluginsToUse": [
+    ///             "FilePlugin",
+    ///             "SearchDatabasePlugin"
+    ///        ]  
+    ///    }  
+    /// }
+    /// ```
+    /// 
+    /// 
+    /// 
     /// ## Chat request with search plugin letting model decide how to search for data
     /// This is less reliable as the model doesn't always understand when it needs to search for information.
     /// The good thing is that the model can make multiple searches for different things.
@@ -81,13 +128,13 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     ///    "chatMessages": [
     ///    {  
     ///        "role": "user",  
-    ///        "content": "What's the difference between our current Q1 sales and the Q3 targets? Search in the database."  
+    ///        "content": "What's the difference between our current Q1 sales and the Q3 targets? First search for each value separately. Describe how you came up with the answer."  
     ///    }  
     ///    ],  
     ///    "chatOptions": {  
     ///        "temperature": 0.2,  
     ///        "pluginsToUse": [
-    ///             "DatePlugin",
+    ///             "MathPlugin",
     ///             "SearchDatabasePlugin"
     ///        ]  
     ///    }  
