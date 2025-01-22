@@ -3,16 +3,21 @@ using Shared.Models;
 using Microsoft.SemanticKernel;
 using Shared.Services.Search;
 using System.ComponentModel;
+using Microsoft.Extensions.Configuration;
+using Shared.Configuration;
 
 namespace Shared.Plugins;
 
 public class SearchDatabasePlugin : IPlugin
 {
     private readonly ISearchServiceFactory _searchServiceFactory;
+    private readonly PostgreSqlOptions _postgreSqlOptions;
 
-    public SearchDatabasePlugin(ISearchServiceFactory searchServiceFactory)
+    public SearchDatabasePlugin(IConfiguration configuration, ISearchServiceFactory searchServiceFactory)
     {
         _searchServiceFactory = searchServiceFactory;
+
+        _postgreSqlOptions = configuration.GetSection(PostgreSqlOptions.PostgreSql).Get<PostgreSqlOptions>() ?? throw new ArgumentNullException(nameof(PostgreSqlOptions));
     }
 
     [KernelFunction("get_sources")]
@@ -26,7 +31,7 @@ public class SearchDatabasePlugin : IPlugin
 
         var searchOptions = new SearchOptions
         {
-            EmbeddingsTableName = "embeddings1",
+            EmbeddingsTableName = _postgreSqlOptions.DefaultEmbeddingsTableName,
             ItemsToRetrieve = 3,
             SemanticSearchContent = searchPhrase
         };
