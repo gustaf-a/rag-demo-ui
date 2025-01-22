@@ -21,6 +21,7 @@ using AgentDemo;
 using AgentDemo.Agents;
 using AgentDemo.TerminationStrategies;
 using Shared.LlmServices;
+using Shared.Services.FileService;
 
 namespace AiDemos.Api;
 
@@ -129,8 +130,12 @@ public class Program
 
         builder.Services.AddScoped<IPluginHandler, PluginHandler>();
         builder.Services.AddScoped<IPlugin, DatePlugin>();
+        builder.Services.AddScoped<IPlugin, MathPlugin>();
         builder.Services.AddScoped<IPlugin, SearchDatabasePlugin>();
         builder.Services.AddScoped<IPlugin, TimePlugin>();
+
+        builder.Services.AddScoped<IPlugin, FilePlugin>();
+        //builder.Services.AddScoped<IFileHandler, LocalFileHandler>(); //Used locally only
 
         builder.Services.AddScoped<IRetrievalHandler, RetrievalHandler>();
         builder.Services.AddScoped<ISearchServiceFactory, SearchServiceFactory>();

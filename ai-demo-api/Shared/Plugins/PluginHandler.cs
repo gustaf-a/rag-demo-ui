@@ -4,7 +4,7 @@ namespace Shared.Plugins;
 
 public class PluginHandler(IServiceProvider _serviceProvider) : IPluginHandler
 {
-    private static readonly List<string> _defaultPlugins = [nameof(DatePlugin), nameof(TimePlugin), nameof(SearchDatabasePlugin)];
+    private static readonly List<string> _defaultPlugins = [nameof(DatePlugin), nameof(TimePlugin), nameof(SearchDatabasePlugin), nameof(MathPlugin), nameof(FilePlugin)];
 
     public void AddPlugins(Kernel kernel)
     {
@@ -20,18 +20,14 @@ public class PluginHandler(IServiceProvider _serviceProvider) : IPluginHandler
                 case nameof(DatePlugin):
                     kernel.Plugins.AddFromType<DatePlugin>();
                     break;
+                case nameof(FilePlugin):
+                    kernel.Plugins.AddFromType<FilePlugin>(serviceProvider: _serviceProvider);
+                    break;
+                case nameof(MathPlugin):
+                    kernel.Plugins.AddFromType<MathPlugin>();
+                    break;
                 case nameof(SearchDatabasePlugin):
-                    ////TODO Fel. Hur ska jag göra ? Funkar inte.
-                    //var builder = Kernel.CreateBuilder();
-                    //builder.Services.AddScoped<ISearchServiceFactory, SearchServiceFactory>();
-                    //var newKernel = builder.Build();
-
-                    //foreach (var plugin in kernel.Plugins)
-                    //    newKernel.Plugins.Add(plugin);
-
                     kernel.Plugins.AddFromType<SearchDatabasePlugin>(serviceProvider: _serviceProvider);
-
-                    //kernel = newKernel;
                     break;
                 case nameof(TimePlugin):
                     kernel.Plugins.AddFromType<TimePlugin>();
