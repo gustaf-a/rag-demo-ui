@@ -136,6 +136,7 @@ public class Program
 
         builder.Services.AddScoped<IPlugin, FilePlugin>();
         //builder.Services.AddScoped<IFileHandler, LocalFileHandler>(); //Used locally only
+        builder.Services.AddScoped<IFileHandler, AzureBlobStorageFileHandler>();
 
         builder.Services.AddScoped<IRetrievalHandler, RetrievalHandler>();
         builder.Services.AddScoped<ISearchServiceFactory, SearchServiceFactory>();
@@ -155,6 +156,8 @@ public class Program
         builder.Services.AddScoped<IProcessRepository, ProcessRepository>();
 
         builder.Services.AddScoped<IStepClassFactory, StepClassFactory>();
+
+        builder.Services.AddScoped<IFileService, FileService>();
         #endregion
 
         #region Agents
@@ -167,7 +170,5 @@ public class Program
 
         #endregion
 
-
-        builder.Services.AddScoped<IFileService, FileService>();
     }
 }
