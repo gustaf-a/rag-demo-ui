@@ -4,5 +4,5 @@ public class SplitText
 {
     public string Text { get; set; }
     public int StartIndex { get; set; }
-    public int EndIndex { get; internal set; }
+    public int EndIndex { get; set; }
 }
