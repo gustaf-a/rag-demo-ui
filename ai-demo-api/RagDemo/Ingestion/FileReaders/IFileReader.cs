@@ -10,6 +10,6 @@ namespace AiDemos.Api.Ingestion.FileReaders
         /// Asynchronously retrieves the content of the next file in the location..
         /// </summary>
         /// <returns>The content of the next file as a string, or null if no more files are available.</returns>
-        Task<IngestionSource> GetNextFileContent();
+        Task<IngestionSource> GetNextFile(bool includeContent);
     }
 }

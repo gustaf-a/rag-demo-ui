@@ -74,8 +74,8 @@ public static class StringExtensions
             }
             else
             {
-                // Extract the text between currentIndex and the separator start.
-                int textLength = nextSeparatorIndex - currentIndex;
+                // Extract the text between currentIndex and include the separator.
+                int textLength = nextSeparatorIndex - currentIndex + foundSeparator.Length;
                 string text = content.Substring(currentIndex, textLength);
 
                 result.Add(new SplitText

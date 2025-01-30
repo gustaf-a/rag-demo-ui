@@ -144,25 +144,70 @@ public class RagRepository : RepositoryBase, IRagRepository
         return queryResult.Select(qr => new ContentChunk(qr));
     }
 
-    //public async Task<IEnumerable<ContentChunk>> GetContentChunks(ContentChunkRequest contentChunkRequest)
-    //{
-    //    //find all from contentChunkRequest.TableName
-    //    //where the json object metadata property
-    //    //SourceChunkNumber is between contentChunkRequest.StartChunk and contentChunkRequest.EndChunk
-    //    //and the metadata property Uri is the same string as contentChunkRequest.Uri
+    public async Task<IngestionSource> GetIngestionSource(Guid id)
+    {
+        const string query = @"
+        SELECT Id, Name, Content, Metadata
+        FROM IngestionSources
+        WHERE Id = @Id
+        LIMIT 1;
+        ";
 
-    //    var query = "";
-    //    var queryResult = await ExecuteQueryAsync(
-    //                        query,
-    //                        parameters,
-    //                        CreateEmbeddingsRowModelMapFunction
-    //                    );
+        var parameters = new Dictionary<string, object>
+        {
+            { "@Id", id }
+        };
 
-    //    if (queryResult == null || !queryResult.Any())
-    //        return Enumerable.Empty<ContentChunk>();
+        // Reuse ExecuteQueryAsync but just map one row
+        var results = await ExecuteQueryAsync(query, parameters, CreateIngestionSource);
+        return results.FirstOrDefault(); // Return single item or null
+    }
 
-    //    return queryResult.Select(qr => new ContentChunk(qr));
-    //}
+    public async Task<IngestionSource> GetIngestionSourceByUri(string uri)
+    {
+        // Adjust if your metadata structure for the URI is different
+        const string query = @"
+        SELECT Id, Name, Content, Metadata
+        FROM IngestionSources
+        WHERE Metadata->>'Uri' = @Uri
+        LIMIT 1;
+        ";
+
+        var parameters = new Dictionary<string, object>
+        {
+            { "@Uri", uri }
+        };
+
+        var results = await ExecuteQueryAsync(query, parameters, CreateIngestionSource);
+        return results.FirstOrDefault();
+    }
+
+    public async Task SaveIngestionSource(IngestionSource ingestionSource)
+    {
+        // We use an UPSERT (on conflict by primary key Id)
+        string upsertQuery = @"
+        INSERT INTO IngestionSources (Id, Name, Content, Metadata)
+        VALUES (@Id, @Name, @Content, @Metadata)
+        ON CONFLICT (Id) DO UPDATE 
+            SET Name = EXCLUDED.Name,
+                Content = EXCLUDED.Content,
+                Metadata = EXCLUDED.Metadata;
+        ";
+
+        var parameters = new Dictionary<string, object>
+        {
+            { "@Id", ingestionSource.Id },
+            { "@Name", Path.GetFileName(ingestionSource.Name) },
+            { "@Content", ingestionSource.Content }
+        };
+
+        var jsonBParameters = new Dictionary<string, string>
+        {
+            { "@Metadata", JsonSerializer.Serialize(ingestionSource.MetaData) }
+        };
+
+        await ExecuteQueryAsync(upsertQuery, parameters, jsonBParameters);
+    }
 
     public async Task<IEnumerable<RetrievedDocument>> RetrieveData(string embeddingsTableName, PostgreSqlQueryParameters queryParameters)
     {
@@ -252,6 +297,36 @@ public class RagRepository : RepositoryBase, IRagRepository
             StartIndex = reader.GetInt64(reader.GetOrdinal("startIndex")),
             EndIndex = reader.GetInt64(reader.GetOrdinal("endIndex")),
             EmbeddingVector = null //Not relevant during retrieval
+        };
+    }
+
+    private static IngestionSource CreateIngestionSource(NpgsqlDataReader reader)
+    {
+        // Id is never null because it's the primary key
+        var id = reader.GetGuid(reader.GetOrdinal("Id"));
+
+        var name = reader.GetString(reader.GetOrdinal("Name"));
+
+        // For the text columns, check for DB null
+        string? content = reader.IsDBNull(reader.GetOrdinal("Content"))
+            ? null
+            : reader.GetString(reader.GetOrdinal("Content"));
+
+        // For JSONB, read as string and then deserialize
+        string? metadataJson = reader.IsDBNull(reader.GetOrdinal("Metadata"))
+            ? null
+            : reader.GetString(reader.GetOrdinal("Metadata"));
+
+        var metaData = string.IsNullOrEmpty(metadataJson)
+            ? null
+            : JsonSerializer.Deserialize<EmbeddingMetaData>(metadataJson);
+
+        return new IngestionSource
+        {
+            Id = id,
+            Name = name,
+            Content = content,
+            MetaData = metaData
         };
     }
 }

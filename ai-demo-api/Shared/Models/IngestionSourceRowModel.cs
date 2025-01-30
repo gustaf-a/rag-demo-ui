@@ -1,6 +1,6 @@
 ﻿namespace Shared.Models;
 
-public class IngestionSource
+public class IngestionSourceRowModel
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; }

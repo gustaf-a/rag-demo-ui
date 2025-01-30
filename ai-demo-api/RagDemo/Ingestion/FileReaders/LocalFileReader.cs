@@ -15,7 +15,7 @@ public class LocalFileReader(IngestDataRequest request) : FileReaderBase(request
         return Task.FromResult(_files.Count);
     }
 
-    public async Task<IngestionSource> GetNextFileContent()
+    public async Task<IngestionSource> GetNextFile(bool includeContent)
     {
         if(_filesRead >= _files.Count)
             return null;
@@ -24,15 +24,16 @@ public class LocalFileReader(IngestDataRequest request) : FileReaderBase(request
 
         var filePath = _files[_filesRead];
 
-        var content = await File.ReadAllTextAsync(filePath);
-
-        var metaData = CreateMetaData(_folderPath, filePath);
-
-        return new IngestionSource
+        var result = new IngestionSource
         {
-            Name = _files[_filesRead],
-            Content = content,
-            MetaData = metaData
+            Name = filePath
         };
+
+        if (includeContent)
+            result.Content = await File.ReadAllTextAsync(filePath);
+
+        result.MetaData = CreateMetaData(_folderPath, filePath);
+
+        return result;
     }
 }

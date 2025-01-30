@@ -16,4 +16,8 @@ public interface IRagRepository
     Task InsertData(string tableName, ContentChunk content, float[] embedding, EmbeddingMetaData metaData);
     Task<IEnumerable<RetrievedDocument>> RetrieveData(string embeddingsTableName, PostgreSqlQueryParameters queryParameters);
     Task<IEnumerable<ContentChunk>> GetContentChunks(ContentChunkRequest contentChunkRequest);
+
+    Task<IngestionSource> GetIngestionSource(Guid id);
+    Task<IngestionSource> GetIngestionSourceByUri(string uri);
+    Task SaveIngestionSource(IngestionSource ingestionSource);
 }

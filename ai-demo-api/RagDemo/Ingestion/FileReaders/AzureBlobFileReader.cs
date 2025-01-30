@@ -56,7 +56,7 @@ public class AzureBlobFileReader : FileReaderBase, IFileReader
         return Task.FromResult(_blobs.Count);
     }
 
-    public async Task<IngestionSource> GetNextFileContent()
+    public async Task<IngestionSource> GetNextFile(bool includeContent)
     {
         _blobsRead++;
 
@@ -68,16 +68,20 @@ public class AzureBlobFileReader : FileReaderBase, IFileReader
 
         try
         {
-            var downloadResult = await blobClient.DownloadContentAsync();
-
-            var metaData = CreateMetaData(_containerClient.Uri.AbsoluteUri, $"{_containerClient.Uri.AbsoluteUri}/{blobName}");
-
-            return new IngestionSource
+            var result = new IngestionSource
             {
-                Content = downloadResult.Value.Content.ToString(),
-                MetaData = metaData,
                 Name = blobName
             };
+
+            if (includeContent)
+            {
+                var downloadResult = await blobClient.DownloadContentAsync();
+                result.Content = downloadResult.Value.Content.ToString();
+            }
+
+            result.MetaData = CreateMetaData(_containerClient.Uri.AbsoluteUri, $"{_containerClient.Uri.AbsoluteUri}/{blobName}");
+
+            return result;
         }
         catch (Exception ex)
         {

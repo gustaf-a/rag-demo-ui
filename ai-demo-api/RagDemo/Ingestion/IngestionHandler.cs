@@ -5,11 +5,18 @@ using AiDemos.Api.Ingestion.PreProcessing;
 using Shared.Models;
 using Shared.Repositories;
 using Shared.Services;
+using System.Text.Json;
+using System.Text;
+using Azure.Storage.Queues;
+using Microsoft.Extensions.Configuration;
+using Shared.Configuration;
 
 namespace AiDemos.Api.Ingestion;
 
-public class IngestionHandler(ILogger<IngestionHandler> _logger, IRagRepository _postgreSqlService, IPreProcessorFactory _contentPreProcessorFactory, IChunkerFactory _chunkerFactory, IEmbeddingService _embeddingService) : IIngestionHandler
+public class IngestionHandler(IConfiguration configuration, ILogger<IngestionHandler> _logger, IRagRepository _postgreSqlService, IPreProcessorFactory _contentPreProcessorFactory, IChunkerFactory _chunkerFactory, IEmbeddingService _embeddingService) : IIngestionHandler
 {
+    private readonly AzureOptions _azureOptions = configuration.GetSection(AzureOptions.Azure).Get<AzureOptions>() ?? throw new ArgumentNullException(nameof(AzureOptions));
+
     public IEnumerable<string> GetChunkerNames()
     {
         return _chunkerFactory.GetChunkerNames();
@@ -23,51 +30,102 @@ public class IngestionHandler(ILogger<IngestionHandler> _logger, IRagRepository 
         if (!await _postgreSqlService.DoesTableExist(request.DatabaseOptions.TableName!))
             throw new Exception($"Invalid table name: Table does not exist.");
 
+        IFileReader fileReader;
+
         if (request.FolderPath != null)
         {
+            if (!request.IngestDataOptions.DoLocalIndexing)
+                throw new NotSupportedException($"Queue based indexing not supported for local files.");
+
             _logger.LogInformation($"Starting to ingest data from local folder: {request.FolderPath}.");
 
-            IFileReader fileReader = new LocalFileReader(request);
-
-            await IngestFiles(fileReader, request);
+            fileReader = new LocalFileReader(request);
         }
-
-        if (request.IngestFromAzureContainerOptions != null)
+        else if (request.IngestFromAzureContainerOptions != null)
         {
             _logger.LogInformation($"Starting to ingest data from Azure container: {request.IngestFromAzureContainerOptions.RootContainerName}.");
 
-            IFileReader fileReader = new AzureBlobFileReader(request);
+            fileReader = new AzureBlobFileReader(request);
+        }
+        else
+        {
+            throw new NotSupportedException($"Failed to find valid file source.");
+        }
 
-            await IngestFiles(fileReader, request);
+        if (request.IngestDataOptions.DoLocalIndexing)
+        {
+            var fileCount = await fileReader.GetFileCount();
+            _logger.LogInformation($"Found {fileCount} files to ingest locally.");
+
+            for (int i = 0; i < fileCount; i++)
+                await DoLocalIndexing(fileReader, request);
+
+            _logger.LogInformation($"Finished ingesting {fileCount} files locally.");
+        }
+        else
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(nameof(_azureOptions.IndexingQueueInput.BlobConnectionString));
+            ArgumentException.ThrowIfNullOrWhiteSpace(nameof(_azureOptions.IndexingQueueInput.QueueName));
+
+            var messages = await CreateQueueMessages(fileReader, request);
+
+            _logger.LogInformation($"Sending {messages.Count()} files to queue based ingestion.");
+
+            var queueClient = new QueueClient(_azureOptions.IndexingQueueInput.BlobConnectionString, _azureOptions.IndexingQueueInput.QueueName);
+
+            foreach (var message in messages)
+                await queueClient.SendMessageAsync(Convert.ToBase64String(Encoding.UTF8.GetBytes(message)));
+
+            _logger.LogInformation($"Finished sending {messages.Count()} files for queue based ingestion.");
         }
     }
 
-    private async Task IngestFiles(IFileReader fileReader, IngestDataRequest request)
+    private async Task<IEnumerable<string>> CreateQueueMessages(IFileReader fileReader, IngestDataRequest request)
     {
         var fileCount = await fileReader.GetFileCount();
 
-        _logger.LogInformation($"Found {fileCount} files to ingest.");
+        List<string> serializedMessages = [];
 
         for (int i = 0; i < fileCount; i++)
         {
-            var ingestionSource = await fileReader.GetNextFileContent();
+            var ingestionSource = await fileReader.GetNextFile(includeContent: false);
 
-            var preprocessedContent = DoPreProcessing(request, ingestionSource.Name, ingestionSource.Content);
-
-            var chunks = await DoChunking(request, ingestionSource.Name, preprocessedContent);
-
-            ingestionSource.MetaData.SourceTotalChunkNumbers = chunks.Count - 1;
-
-            for (int j = 0; j < chunks.Count; j++)
+            var indexFileRequestQueueMessage = new IndexFileRequestQueueMessage()
             {
-                var chunk = chunks[j];
+                FileName = ingestionSource.Name,
+                Metadata = ingestionSource.MetaData,
+                IngestDataRequest = request
+            };
 
-                var embedding = await _embeddingService.GetEmbeddings(chunk.EmbeddingContent);
+            var messageJson = JsonSerializer.Serialize(indexFileRequestQueueMessage);
+        }
 
-                ingestionSource.MetaData.SourceChunkNumber = j;
+        return serializedMessages;
+    }
 
-                await _postgreSqlService.InsertData(request.DatabaseOptions!.TableName, chunk, embedding, ingestionSource.MetaData);
-            }
+    private async Task DoLocalIndexing(IFileReader fileReader, IngestDataRequest request)
+    {
+        var ingestionSource = await fileReader.GetNextFile(includeContent: true);
+
+        var preprocessedContent = DoPreProcessing(request, ingestionSource.Name, ingestionSource.Content);
+
+        var chunks = await DoChunking(request, ingestionSource.Name, preprocessedContent);
+
+        ingestionSource.MetaData.SourceTotalChunkNumbers = chunks.Count - 1;
+        
+        await _postgreSqlService.SaveIngestionSource(ingestionSource);
+
+        ingestionSource.MetaData.Tags["source-id"] = ingestionSource.Id.ToString();
+
+        for (int j = 0; j < chunks.Count; j++)
+        {
+            var chunk = chunks[j];
+
+            var embedding = await _embeddingService.GetEmbeddings(chunk.EmbeddingContent);
+
+            ingestionSource.MetaData.SourceChunkNumber = j;
+
+            await _postgreSqlService.InsertData(request.DatabaseOptions!.TableName, chunk, embedding, ingestionSource.MetaData);
         }
     }
 

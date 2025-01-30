@@ -14,6 +14,9 @@ public class AzureBlobStorageFileHandler : IFileHandler
         _azureOptions = configuration.GetSection(AzureOptions.Azure).Get<AzureOptions>() 
             ?? throw new ArgumentNullException(nameof(AzureOptions));
 
+        ArgumentNullException.ThrowIfNullOrWhiteSpace(nameof(_azureOptions.FileStorageBlob.ConnectionString));
+        ArgumentNullException.ThrowIfNullOrWhiteSpace(nameof(_azureOptions.FileStorageBlob.RootContainerName));
+
         _blobContainerClient = new(_azureOptions.FileStorageBlob.ConnectionString, _azureOptions.FileStorageBlob.RootContainerName);
     }
 

@@ -1,6 +1,4 @@
-﻿using Shared.Extensions;
-using Shared.Extensions;
-using Shared.Models;
+﻿using Shared.Models;
 
 namespace Shared.Extensions;
 

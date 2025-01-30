@@ -10,5 +10,6 @@
         /// </summary>
         public IEnumerable<string> SelectedChunkers { get; set; } = ["ContextualChunker"];
         public bool DoPreProcessing { get; set; } = true;
+        public bool DoLocalIndexing { get; set; } = true;
     }
 }
