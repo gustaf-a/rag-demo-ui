@@ -8,5 +8,6 @@ public class AzureOptions
     public AzureServiceEndpoint SearchService { get; set; }
     public AzureServiceEndpoint EmbeddingService { get; set; }
     public AzureServiceQueue IndexingQueueInput { get; set; }
+    public AzureServiceQueue ComputerUseQueueStartTask { get; set; }
     public AzureServiceBlob FileStorageBlob { get; set; }
 }

@@ -50,6 +50,29 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     /// }  
     /// ```
     /// 
+    /// ## RAG chat request:
+    /// ```   
+    /// {
+    ///     "chatMessages": [
+    ///     {
+    ///         "role":"user",
+    ///         "content":  "How do I pair to my Nimbus headphones?"
+    ///     }
+    ///     ],
+    ///     "chatOptions":{},
+    ///     "searchOptions":
+    ///     { 
+    ///         "embeddingsTableName":"embeddings2",
+    ///         "itemsToRetrieve":3,
+    ///         "metaDataIncludeWhenContainsAny":
+    ///         { 
+    ///             "department":["Sales"],
+    ///             "accessLevel":["0","1","2"]
+    ///         }
+    ///     }
+    /// }
+    /// ```
+    /// 
     /// ## RAG chat request with 1 plugin:
     /// ```   
     /// {  
@@ -94,6 +117,27 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     /// } 
     /// ```
     /// 
+    /// ## Chat request with computer use plugin  
+    /// The ComputerUsePlugin sends a task to a queue. This can then be picked up by another computer running a computer use demo.
+    /// The computer demo is ubuntu and might not have access to a lot of programs.
+    /// 
+    /// ```
+    /// {  
+    ///    "chatMessages": [
+    ///    {  
+    ///        "role": "user",  
+    ///        "content": "Tell the computer to open a calculator and calculate 5 times 34."  
+    ///    }  
+    ///    ],
+    ///     "chatOptions": {  
+    ///        "temperature": 0.2,  
+    ///        "pluginsToUse": [
+    ///             "ComputerUsePlugin"
+    ///        ]  
+    ///    } 
+    /// } 
+    /// ```
+    /// 
     /// ## Chat request with search plugin and file plugin 
     /// Here the model decides first what to search for so the search is smarter in some ways.
     /// It's good to be extra clear that search needs to be done though.
@@ -117,8 +161,6 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     /// }
     /// ```
     /// 
-    /// 
-    /// 
     /// ## Chat request with search plugin letting model decide how to search for data
     /// This is less reliable as the model doesn't always understand when it needs to search for information.
     /// The good thing is that the model can make multiple searches for different things.
@@ -140,6 +182,7 @@ public class GenerationController(ILogger<GenerationController> _logger, IConfig
     ///    }  
     /// }
     /// ```
+    /// 
     /// There's a big risk here that the bot doesn't understand that it needs to search multiple times for different things.
     /// For example the search phrase could become "difference between sales" which will not do much.
     /// Which probably will not get anything useful.

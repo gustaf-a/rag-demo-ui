@@ -41,7 +41,8 @@ public class IngestionController(ILogger<IngestionController> _logger, IConfigur
     ///  },
     ///  "ingestFromAzureContainerOptions": {
     ///    "connectionString": "DefaultEndpointsProtocol=https;AccountName=[storage-account];AccountKey=[storage-account-key];EndpointSuffix=core.windows.net",
-    ///    "containerName": "[container-folder-name]"
+    ///    "rootContainerName": "rag-data-version-1",
+    ///    "subFolderPrefix": "version_1/product_development/engineering_2"
     ///  }
     ///}
     /// ```

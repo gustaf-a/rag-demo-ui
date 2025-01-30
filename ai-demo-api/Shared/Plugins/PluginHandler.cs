@@ -17,6 +17,9 @@ public class PluginHandler(IServiceProvider _serviceProvider) : IPluginHandler
         {
             switch (pluginName)
             {
+                case nameof(ComputerUsePlugin):
+                    kernel.Plugins.AddFromType<ComputerUsePlugin>(serviceProvider: _serviceProvider);
+                    break;
                 case nameof(DatePlugin):
                     kernel.Plugins.AddFromType<DatePlugin>();
                     break;

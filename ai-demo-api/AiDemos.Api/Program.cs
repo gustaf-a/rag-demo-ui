@@ -134,6 +134,9 @@ public class Program
         builder.Services.AddScoped<IPlugin, SearchDatabasePlugin>();
         builder.Services.AddScoped<IPlugin, TimePlugin>();
 
+        builder.Services.AddScoped<IPlugin, ComputerUsePlugin>();
+        builder.Services.AddScoped<IComputerUseService, ComputerUseService>();
+
         builder.Services.AddScoped<IPlugin, FilePlugin>();
         //builder.Services.AddScoped<IFileHandler, LocalFileHandler>(); //Used locally only
         builder.Services.AddScoped<IFileHandler, AzureBlobStorageFileHandler>();
